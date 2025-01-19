@@ -1,0 +1,13 @@
+[project]
+name = "comfyui-copilot"
+description = ""
+version = "1.0.0"
+license = { file = "LICENSE" }
+
+[project.urls]
+Repository = "https://github.com/ai-business-hql/comfyUIAgent"
+
+[tool.comfy]
+PublisherId = "weixuan11"
+DisplayName = "comfyui-copilot"
+Icon = ""
