@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { XIcon, TrashIcon } from './Icons';
+import { XIcon, TrashIcon, CogIcon } from './Icons';
 import { ApiKeyModal } from './ApiKeyModal';
 
 interface ChatHeaderProps {
@@ -26,9 +26,9 @@ export function ChatHeader({ onClose, onClear, hasMessages }: ChatHeaderProps) {
                 <h3 className="text-lg font-medium text-gray-800">copilot</h3>
                 <button
                     onClick={handleApiKeyClick}
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="p-1 hover:bg-gray-100 rounded text-gray-500"
                 >
-                    🔨
+                    <CogIcon className="h-5 w-5" />
                 </button>
             </div>
             <div className="flex items-center gap-1">

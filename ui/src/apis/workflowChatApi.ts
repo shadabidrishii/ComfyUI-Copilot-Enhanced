@@ -8,8 +8,8 @@ const BASE_URL = config.apiBaseUrl
 const getApiKey = () => {
     const apiKey = localStorage.getItem('chatApiKey');
     if (!apiKey) {
-        alert('API key is required. Please set your API key first.');
-        throw new Error('API key is required. Please set your API key first.');
+        // alert('API key is required. Please set your API key first.');
+        // throw new Error('API key is required. Please set your API key first.');
     }
     return apiKey;
 };
@@ -19,6 +19,14 @@ export namespace WorkflowChatAPI {
   export async function* streamInvokeServer(sessionId: string, prompt: string, images: File[] = [], intent: string | null = null, ext: any | null = null): AsyncGenerator<ChatResponse> {
     try {
       const apiKey = getApiKey();
+
+      if (!apiKey) {
+        yield {
+            text: 'API key is required. Please set your API key first.⚙',
+            finished: true
+        } as ChatResponse;
+        return;
+      }
       
       // Convert images to base64
       const imagePromises = (images || []).map(file => 
@@ -77,7 +85,7 @@ export namespace WorkflowChatAPI {
       }
     } catch (error) {
       console.error('Error in streamInvokeServer:', error);
-      alert(error instanceof Error ? error.message : 'An error occurred while streaming');
+      alert(error instanceof Error ? error.message : 'An error occurred while streaming, please refresh the page and try again.');
       throw error;
     }
   }
@@ -154,7 +162,7 @@ export namespace WorkflowChatAPI {
       const result = await response.json();
       if (!result.success) {
         const message = result.message || 'Failed to fetch messages';
-        alert(message);
+        alert(message + ', please refresh the page and try again.');
         throw new Error(message);
       }
 
@@ -177,7 +185,7 @@ export namespace WorkflowChatAPI {
       });
     } catch (error) {
       console.error('Error fetching messages:', error);
-      alert(error instanceof Error ? error.message : 'Failed to fetch messages');
+      alert(error instanceof Error ? error.message : 'Failed to fetch messages' + ', please refresh the page and try again.');
       throw error;
     }
   }
