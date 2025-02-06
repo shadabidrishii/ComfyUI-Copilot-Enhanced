@@ -90,6 +90,9 @@ export function ChatInput({
                 onChange={onChange}
                 onKeyDown={(e: KeyboardEvent) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
+                        if (e.nativeEvent.isComposing) {
+                            return;
+                        }
                         e.preventDefault();
                         onSend();
                     }

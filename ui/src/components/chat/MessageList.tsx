@@ -7,6 +7,7 @@ import { NodeRecommend } from "./messages/NodeRecommend";
 import { DownstreamSubgraphs } from "./messages/DownstreamSubgraphs";
 import { NodeInstallGuide } from "./messages/NodeInstallGuide";
 import { LoadingMessage } from "./messages/LoadingMessage";
+import { generateUUID } from "../../utils/uuid";
 
 interface MessageListProps {
     messages: Message[];
@@ -163,6 +164,18 @@ const renderMessage = (message: Message) => {
                                         }
                                     }
                                     app.graph.setDirtyCanvas(false, true);
+                                    // Add success message
+                                    const successMessage = {
+                                        id: generateUUID(),
+                                        role: 'tool',
+                                        content: JSON.stringify({
+                                            text: 'The workflow has been successfully loaded to the canvas',
+                                            ext: []
+                                        }),
+                                        format: 'markdown',
+                                        name: 'Assistant'
+                                    };
+                                    onAddMessage?.(successMessage);
                                 }
                             }}
                         />

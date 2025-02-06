@@ -43,9 +43,6 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                     nodeTypes.add(node.type);
                 }
                 
-                console.log('[WorkflowOption] Required node types:', Array.from(nodeTypes));
-                console.log('[WorkflowOption] Installed nodes:', installedNodes);
-                
                 const missingNodeTypes = Array.from(nodeTypes).filter(
                     type => !installedNodes.includes(type)
                 );
@@ -111,6 +108,19 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
             }
         }
         app.graph.setDirtyCanvas(false, true);
+
+        // Add success message
+        const successMessage = {
+            id: generateUUID(),
+            role: 'tool',
+            content: JSON.stringify({
+                text: 'The workflow has been successfully loaded to the canvas',
+                ext: []
+            }),
+            format: 'markdown',
+            name: 'Assistant'
+        };
+        onAddMessage?.(successMessage);
     };
     
     return (
@@ -132,17 +142,28 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                                         }}
                                     />
                                 )}
-                                <div className="flex-1 break-words flex flex-col justify-between">
+                                <div className="flex-1 break-words flex flex-col h-[4.5rem] justify-between">
                                     <div>
-                                        <h3 className="font-medium text-xs">{workflow.name}</h3>
-                                        {workflow.description && (
-                                            <p className="text-gray-600 text-xs">{workflow.description}</p>
-                                        )}
+                                        <h3 className="font-medium text-sm line-clamp-2 h-10 overflow-hidden">{workflow.name}</h3>
                                     </div>
-                                    <div className="flex justify-end mt-4">
+                                    <div className="flex justify-between items-center mt-1">
+                                        {workflow.description && (
+                                            <div className="relative group">
+                                                <div className="w-5 h-5 flex items-center justify-center text-gray-500 cursor-help">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                                                    </svg>
+                                                </div>
+                                                <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block">
+                                                    <div className="bg-gray-900 text-white text-xs rounded-md py-1 px-2 max-w-xs">
+                                                        {workflow.description}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                         <button
                                             onClick={() => handleAcceptWorkflow(workflow)}
-                                            className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
+                                            className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-xs"
                                         >
                                             Accept
                                         </button>

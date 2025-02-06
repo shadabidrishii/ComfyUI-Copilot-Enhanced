@@ -42,7 +42,7 @@ export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading }: Select
         <div className="mb-3 p-3 rounded-md bg-gray-50 border border-gray-200 
                       transform transition-all duration-200 hover:shadow-md">
             <div className="text-sm">
-                <p>node: {nodeInfo.type}</p>
+                <p>Selected node: {nodeInfo.type}</p>
                 <div className="flex gap-2 mt-2">
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-blue-50 
@@ -50,21 +50,21 @@ export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading }: Select
                                  duration-200 hover:shadow-sm active:scale-95"
                         onClick={() => onSendWithIntent('node_explain')}
                         disabled={loading}>
-                        Node Usage
+                        Usage
                     </button>
                     <button
                         className="px-3 py-1 text-xs rounded bg-green-100 
                                  hover:bg-green-200 text-green-700 transition-colors"
                         onClick={() => onSendWithIntent('node_params')}
                         disabled={loading}>
-                        Node Parameters
+                        Parameters
                     </button>
                     <button
                         className="px-3 py-1 text-xs rounded bg-purple-100 
                                  hover:bg-purple-200 text-purple-700 transition-colors"
                         onClick={() => onSendWithIntent('downstream_subgraph_search', getDownstreamSubgraphExt())}
                         disabled={loading}>
-                        Downstream Node Recommend
+                        Downstream Nodes
                     </button>
                 </div>
             </div>
