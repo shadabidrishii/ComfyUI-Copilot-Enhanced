@@ -46,6 +46,17 @@ export function ApiKeyModal({ isOpen, onClose, onSave, initialApiKey = '' }: Api
                         )}
                     </button>
                 </div>
+                <div className="mb-4 text-sm text-gray-600">
+                    <span>Don't have an API key? </span>
+                    <a 
+                        href="https://form.typeform.com/to/d1AaMgIL"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-600 underline"
+                    >
+                        Click here to request one
+                    </a>
+                </div>
                 <div className="flex justify-end gap-2">
                     <button
                         onClick={onClose}
