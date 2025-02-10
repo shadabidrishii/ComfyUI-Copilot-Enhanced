@@ -48,8 +48,11 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 - **Interactive Q&A Bot**: Access a robust Q&A platform where users can inquire about model intricacies, node details, and parameter utilization with ease.
 - **Natural Language Node Suggestions**: Employ our advanced search mechanism to swiftly identify desired nodes and enhance workflow construction efficacy.
+<img src="assets/comfycopilot_nodes_recommend.gif"/>
 - **Node Query System**: Dive deeper into nodes by exploring their explanations, parameter definitions, usage tips, and downstream workflow recommendations.
+<img src="assets/comfycopilot_nodes_search.gif"/>
 - **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
+<img src="assets/工作流检索.png"/>
 - **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
 - **Up-and-Coming Features**:
   
