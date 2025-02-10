@@ -1,5 +1,5 @@
-<p align="center">
 <div align="center">
+
 # 🚀 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
 
 <!-- Enhancing Image Generation Development with Smart Assistance -->
@@ -15,6 +15,7 @@
 
 </h4>
 
+
 👾 _**XXTeam**_
 
 🏢 [_**Your Organization**_](https://your-org-website.com)
@@ -22,7 +23,6 @@
 :octocat: [**Github**](https://github.com/your-repo/ComfyUI-Copilot) 📑  [**Documentation**](https://your-docs-link.com)
 
 </div>
-<p>
 ---
 
 🎥 [Promotional Video](#)
