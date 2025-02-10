@@ -1,5 +1,5 @@
 <p align="center">
-
+<div align="center">
 # 🚀 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
 
 <!-- Enhancing Image Generation Development with Smart Assistance -->
@@ -14,8 +14,6 @@
 <img src="https://img.shields.io/badge/python-3.10%2B-purple.svg" alt="Python">
 
 </h4>
-
-<div align="center">
 
 👾 _**XXTeam**_
 
