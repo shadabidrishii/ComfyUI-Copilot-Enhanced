@@ -1,5 +1,4 @@
 <p align="center">
-    <img src="assets/comfyui_copilot_logo.png" width="150" style="margin-bottom: 0.2;"/>
 
 # 🚀 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
 
