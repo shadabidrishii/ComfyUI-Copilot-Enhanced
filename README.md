@@ -17,7 +17,6 @@
 </h4>
 
 <div align="center">
-<p>
 
 👾 _**XXTeam**_
 
@@ -26,7 +25,7 @@
 :octocat: [**Github**](https://github.com/your-repo/ComfyUI-Copilot) 📑  [**Documentation**](https://your-docs-link.com)
 
 </div>
-
+<p>
 ---
 
 🎥 [Promotional Video](#)
