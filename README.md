@@ -20,7 +20,7 @@
 
 🏢 [_**Your Organization**_](https://your-org-website.com)
 
-:octocat: [**Github**](https://github.com/your-repo/ComfyUI-Copilot) 📑  [**Documentation**](https://your-docs-link.com)
+[**Github**](https://github.com/your-repo/ComfyUI-Copilot) 📑  [**Documentation**](https://your-docs-link.com)
 
 </div>
 ---
@@ -89,11 +89,6 @@ We welcome any form of contribution! Feel free to make issues, pull requests, or
 ## 📞 Contact Us
 
 For any queries or suggestions, please feel free to contact:
-
-- **李俊文(以澈)**
-- **杨雪(筛理)**
-- **胡卿莉(晴知)**
-- **吴子骄(璞珂)**
 
 ---
 
