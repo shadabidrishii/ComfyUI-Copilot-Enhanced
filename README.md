@@ -1,10 +1,9 @@
 <p align="center">
     <img src="assets/comfyui_copilot_logo.png" width="150" style="margin-bottom: 0.2;"/>
-<p>
 
 # 🚀 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
 
-<!-- Enhancing AI Development with Smart Assistance -->
+<!-- Enhancing Image Generation Development with Smart Assistance -->
 
 <h4 align="center">
 
@@ -18,6 +17,7 @@
 </h4>
 
 <div align="center">
+<p>
 
 👾 _**XXTeam**_
 
