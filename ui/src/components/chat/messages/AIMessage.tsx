@@ -116,7 +116,7 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
               {guides.map((guide: string, index: number) => (
                 <button
                   key={index}
-                  className="px-3 py-1.5 bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-xs w-full"
+                  className="px-3 py-1.5 bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-[12px] w-[calc(50%-0.25rem)]"
                   onClick={() => onOptionClick?.(guide)}
                 >
                   {guide}
