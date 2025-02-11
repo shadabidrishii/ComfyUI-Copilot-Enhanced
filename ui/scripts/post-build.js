@@ -17,28 +17,35 @@ files.forEach(file => {
     let content = fs.readFileSync(file, 'utf-8');
 
     if (content.includes('__vite__mapDeps')) {
-        // 提取原始依赖数组
-        const depsMatch = content.match(/__vite__mapDeps\.viteFileDeps = \[(.*?)\]/);
+        // 提取新格式的依赖数组，使用非贪婪匹配
+        const depsMatch = content.match(/const __vite__mapDeps=\(.*?m\.f=\[(.*?)\]/);
         if (depsMatch && depsMatch[1]) {
             const originalDeps = depsMatch[1];
-
-            // 替换函数实现
+            
+            // 替换为新的实现
             content = content.replace(
-                /function __vite__mapDeps\(indexes\) {[\s\S]*?return indexes\.map\(\(i\) => __vite__mapDeps\.viteFileDeps\[i\]\)\s*}/,
-                `function __vite__mapDeps(indexes) {
-          const apiBase = window.comfyAPI?.api?.api?.api_base;
-          const prefix = apiBase ? \`\${apiBase.substring(1)}/\` : '';
-          if (!__vite__mapDeps.viteFileDeps) {
-            __vite__mapDeps.viteFileDeps = [${originalDeps}].map(
-              path => \`\${prefix}\${path}\`
+                /const __vite__mapDeps=\(.*?\)=>i\.map\(i=>d\[i\]\);/,
+                `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[${originalDeps}])))=>i.map(i=>d[i]);`
             );
-          }
-          return indexes.map((i) => __vite__mapDeps.viteFileDeps[i]);
-        }`
-            );
+
+            // 如果文件中还没有路径转换逻辑，则添加
+            if (!content.includes('window.comfyAPI?.api?.api?.api_base')) {
+                content = content.replace(
+                    /const __vite__mapDeps=.*?m\.f=\[(.*?)\]/,
+                    `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[$1].map(path => {
+                        const apiBase = window.comfyAPI?.api?.api?.api_base;
+                        const prefix = apiBase ? \`\${apiBase.substring(1)}/\` : '';
+                        return \`\${prefix}\${path}\`;
+                    }))))`
+                );
+            }
 
             fs.writeFileSync(file, content, 'utf-8');
             console.log(`Modified ${path.basename(file)}`);
+        } else {
+            console.log(`No deps pattern found in ${path.basename(file)}`);
         }
+    } else {
+        console.log(`No __vite__mapDeps found in ${path.basename(file)}`);
     }
 }); 
