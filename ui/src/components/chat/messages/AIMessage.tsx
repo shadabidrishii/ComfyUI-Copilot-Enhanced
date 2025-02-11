@@ -93,7 +93,7 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
                     <img
                       {...props}
                       loading="lazy"
-                      className="max-w-full h-auto"
+                      className="w-1/2 h-auto mx-auto block" 
                       onError={(e) => {
                         console.warn('Image failed to load:', props.src, 'Error:', e);
                         e.currentTarget.style.display = 'none';
