@@ -20,7 +20,7 @@ export function NodeInstallGuide({ content, onLoadSubgraph }: NodeInstallGuidePr
                                  hover:shadow-sm transition-all duration-200"
                     >
                         <div className="flex flex-col">
-                            <h3 className="text-sm font-medium text-gray-800 mb-4">
+                            <h3 className="text-[12px] font-medium text-gray-800 mb-4">
                                 {node.name}
                             </h3>
                             <div className="flex justify-end">
