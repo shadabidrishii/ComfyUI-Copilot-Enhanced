@@ -25,7 +25,7 @@
 </div>
 ---
 
-🎥 [Promotional Video](#)
+�� [Promotional Video](https://youtu.be/uBllajp38_g)
 *_(Placeholder for a captivating introductory video demonstrating the capabilities and ease of use of ComfyUI-Copilot)._*
 
 ## 🌟 Introduction
