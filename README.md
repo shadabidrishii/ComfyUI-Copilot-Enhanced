@@ -25,8 +25,12 @@
 </div>
 ---
 
-�� [Promotional Video](https://youtu.be/uBllajp38_g)
-*_(Placeholder for a captivating introductory video demonstrating the capabilities and ease of use of ComfyUI-Copilot)._*
+<div align="center">
+    <video width="600" controls>
+        <source src="https://youtu.be/uBllajp38_g" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
 
 ## 🌟 Introduction
 
