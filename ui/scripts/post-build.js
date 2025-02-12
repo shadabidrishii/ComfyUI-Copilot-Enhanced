@@ -26,7 +26,7 @@ files.forEach(file => {
             if (!content.includes('window.comfyAPI?.api?.api?.api_base')) {
                 content = content.replace(
                     /const __vite__mapDeps=.*?\)=>i\.map\(i=>d\[i\]\);/,
-                    `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[$1].map(path => {
+                    `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[${originalDeps}].map(path => {
                         const apiBase = window.comfyAPI?.api?.api?.api_base;
                         const prefix = apiBase ? \`\${apiBase.substring(1)}/\` : '';
                         return \`\${prefix}\${path}\`;

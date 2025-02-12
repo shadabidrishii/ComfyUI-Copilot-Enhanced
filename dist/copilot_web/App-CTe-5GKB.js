@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[$1].map(path => {
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["copilot_web/workflowChat-2b2JOI-A.js","copilot_web/input.js","copilot_web/assets/input-BiPrIQoG.css"].map(path => {
                         const apiBase = window.comfyAPI?.api?.api?.api_base;
                         const prefix = apiBase ? `${apiBase.substring(1)}/` : '';
                         return `${prefix}${path}`;
