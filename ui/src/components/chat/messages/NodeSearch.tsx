@@ -105,7 +105,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                 onMouseEnter={() => setHoveredNode(node.name)}
                                 onMouseLeave={() => setHoveredNode(null)}
                             >
-                                <h3 className="text-sm font-medium text-gray-800 mb-4">
+                                <h3 className="text-[12px] font-medium text-gray-800 mb-4">
                                     {node.name}
                                 </h3>
                                 <div className="flex items-center justify-between text-[11px]">

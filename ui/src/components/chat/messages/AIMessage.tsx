@@ -93,12 +93,11 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
                     <img
                       {...props}
                       loading="lazy"
-                      className="max-w-full h-auto"
+                      className="w-1/2 h-auto mx-auto block" 
                       onError={(e) => {
-                        console.warn('Image failed to load:', props.src);
+                        console.warn('Image failed to load:', props.src, 'Error:', e);
                         e.currentTarget.style.display = 'none';
                       }}
-                      crossOrigin="anonymous"
                     />
                   ),
                 }}
@@ -117,7 +116,7 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
               {guides.map((guide: string, index: number) => (
                 <button
                   key={index}
-                  className="px-3 py-1.5 bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-xs w-full"
+                  className="px-3 py-1.5 bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-[12px] w-[calc(50%-0.25rem)]"
                   onClick={() => onOptionClick?.(guide)}
                 >
                   {guide}
