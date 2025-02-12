@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { DRAWER_Z_INDEX } from "./const";
+import { COPILOT_EVENTS } from "./constants/events";
 const WorkflowChat = React.lazy(() => import("./workflowChat/workflowChat"));
 
 export default function App() {
@@ -8,6 +9,18 @@ export default function App() {
   const [position, setPosition] = useState<{ x: number; y: number }>();
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [shouldTriggerUsage, setShouldTriggerUsage] = useState(false);
+
+  useEffect(() => {
+    const handleExplainNode = () => {
+      console.log("Explain node event received");
+      setShowChat(true);
+      setShouldTriggerUsage(true);
+    };
+
+    window.addEventListener(COPILOT_EVENTS.EXPLAIN_NODE, handleExplainNode);
+    return () => window.removeEventListener(COPILOT_EVENTS.EXPLAIN_NODE, handleExplainNode);
+  }, []);
 
   useEffect(() => {
     setPosition({
@@ -65,12 +78,22 @@ export default function App() {
       >
         <button 
           onMouseDown={handleMouseDown}
-          onClick={() => setShowChat(true)}
+          onClick={() => {
+            setShowChat(true);
+          }}
           className="px-4 py-2 border border-gray-300 rounded-md bg-white text-black hover:bg-green-600 transition-colors select-none"
         >
           copilot
         </button>
-        <WorkflowChat onClose={() => setShowChat(false)} visible={showChat} />
+        <WorkflowChat 
+          onClose={() => {
+            setShowChat(false);
+            setShouldTriggerUsage(false);
+          }}
+          visible={showChat}
+          triggerUsage={shouldTriggerUsage}
+          onUsageTriggered={() => setShouldTriggerUsage(false)}
+        />
       </div>
     </div>
   );

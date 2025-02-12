@@ -14,9 +14,11 @@ import React from "react";
 interface WorkflowChatProps {
     onClose?: () => void;
     visible?: boolean;
+    triggerUsage?: boolean;
+    onUsageTriggered?: () => void;
 }
 
-export default function WorkflowChat({ onClose, visible = true }: WorkflowChatProps) {
+export default function WorkflowChat({ onClose, visible = true, triggerUsage = false, onUsageTriggered }: WorkflowChatProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState<string>('');
     const [latestInput, setLatestInput] = useState<string>('');
@@ -284,6 +286,13 @@ export default function WorkflowChat({ onClose, visible = true }: WorkflowChatPr
             uploadedImages.forEach(image => URL.revokeObjectURL(image.preview));
         };
     }, [uploadedImages]);
+
+    useEffect(() => {
+        if (triggerUsage && onUsageTriggered) {
+            handleSendMessageWithIntent('node_explain');
+            onUsageTriggered();
+        }
+    }, [triggerUsage]);
 
     return (
         <div 
