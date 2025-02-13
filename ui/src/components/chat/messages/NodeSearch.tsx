@@ -5,6 +5,7 @@ import { app } from "../../../utils/comfyapp";
 import { BaseMessage } from './BaseMessage';
 import { useState } from 'react';
 import { ChatResponse, Node } from "../../../types/types";
+import { addNodeOnGraph } from "../../../utils/graphUtils";
 
 interface NodeSearchProps {
     content: string;
@@ -65,7 +66,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                         className="px-2 py-1 bg-blue-500 text-white rounded-md 
                                                  hover:bg-blue-600 transition-colors text-[10px] flex items-center gap-1"
                                         onClick={() => {
-                                            const addNode = app.addNodeOnGraph({ name: node.name });
+                                            const addNode = addNodeOnGraph(node.name);
                                             if (addNode) {
                                                 addNode.connect(node.from_index, addNode, node.to_index);
                                             }

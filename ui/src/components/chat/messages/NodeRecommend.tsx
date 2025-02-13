@@ -4,6 +4,7 @@
 import { app } from "../../../utils/comfyapp";
 import { useState } from 'react';
 import { ChatResponse, Node } from "../../../types/types";
+import { addNodeOnGraph } from "../../../utils/graphUtils";
 
 interface NodeRecommendProps {
     content: string;
@@ -38,7 +39,7 @@ export function NodeRecommend({ content, name = 'Assistant', avatar, installedNo
                                                 className="px-3 py-1.5 bg-blue-500 text-white rounded-md 
                                                          hover:bg-blue-600 transition-colors text-xs"
                                                 onClick={() => {
-                                                    const addNode = app.addNodeOnGraph({ name: node.name });
+                                                    const addNode = addNodeOnGraph(node.name);
                                                     if (addNode) {
                                                         const selectedNode = Object.values(app.canvas.selected_nodes)[0];
                                                         if (selectedNode) {

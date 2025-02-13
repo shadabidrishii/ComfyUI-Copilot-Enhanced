@@ -12,6 +12,7 @@ import { NodeInstallGuide } from "./messages/NodeInstallGuide";
 import { LoadingMessage } from "./messages/LoadingMessage";
 import { generateUUID } from "../../utils/uuid";
 import { app } from "../../utils/comfyapp";
+import { addNodeOnGraph } from "../../utils/graphUtils";
 
 interface MessageListProps {
     messages: Message[];
@@ -128,10 +129,7 @@ const renderMessage = (message: Message) => {
                                                         node.pos[0] + posEntryNew[0] - posEntryOld[0], 
                                                         node.pos[1] + posEntryNew[1] - posEntryOld[1]
                                                     ];
-                                                    nodeMap[node.id] = app.addNodeOnGraph(
-                                                        { name: node.type }, 
-                                                        {pos: nodePosNew}
-                                                    );
+                                                    nodeMap[node.id] = addNodeOnGraph(node.type, {pos: nodePosNew});
                                                 }
                                             }
                                         } finally {

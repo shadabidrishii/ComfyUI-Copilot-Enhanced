@@ -7,6 +7,7 @@ import { ChatResponse, Node, Subgraph } from "../../../types/types";
 import { Network } from 'vis-network';
 import { WorkflowChatAPI } from "../../../apis/workflowChatApi";
 import { generateUUID } from "../../../utils/uuid";
+import { addNodeOnGraph } from "../../../utils/graphUtils";
 
 interface DownstreamSubgraphsProps {
     content: string;
@@ -221,10 +222,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, insta
                         node.pos[0] + posEntryNew[0] - posEntryOld[0], 
                         node.pos[1] + posEntryNew[1] - posEntryOld[1]
                     ];
-                    nodeMap[node.id] = app.addNodeOnGraph(
-                        { name: node.type }, 
-                        {pos: nodePosNew}
-                    );
+                    nodeMap[node.id] = addNodeOnGraph(node.type, {pos: nodePosNew});
                 }
             }
             // 处理所有连接
