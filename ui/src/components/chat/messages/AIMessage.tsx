@@ -90,15 +90,17 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
                     return <pre className="text-xs bg-gray-100 rounded p-2 overflow-x-auto">{children}</pre>
                   },
                   img: ({ node, ...props }) => (
-                    <img
-                      {...props}
-                      loading="lazy"
-                      className="w-1/2 h-auto mx-auto block" 
-                      onError={(e) => {
-                        console.warn('Image failed to load:', props.src, 'Error:', e);
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
+                    <div className="w-1/2 mx-auto">
+                      <img
+                        {...props}
+                        loading="lazy"
+                        className="w-full h-auto block" 
+                        onError={(e) => {
+                          console.warn('Image failed to load:', props.src, 'Error:', e);
+                          e.currentTarget.style.opacity = '0';
+                        }}
+                      />
+                    </div>
                   ),
                 }}
               >
