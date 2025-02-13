@@ -23,10 +23,8 @@
 [**Github**](https://github.com/your-repo/ComfyUI-Copilot) 📑  [**Documentation**](https://your-docs-link.com)
 
 </div>
----
 
-🎥 [Promotional Video](#)
-*_(Placeholder for a captivating introductory video demonstrating the capabilities and ease of use of ComfyUI-Copilot)._*
+https://github.com/user-attachments/assets/3ee4c926-e551-408b-9daa-5201f47ea48c
 
 ## 🌟 Introduction
 
@@ -108,3 +106,9 @@ _(A visually engaging illustration or screenshot of ComfyUI-Copilot in action, h
 ---
 
 This refactored README not only enhances the technical prowess of ComfyUI-Copilot but also makes it more appealing and accessible to users. It strategically spots where visual aids could further engage viewers and clarifies the setup and utilization of the tool.
+
+<div align="center">
+    <img src="path/to/your/image.gif" alt="视频介绍" width="600" />
+</div>
+
+## 🌟 Introduction

@@ -22,21 +22,21 @@ files.forEach(file => {
         if (depsMatch && depsMatch[1]) {
             const originalDeps = depsMatch[1];
             
-            // 替换为新的实现
-            content = content.replace(
-                /const __vite__mapDeps=\(.*?\)=>i\.map\(i=>d\[i\]\);/,
-                `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[${originalDeps}])))=>i.map(i=>d[i]);`
-            );
-
             // 如果文件中还没有路径转换逻辑，则添加
             if (!content.includes('window.comfyAPI?.api?.api?.api_base')) {
                 content = content.replace(
-                    /const __vite__mapDeps=.*?m\.f=\[(.*?)\]/,
-                    `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[$1].map(path => {
+                    /const __vite__mapDeps=.*?\)=>i\.map\(i=>d\[i\]\);/,
+                    `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[${originalDeps}].map(path => {
                         const apiBase = window.comfyAPI?.api?.api?.api_base;
                         const prefix = apiBase ? \`\${apiBase.substring(1)}/\` : '';
                         return \`\${prefix}\${path}\`;
-                    }))))`
+                    }))))=>i.map(i=>d[i]);`
+                );
+            } else {
+                // 如果已经有路径转换逻辑，只替换依赖数组部分
+                content = content.replace(
+                    /const __vite__mapDeps=\(.*?\)=>i\.map\(i=>d\[i\]\);/,
+                    `const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[${originalDeps}])))=>i.map(i=>d[i]);`
                 );
             }
 
