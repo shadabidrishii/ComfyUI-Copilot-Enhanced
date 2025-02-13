@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 const isDevelopment = import.meta.env.MODE === 'development'
 
 const defaultApiBaseUrl = 'http://localhost:8000'

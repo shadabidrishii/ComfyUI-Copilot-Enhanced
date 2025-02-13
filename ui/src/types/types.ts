@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { EWorkflowPrivacy } from "./dbTypes";
 
 export type WorkspaceRoute =

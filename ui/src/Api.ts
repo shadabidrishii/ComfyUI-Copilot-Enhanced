@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { Table } from "./db-tables/WorkspaceDB";
 import type { ModelsListRespItem } from "./model-manager/types";
 import { api } from "./utils/comfyapp";
