@@ -14,6 +14,8 @@ interface ChatInputProps {
     onUploadImages: (files: FileList) => void;
     uploadedImages: UploadedImage[];
     onRemoveImage: (imageId: string) => void;
+    selectedModel: string;
+    onModelChange: (model: string) => void;
 }
 
 export interface UploadedImage {
@@ -34,6 +36,8 @@ export function ChatInput({
     onUploadImages,
     uploadedImages,
     onRemoveImage,
+    selectedModel,
+    onModelChange,
 }: ChatInputProps) {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -110,16 +114,35 @@ export function ChatInput({
                          duration-200 text-gray-700"
             />
 
-            {/* 上传图片按钮 */}
-            <button
-                type="button"
-                onClick={() => setShowUploadModal(true)}
-                className="absolute bottom-3 left-3 p-2 rounded-md text-gray-500 
-                         hover:bg-gray-100 hover:text-gray-600 transition-all duration-200">
-                <ImageIcon className="h-5 w-5" />
-            </button>
+            {/* Bottom toolbar */}
+            <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                {/* Model selector dropdown */}
+                <select
+                    value={selectedModel}
+                    onChange={(e) => onModelChange(e.target.value)}
+                    className="px-1.5 py-0.5 text-xs rounded-md 
+                             border border-gray-200 bg-white text-gray-700
+                             focus:outline-none focus:ring-2 focus:ring-blue-500
+                             focus:border-transparent hover:bg-gray-50
+                             transition-colors border-0"
+                >
+                    <option value="gpt-4o">gpt-4o</option>
+                    <option value="gpt-4o-mini">gpt-4o-mini</option>
+                    <option value="DeepSeek-V3">DeepSeek-V3</option>
+                </select>
 
-            {/* 发送按钮 */}
+                {/* Upload image button */}
+                <button
+                    type="button"
+                    onClick={() => setShowUploadModal(true)}
+                    className="p-1.5 text-gray-500 
+                             hover:bg-gray-100 hover:text-gray-600 
+                             transition-all duration-200 outline-none">
+                    <ImageIcon className="h-4 w-4" />
+                </button>
+            </div>
+
+            {/* Send button */}
             <button
                 type="submit"
                 onClick={onSend}

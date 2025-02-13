@@ -19,7 +19,13 @@ const getApiKey = () => {
 
 export namespace WorkflowChatAPI {
 
-  export async function* streamInvokeServer(sessionId: string, prompt: string, images: File[] = [], intent: string | null = null, ext: any | null = null): AsyncGenerator<ChatResponse> {
+  export async function* streamInvokeServer(
+    sessionId: string, 
+    prompt: string, 
+    images: File[] = [], 
+    intent: string | null = null, 
+    ext: any | null = null
+  ): AsyncGenerator<ChatResponse> {
     try {
       const apiKey = getApiKey();
 
@@ -42,6 +48,9 @@ export namespace WorkflowChatAPI {
       );
       
       const base64Images = await Promise.all(imagePromises);
+
+      // Handle ext parameter
+      let finalExt = ext ? (Array.isArray(ext) ? ext : [ext]) : [];
       
       const response = await fetch(`${BASE_URL}/api/chat/invoke`, {
         method: 'POST',
@@ -57,7 +66,7 @@ export namespace WorkflowChatAPI {
           prompt: prompt,
           mock: false,
           intent: intent,
-          ext: ext,
+          ext: finalExt,
           images: base64Images.map((base64, index) => ({
             filename: images[index].name,
             data: base64

@@ -33,6 +33,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const [width, setWidth] = useState(window.innerWidth / 3);
     const [isResizing, setIsResizing] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+    const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -124,10 +125,15 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         setInput("");
 
         try {
+            // Create ext array with model selection
+            const modelExt = { type: "model_select", data: [selectedModel] };
+            
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
                 input, 
-                uploadedImages.map(img => img.file)
+                uploadedImages.map(img => img.file),
+                null,  // intent
+                modelExt  // ext
             )) {
                 const aiMessage: Message = {
                     id: generateUUID(),
@@ -352,6 +358,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                         onUploadImages={handleUploadImages}
                         uploadedImages={uploadedImages}
                         onRemoveImage={handleRemoveImage}
+                        selectedModel={selectedModel}
+                        onModelChange={setSelectedModel}
                     />
                 </div>
             </div>
