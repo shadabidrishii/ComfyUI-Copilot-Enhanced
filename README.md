@@ -16,15 +16,13 @@
 </h4>
 
 
-👾 _**XXTeam**_
+👾 _**AIDC**_
 
-🏢 [_**Your Organization**_](https://your-org-website.com)
-
-[**Github**](https://github.com/your-repo/ComfyUI-Copilot) 📑  [**Documentation**](https://your-docs-link.com)
+[**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot) 📑  
 
 </div>
 
-https://github.com/user-attachments/assets/3ee4c926-e551-408b-9daa-5201f47ea48c
+<视频链接占位符>
 
 ## 🌟 Introduction
 
@@ -89,7 +87,7 @@ We welcome any form of contribution! Feel free to make issues, pull requests, or
 
 ## 📞 Contact Us
 
-For any queries or suggestions, please feel free to contact:
+For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@service.alibaba.com
 
 ---
 
@@ -106,9 +104,3 @@ _(A visually engaging illustration or screenshot of ComfyUI-Copilot in action, h
 ---
 
 This refactored README not only enhances the technical prowess of ComfyUI-Copilot but also makes it more appealing and accessible to users. It strategically spots where visual aids could further engage viewers and clarifies the setup and utilization of the tool.
-
-<div align="center">
-    <img src="path/to/your/image.gif" alt="视频介绍" width="600" />
-</div>
-
-## 🌟 Introduction
