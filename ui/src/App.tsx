@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React, { useRef, useState, useEffect } from "react";
 import { DRAWER_Z_INDEX } from "./const";
 import { COPILOT_EVENTS } from "./constants/events";

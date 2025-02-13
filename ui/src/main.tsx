@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { waitForApp } from "./utils/comfyapp.ts";

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { FC, memo } from 'react'
 import ReactMarkdown, { Options } from 'react-markdown'
 

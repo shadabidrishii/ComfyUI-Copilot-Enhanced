@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { app } from "../../../utils/comfyapp";
 import { useState } from 'react';
 import { ChatResponse, Node } from "../../../types/types";

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { useState } from 'react';
 import { XIcon, TrashIcon, CogIcon } from './Icons';
 import { ApiKeyModal } from './ApiKeyModal';

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Message } from "../types/types";
 import { WorkflowChatAPI } from "../apis/workflowChatApi";

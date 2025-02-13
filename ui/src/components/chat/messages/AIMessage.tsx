@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { MemoizedReactMarkdown } from "../../markdown";
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 export function generateUUID(): string {
     // 检查是否支持 crypto.randomUUID()
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {

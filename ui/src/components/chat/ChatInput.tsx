@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { SendIcon, ImageIcon, PlusIcon, XIcon } from './Icons';
 import React from 'react';

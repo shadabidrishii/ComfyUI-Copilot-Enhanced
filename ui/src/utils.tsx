@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { ESortTypes } from "./RecentFilesDrawer/types";
 import { userSettingsTable } from "./db-tables/WorkspaceDB";
 import { Workflow, EShortcutKeys, SortableItem } from "./types/dbTypes";
