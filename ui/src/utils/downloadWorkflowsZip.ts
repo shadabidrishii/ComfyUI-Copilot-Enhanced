@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { Workflow } from "../types/dbTypes";
 import { formatTimestamp } from "../utils";
 import JSZip from "JSZip";

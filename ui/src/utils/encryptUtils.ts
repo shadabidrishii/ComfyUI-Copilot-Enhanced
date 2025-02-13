@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 // utils/encryptUtils
 const defaultSalt = import.meta.env.VITE_SHARE_KEY_ENCODE_KEY;
 

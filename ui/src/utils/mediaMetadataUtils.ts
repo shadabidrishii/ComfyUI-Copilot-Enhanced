@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 export function getPngMetadata(file: File) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

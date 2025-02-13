@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 export const LEGACY_COMFYSPACE_TRACKING_FIELD_NAME = "comfyspace_tracking";
 export const COMFYSPACE_TRACKING_FIELD_NAME = "workspace_info";
 export const COMFYSPACE_AUTH_ENDPOINT = "comfyspace_auth";

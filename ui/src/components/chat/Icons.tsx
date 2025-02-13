@@ -1,3 +1,5 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
 export function SendIcon(props: any) {
     return (
         <svg

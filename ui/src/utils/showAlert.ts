@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import "./showAlert.css";
 
 // Function to show a modal alert

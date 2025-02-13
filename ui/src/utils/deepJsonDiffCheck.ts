@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 export const deepJsonDiffCheck = (oldData: any, newData: any) => {
   const oldDataNodes = oldData["nodes"] == null ? [] : oldData["nodes"];
   const newDataNodes = newData["nodes"] == null ? [] : newData["nodes"];

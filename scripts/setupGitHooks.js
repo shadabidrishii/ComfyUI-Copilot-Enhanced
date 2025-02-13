@@ -1,3 +1,7 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
+
 const fs = require('fs');
 const { exec } = require('child_process');
 const path = require('path');

@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import type { MODEL_TYPE } from "../model-manager/install-models/util/modelTypes";
 import { TopFieldType } from "../gallery/components/MetaBox/MetadataForm.tsx";
 

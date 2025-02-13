@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import { SearchHit } from "../model-manager/civitSearchTypes";
 import { isCivitModel } from "../model-manager/install-models/util/modelTypes";
 import { CivitiModel } from "../model-manager/types";
