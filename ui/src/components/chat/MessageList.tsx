@@ -8,6 +8,7 @@ import { DownstreamSubgraphs } from "./messages/DownstreamSubgraphs";
 import { NodeInstallGuide } from "./messages/NodeInstallGuide";
 import { LoadingMessage } from "./messages/LoadingMessage";
 import { generateUUID } from "../../utils/uuid";
+import { app } from "../../utils/comfyapp";
 
 interface MessageListProps {
     messages: Message[];
