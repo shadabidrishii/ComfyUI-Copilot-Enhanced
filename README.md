@@ -30,6 +30,10 @@ Welcome to **ComfyUI-Copilot**, an intelligent assistant built on the Comfy-UI f
 
 Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive node recommendations, workflow building aids, and model querying services to streamline your development process.
 
+<div align="center">
+<img src="assets/Framework.png"/>
+</div>
+
 ---
 
 ## 🤔 Why Choose ComfyUI-Copilot?
