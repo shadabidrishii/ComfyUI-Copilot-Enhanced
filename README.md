@@ -33,6 +33,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 <div align="center">
 <img src="assets/Framework.png"/>
 </div>
+![Framework](https://raw.githubusercontent.com/AIDC-AI/ComfyUI-Copilot/main/assets/Framework.png)
 
 ---
 
