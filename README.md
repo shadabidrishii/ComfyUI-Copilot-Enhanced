@@ -79,7 +79,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
    git clone http://gitlab.alibaba-inc.com/aidc-innovation/ComfyUI-Copilot.git
    ```
 2. **Activation**: After running the ComfyUI project, find the Copilot activation button at the top-right corner of the board to launch its service.
-3. **API Key Application**: For internal users, obtain the API key from the [access link](https://aidc-appsmith.alibaba-inc.com/app/comfyui-copilot-website/page1-677648e0b007d02d2b193eeb) and insert it on the Copilot settings page for uninterrupted ComfyUI-Copilot services.
+3. **API Key Application**: For internal users, obtain the API key from the [access link](https://form.typeform.com/to/tkg91K8D) and insert it on the Copilot settings page for uninterrupted ComfyUI-Copilot services.
 
 ---
 
