@@ -16,7 +16,7 @@
 </h4>
 
 
-👾 _**AIDC**_
+👾 _**Alibaba International Digital Commerce**_
 
 [**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot) 📑  
 
@@ -79,7 +79,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
    git clone https://github.com/AIDC-AI/ComfyUI-Copilot
    ```
 2. **Activation**: After running the ComfyUI project, find the Copilot activation button at the top-right corner of the board to launch its service.
-3. **API Key Application**: For internal users, obtain the API key from the [access link](https://aidc-appsmith.alibaba-inc.com/app/comfyui-copilot-website/page1-677648e0b007d02d2b193eeb) and insert it on the Copilot settings page for uninterrupted ComfyUI-Copilot services.
+
 
 ---
 
