@@ -22,7 +22,7 @@
 
 </div>
 
-<视频链接占位符>
+https://github.com/user-attachments/assets/527706d5-fbaf-40ac-9bab-e0d144c24454
 
 ## 🌟 Introduction
 
