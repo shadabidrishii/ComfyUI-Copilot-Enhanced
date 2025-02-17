@@ -1,3 +1,11 @@
+/*
+ * @Author: 晴知 qingli.hql@alibaba-inc.com
+ * @Date: 2024-12-12 21:28:03
+ * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
+ * @LastEditTime: 2025-02-17 19:34:17
+ * @FilePath: /comfyui_copilot/ui/src/components/chat/ApiKeyModal.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
@@ -52,7 +60,7 @@ export function ApiKeyModal({ isOpen, onClose, onSave, initialApiKey = '' }: Api
                 <div className="mb-4 text-sm text-gray-600">
                     <span>Don't have an API key? </span>
                     <a 
-                        href="https://form.typeform.com/to/d1AaMgIL"
+                        href="https://form.typeform.com/to/tkg91K8D"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-600 underline"
