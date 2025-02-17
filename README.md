@@ -22,7 +22,7 @@
 
 </div>
 
-https://github.com/user-attachments/assets/527706d5-fbaf-40ac-9bab-e0d144c24454
+https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 
 ## 🌟 Introduction
 
