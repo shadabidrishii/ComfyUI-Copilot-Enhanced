@@ -99,13 +99,3 @@ For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@ser
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/licenses/MIT) file for details.
-
----
-
-### [Image Placement Placeholder]
-
-_(A visually engaging illustration or screenshot of ComfyUI-Copilot in action, highlighting its interface and showcasing user interaction.)_
-
----
-
-This refactored README not only enhances the technical prowess of ComfyUI-Copilot but also makes it more appealing and accessible to users. It strategically spots where visual aids could further engage viewers and clarifies the setup and utilization of the tool.
