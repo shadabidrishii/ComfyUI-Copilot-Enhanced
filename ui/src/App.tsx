@@ -4,6 +4,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { DRAWER_Z_INDEX } from "./const";
 import { COPILOT_EVENTS } from "./constants/events";
+import logoImage from '../../assets/logo.png'; 
 const WorkflowChat = React.lazy(() => import("./workflowChat/workflowChat"));
 
 export default function App() {
@@ -84,9 +85,15 @@ export default function App() {
           onClick={() => {
             setShowChat(true);
           }}
-          className="px-4 py-2 border border-gray-300 rounded-md bg-white text-black hover:bg-green-600 transition-colors select-none w-32"
+          className="px-2 py-1 border border-gray-300 rounded-md bg-white text-black hover:bg-blue-300 hover:font-bold transition-colors select-none w-40 flex items-center space-x-1"
+          style={{ marginLeft: "-40px" }}
         >
-          Copilot
+          <img 
+            src={logoImage}
+            alt="ComfyUI-Copilot Logo" 
+            className="h-8 w-8"
+          />
+          <span className="text-[14px] font-medium text-gray-800">ComfyUI-Copilot</span>
         </button>
         <WorkflowChat 
           onClose={() => {

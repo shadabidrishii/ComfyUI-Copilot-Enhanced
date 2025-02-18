@@ -1,9 +1,18 @@
+/*
+ * @Author: 晴知 qingli.hql@alibaba-inc.com
+ * @Date: 2024-11-28 10:19:07
+ * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
+ * @LastEditTime: 2025-02-17 17:35:17
+ * @FilePath: /comfyui_copilot/ui/src/components/chat/ChatHeader.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
 import { useState } from 'react';
 import { XIcon, TrashIcon, CogIcon } from './Icons';
 import { ApiKeyModal } from './ApiKeyModal';
+import logoImage from '../../../../assets/logo.png';
 
 interface ChatHeaderProps {
     onClose?: () => void;
@@ -26,7 +35,12 @@ export function ChatHeader({ onClose, onClear, hasMessages }: ChatHeaderProps) {
         <div className="flex items-center justify-between border-b px-4 py-3 
                         bg-white border-gray-200 sticky top-0 z-10">
             <div className="flex items-center space-x-2">
-                <h3 className="text-lg font-medium text-gray-800">copilot</h3>
+                <img 
+                    src={logoImage}
+                    alt="ComfyUI-Copilot Logo" 
+                    className="h-12 w-12 -ml-2"
+                />
+                <h3 className="text-[16px] font-medium text-gray-800">ComfyUI-Copilot</h3>
                 <button
                     onClick={handleApiKeyClick}
                     className="p-1 hover:bg-gray-100 rounded text-gray-500"

@@ -52,12 +52,12 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                 onMouseEnter={() => setHoveredNode(node.name)}
                                 onMouseLeave={() => setHoveredNode(null)}
                             >
-                                <h3 className="text-sm font-medium text-gray-800 mb-4">
+                                <h3 className="text-[12px] font-medium text-gray-800 mb-4">
                                     {node.name}
                                 </h3>
                                 <div className="flex items-center justify-between text-[11px]">
                                     <div className="flex items-center gap-1 text-gray-600">
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 .25a.75.75 0 0 1 .673.418l3.058 6.197 6.839.994a.75.75 0 0 1 .415 1.279l-4.948 4.823 1.168 6.811a.75.75 0 0 1-1.088.791L12 18.347l-6.117 3.216a.75.75 0 0 1-1.088-.79l1.168-6.812-4.948-4.823a.75.75 0 0 1 .416-1.28l6.838-.993L11.327.668A.75.75 0 0 1 12 .25z"/>
                                         </svg>
                                         <span>{formatNumber(node.github_stars || 0)}</span>

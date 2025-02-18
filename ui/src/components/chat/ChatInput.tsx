@@ -107,15 +107,17 @@ export function ChatInput({
                 }}
                 value={input}
                 placeholder="Type your message..."
-                className="w-full min-h-[80px] resize-none rounded-md border 
-                         border-gray-200 px-3 py-2 pr-12 text-sm shadow-sm 
+                className="w-full min-h-[80px] max-h-[400px] resize-none rounded-md border 
+                         border-gray-200 px-3 py-2 pr-12 pb-10 text-sm shadow-sm 
                          focus:outline-none focus:ring-2 focus:ring-blue-500 
                          focus:border-transparent bg-white transition-all 
-                         duration-200 text-gray-700"
+                         duration-200 text-gray-700 overflow-y-auto"
+                style={{ height: 'auto' }}
             />
 
             {/* Bottom toolbar */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-2">
+            <div className="absolute bottom-2 left-3 right-12 flex items-center gap-2 
+                          bg-white border-t border-gray-100 pt-1">
                 {/* Model selector dropdown */}
                 <select
                     value={selectedModel}

@@ -9,20 +9,20 @@
 <div align="center">
 <img src="https://img.shields.io/badge/Version-1.0.0-blue.svg" alt="Version"> 
 <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-<img src="https://img.shields.io/github/stars/your-repo/ComfyUI-Copilot?color=yellow" alt="Stars">
-<img src="https://img.shields.io/github/issues/your-repo/ComfyUI-Copilot?color=red" alt="Issues">
+<img src="https://img.shields.io/github/stars/AIDC-AI/ComfyUI-Copilot?color=yellow" alt="Stars">
+<img src="https://img.shields.io/github/issues/AIDC-AI/ComfyUI-Copilot?color=red" alt="Issues">
 <img src="https://img.shields.io/badge/python-3.10%2B-purple.svg" alt="Python">
 
 </h4>
 
 
-👾 _**Alibaba International Digital Commerce**_
+👾 _**AIDC**_
 
 [**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot) 📑  
 
 </div>
 
-https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
+<视频链接占位符>
 
 ## 🌟 Introduction
 
@@ -33,7 +33,6 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 <div align="center">
 <img src="assets/Framework.png"/>
 </div>
-
 
 ---
 
@@ -64,23 +63,23 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ## 🚀 Getting Started
 
-**Repository Overview**: Visit the [GitHub Repository](https://github.com/AIDC-AI/ComfyUI-Copilot) to access the complete codebase.
+**Repository Overview**: Visit the [GitHub Repository](https://code.alibaba-inc.com/aidc-innovation/ComfyUI-Copilot) to access the complete codebase.
 
 1. **Installation**:
    
    ```bash
    cd ComfyUI/custom_nodes
-   git clone git@github.com:AIDC-AI/ComfyUI-Copilot.git
+   git clone git@gitlab.alibaba-inc.com:aidc-innovation/ComfyUI-Copilot.git
    ```
    
    or
    
    ```bash
    cd ComfyUI/custom_nodes
-   git clone https://github.com/AIDC-AI/ComfyUI-Copilot
+   git clone http://gitlab.alibaba-inc.com/aidc-innovation/ComfyUI-Copilot.git
    ```
 2. **Activation**: After running the ComfyUI project, find the Copilot activation button at the top-right corner of the board to launch its service.
-
+3. **API Key Application**: For internal users, obtain the API key from the [access link](https://form.typeform.com/to/tkg91K8D) and insert it on the Copilot settings page for uninterrupted ComfyUI-Copilot services.
 
 ---
 
