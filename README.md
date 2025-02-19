@@ -81,7 +81,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
    ```
 2. **Activation**: After running the ComfyUI project, find the Copilot activation button at the top-right corner of the board to launch its service.
 <img src="assets/start.png"/>
-3.  **KeyGeneration**：Enter your name and email address on the link, and the api-key will automatically be sent to your email address later.
+3.  **KeyGeneration**：Enter your email address on the link, the api-key will automatically be sent to your email address later.
     
 <img src="assets/keygen.png"/>
 ---
