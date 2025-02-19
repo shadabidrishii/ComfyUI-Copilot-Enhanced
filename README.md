@@ -18,7 +18,7 @@
 
 👾 _**Alibaba International Digital Commerce**_
 
-[**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot) 📑  
+:octocat: [**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot)
 
 </div>
 
