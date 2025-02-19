@@ -16,7 +16,7 @@
 </h4>
 
 
-👾 _**Alibaba International Digital Commerce**_
+👾 _**Alibaba International Digital Commerce**_ 👾
 
 :octocat: [**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot)
 
@@ -39,26 +39,26 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ## 🤔 Why Choose ComfyUI-Copilot?
 
-- 🍀**Ease of Use**: Lower the barriers to entry with natural language interaction, making Comfy-UI accessible even for beginners.
-- 🍀**Smart Recommendations**: Leverage AI-driven node suggestions and workflow implementations to boost development efficiency.
-- 🍀**Real-Time Assistance**: Benefit from round-the-clock interactive support to address any issues encountered during development.
+- 🍀 **Ease of Use**: Lower the barriers to entry with natural language interaction, making Comfy-UI accessible even for beginners.
+- 🍀 **Smart Recommendations**: Leverage AI-driven node suggestions and workflow implementations to boost development efficiency.
+- 🍀 **Real-Time Assistance**: Benefit from round-the-clock interactive support to address any issues encountered during development.
 
 ---
 
 ## 🔥 Core Features
 
-- **Interactive Q&A Bot**: Access a robust Q&A platform where users can inquire about model intricacies, node details, and parameter utilization with ease.
-- **Natural Language Node Suggestions**: Employ our advanced search mechanism to swiftly identify desired nodes and enhance workflow construction efficacy.
+- 💎 **Interactive Q&A Bot**: Access a robust Q&A platform where users can inquire about model intricacies, node details, and parameter utilization with ease.
+- 💎 **Natural Language Node Suggestions**: Employ our advanced search mechanism to swiftly identify desired nodes and enhance workflow construction efficacy.
 <img src="assets/comfycopilot_nodes_recommend.gif"/>
 
-- **Node Query System**: Dive deeper into nodes by exploring their explanations, parameter definitions, usage tips, and downstream workflow recommendations.
+- 💎 **Node Query System**: Dive deeper into nodes by exploring their explanations, parameter definitions, usage tips, and downstream workflow recommendations.
 <img src="assets/comfycopilot_nodes_search.gif"/>
 
-- **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
+- 💎 **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
 <img src="assets/工作流检索.png"/>
 
-- **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
-- **Up-and-Coming Features**:
+- 💎 **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
+- 💎 **Up-and-Coming Features**:
   
   - **Automated Parameter Tuning**: Exploit machine learning algorithms for seamless analysis and optimization of critical workflow parameters.
   - **Error Diagnosis and Fix Suggestions**: Receive comprehensive error insights and corrective advice to swiftly pinpoint and resolve issues.
@@ -84,6 +84,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
    ```
 2. **Activation**: After running the ComfyUI project, find the Copilot activation button at the top-right corner of the board to launch its service.
 <img src="assets/start.png"/>
+
 3.  **KeyGeneration**：Enter your name and email address on the link, and the api-key will automatically be sent to your email address later.
     
 <img src="assets/keygen.png"/>
