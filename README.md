@@ -9,8 +9,8 @@
 <div align="center">
 <img src="https://img.shields.io/badge/Version-1.0.0-blue.svg" alt="Version"> 
 <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-<img src="https://img.shields.io/github/stars/your-repo/ComfyUI-Copilot?color=yellow" alt="Stars">
-<img src="https://img.shields.io/github/issues/your-repo/ComfyUI-Copilot?color=red" alt="Issues">
+<img src="https://img.shields.io/github/stars/AIDC-AI/ComfyUI-Copilot?color=yellow" alt="Stars">
+<img src="https://img.shields.io/github/issues/AIDC-AI/ComfyUI-Copilot?color=red" alt="Issues">
 <img src="https://img.shields.io/badge/python-3.10%2B-purple.svg" alt="Python">
 
 </h4>
