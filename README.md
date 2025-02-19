@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
+# 🎯 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
 
 <!-- Enhancing Image Generation Development with Smart Assistance -->
 
@@ -9,16 +9,16 @@
 <div align="center">
 <img src="https://img.shields.io/badge/Version-1.0.0-blue.svg" alt="Version"> 
 <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
-<img src="https://img.shields.io/github/stars/your-repo/ComfyUI-Copilot?color=yellow" alt="Stars">
-<img src="https://img.shields.io/github/issues/your-repo/ComfyUI-Copilot?color=red" alt="Issues">
+<img src="https://img.shields.io/github/stars/AIDC-AI/ComfyUI-Copilot?color=yellow" alt="Stars">
+<img src="https://img.shields.io/github/issues/AIDC-AI/ComfyUI-Copilot?color=red" alt="Issues">
 <img src="https://img.shields.io/badge/python-3.10%2B-purple.svg" alt="Python">
 
 </h4>
 
 
-👾 _**Alibaba International Digital Commerce**_
+👾 _**Alibaba International Digital Commerce**_ 👾
 
-[**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot) 📑  
+:octocat: [**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot)
 
 </div>
 
@@ -39,23 +39,26 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ## 🤔 Why Choose ComfyUI-Copilot?
 
-- **Ease of Use**: Lower the barriers to entry with natural language interaction, making Comfy-UI accessible even for beginners.
-- **Smart Recommendations**: Leverage AI-driven node suggestions and workflow implementations to boost development efficiency.
-- **Real-Time Assistance**: Benefit from round-the-clock interactive support to address any issues encountered during development.
+- 🍀 **Ease of Use**: Lower the barriers to entry with natural language interaction, making Comfy-UI accessible even for beginners.
+- 🍀 **Smart Recommendations**: Leverage AI-driven node suggestions and workflow implementations to boost development efficiency.
+- 🍀 **Real-Time Assistance**: Benefit from round-the-clock interactive support to address any issues encountered during development.
 
 ---
 
-## ⚙️ Core Features
+## 🔥 Core Features
 
-- **Interactive Q&A Bot**: Access a robust Q&A platform where users can inquire about model intricacies, node details, and parameter utilization with ease.
-- **Natural Language Node Suggestions**: Employ our advanced search mechanism to swiftly identify desired nodes and enhance workflow construction efficacy.
+- 💎 **Interactive Q&A Bot**: Access a robust Q&A platform where users can inquire about model intricacies, node details, and parameter utilization with ease.
+- 💎 **Natural Language Node Suggestions**: Employ our advanced search mechanism to swiftly identify desired nodes and enhance workflow construction efficacy.
 <img src="assets/comfycopilot_nodes_recommend.gif"/>
-- **Node Query System**: Dive deeper into nodes by exploring their explanations, parameter definitions, usage tips, and downstream workflow recommendations.
+
+- 💎 **Node Query System**: Dive deeper into nodes by exploring their explanations, parameter definitions, usage tips, and downstream workflow recommendations.
 <img src="assets/comfycopilot_nodes_search.gif"/>
-- **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
+
+- 💎 **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
 <img src="assets/工作流检索.png"/>
-- **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
-- **Up-and-Coming Features**:
+
+- 💎 **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
+- 💎 **Up-and-Coming Features**:
   
   - **Automated Parameter Tuning**: Exploit machine learning algorithms for seamless analysis and optimization of critical workflow parameters.
   - **Error Diagnosis and Fix Suggestions**: Receive comprehensive error insights and corrective advice to swiftly pinpoint and resolve issues.
@@ -81,9 +84,15 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
    ```
 2. **Activation**: After running the ComfyUI project, find the Copilot activation button at the top-right corner of the board to launch its service.
 <img src="assets/start.png"/>
+<<<<<<< HEAD
 3.  **KeyGeneration**：Enter your email address on the link, the api-key will automatically be sent to your email address later.
+=======
+
+3.  **KeyGeneration**：Enter your name and email address on the link, and the api-key will automatically be sent to your email address later.
+>>>>>>> 62f0878737649971dd8c5e71c3c44e2328a38e74
     
 <img src="assets/keygen.png"/>
+
 ---
 
 ## 🤝 Contributions
@@ -94,10 +103,10 @@ We welcome any form of contribution! Feel free to make issues, pull requests, or
 
 ## 📞 Contact Us
 
-For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@service.alibaba.com
+For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@service.alibaba.com.
 
 ---
 
-## 📄 License
+## 📚 License
 
 This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/licenses/MIT) file for details.
