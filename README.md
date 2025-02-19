@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
+# 🎯 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
 
 <!-- Enhancing Image Generation Development with Smart Assistance -->
 
@@ -45,7 +45,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ---
 
-## ⚙️ Core Features
+## 🔥 Core Features
 
 - **Interactive Q&A Bot**: Access a robust Q&A platform where users can inquire about model intricacies, node details, and parameter utilization with ease.
 - **Natural Language Node Suggestions**: Employ our advanced search mechanism to swiftly identify desired nodes and enhance workflow construction efficacy.
@@ -98,6 +98,6 @@ For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@ser
 
 ---
 
-## 📄 License
+## 📚 License
 
 This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/licenses/MIT) file for details.
