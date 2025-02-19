@@ -87,6 +87,7 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 3.  **KeyGeneration**：Enter your name and email address on the link, and the api-key will automatically be sent to your email address later.
     
 <img src="assets/keygen.png"/>
+
 ---
 
 ## 🤝 Contributions
@@ -97,7 +98,7 @@ We welcome any form of contribution! Feel free to make issues, pull requests, or
 
 ## 📞 Contact Us
 
-For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@service.alibaba.com
+For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@service.alibaba.com.
 
 ---
 
