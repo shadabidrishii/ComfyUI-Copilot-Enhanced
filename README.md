@@ -39,9 +39,9 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ## 🤔 Why Choose ComfyUI-Copilot?
 
-- **Ease of Use**: Lower the barriers to entry with natural language interaction, making Comfy-UI accessible even for beginners.
-- **Smart Recommendations**: Leverage AI-driven node suggestions and workflow implementations to boost development efficiency.
-- **Real-Time Assistance**: Benefit from round-the-clock interactive support to address any issues encountered during development.
+- 🍀**Ease of Use**: Lower the barriers to entry with natural language interaction, making Comfy-UI accessible even for beginners.
+- 🍀**Smart Recommendations**: Leverage AI-driven node suggestions and workflow implementations to boost development efficiency.
+- 🍀**Real-Time Assistance**: Benefit from round-the-clock interactive support to address any issues encountered during development.
 
 ---
 
