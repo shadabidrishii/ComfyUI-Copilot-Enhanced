@@ -1,6 +1,6 @@
 [project]
 name = "ComfyUI-Copilot"
-description = ""
+description = "Your Intelligent Assistant for Comfy-UI."
 version = "1.0.1"
 license = {file = "LICENSE"}
 
