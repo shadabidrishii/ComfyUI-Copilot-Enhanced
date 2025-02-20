@@ -82,8 +82,9 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
    cd ComfyUI/custom_nodes
    git clone https://github.com/AIDC-AI/ComfyUI-Copilot
    ```
-   
+
    or
+   
    **Using ComfyUI Manager**: Open ComfyUI Manager, click on Custom Nodes Manager, search for ComfyUI-Copilot, and click the install button.
    <img src="assets/comfyui_manager.png"/>
    <img src="assets/comfyui_manager_install.png"/>
