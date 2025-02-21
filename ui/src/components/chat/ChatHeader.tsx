@@ -1,8 +1,8 @@
 /*
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2024-11-28 10:19:07
- * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
- * @LastEditTime: 2025-02-17 17:35:17
+ * @LastEditors: ai-business-hql ai-business-hql@gmail.com
+ * @LastEditTime: 2025-02-21 16:48:40
  * @FilePath: /comfyui_copilot/ui/src/components/chat/ChatHeader.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -51,16 +51,14 @@ export function ChatHeader({ onClose, onClear, hasMessages }: ChatHeaderProps) {
             <div className="flex items-center gap-1">
                 <button
                     className="inline-flex items-center justify-center rounded-md p-2 
-                             text-gray-500 hover:bg-gray-100 hover:text-gray-600 
-                             disabled:opacity-50 transition-colors duration-200"
+                             text-gray-500 hover:bg-gray-100"
                     disabled={!hasMessages}
                     onClick={onClear}>
                     <TrashIcon className="h-5 w-5" />
                 </button>
                 <button
                     className="inline-flex items-center justify-center rounded-md p-2 
-                             text-gray-500 hover:bg-gray-100 hover:text-gray-600 
-                             transition-colors duration-200"
+                             text-gray-500 hover:bg-gray-100"
                     onClick={onClose}>
                     <XIcon className="h-5 w-5" />
                 </button>

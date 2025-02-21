@@ -1,8 +1,8 @@
 /*
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2025-02-17 20:53:45
- * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
- * @LastEditTime: 2025-02-20 18:11:08
+ * @LastEditors: ai-business-hql ai-business-hql@gmail.com
+ * @LastEditTime: 2025-02-21 17:06:35
  * @FilePath: /comfyui_copilot/ui/src/components/chat/SelectedNodeInfo.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -50,29 +50,27 @@ function getDownstreamSubgraphExt() {
 
 export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading }: SelectedNodeInfoProps) {
     return (
-        <div className="mb-3 p-3 rounded-md bg-gray-50 border border-gray-200 
-                      transform transition-all duration-200 hover:shadow-md">
-            <div className="text-sm">
+        <div className="mb-3 p-3 rounded-md bg-gray-50 border border-gray-200">
+            <div className="text-sm text-gray-700">
                 <p>Selected node: {nodeInfo.type}</p>
                 <div className="flex gap-2 mt-2">
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-blue-50 
-                                 hover:bg-blue-100 text-blue-700 transition-all 
-                                 duration-200 hover:shadow-sm active:scale-95"
+                                 text-blue-700 hover:bg-blue-100"
                         onClick={() => onSendWithIntent('node_explain')}
                         disabled={loading}>
                         Usage
                     </button>
                     <button
                         className="px-3 py-1 text-xs rounded bg-green-100 
-                                 hover:bg-green-200 text-green-700 transition-colors"
+                                 text-green-700 hover:bg-green-200"
                         onClick={() => onSendWithIntent('node_params')}
                         disabled={loading}>
                         Parameters
                     </button>
                     <button
                         className="px-3 py-1 text-xs rounded bg-purple-100 
-                                 hover:bg-purple-200 text-purple-700 transition-colors"
+                                 text-purple-700 hover:bg-purple-200"
                         onClick={() => onSendWithIntent('downstream_subgraph_search', getDownstreamSubgraphExt())}
                         disabled={loading}>
                         Downstream Nodes

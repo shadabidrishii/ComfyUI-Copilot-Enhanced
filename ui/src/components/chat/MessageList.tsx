@@ -38,8 +38,10 @@ const DownstreamSubgraphs = lazy(() => import('./messages/DownstreamSubgraphs').
 const NodeInstallGuide = lazy(() => import('./messages/NodeInstallGuide').then(m => ({ default: m.NodeInstallGuide })));
 
 export function MessageList({ messages, latestInput, onOptionClick, installedNodes, onAddMessage, loading }: MessageListProps) {
-    const renderMessage = (message: Message) => {
-        console.log('[MessageList] Rendering message:', message);
+    // 使用useMemo缓存renderMessage函数
+    const renderMessage = React.useMemo(() => (message: Message) => {
+        // 移除频繁的日志输出
+        // console.log('[MessageList] Rendering message:', message);
         
         if (message.role === 'user') {
             return <UserMessage 
@@ -54,7 +56,8 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
             
             try {
                 const response = JSON.parse(message.content);
-                console.log('[MessageList] Parsed message content:', response);
+                // 移除频繁的日志输出
+                // console.log('[MessageList] Parsed message content:', response);
                 
                 // 获取扩展类型
                 const workflowExt = response.ext?.find(item => item.type === 'workflow');
@@ -63,13 +66,14 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                 const downstreamSubgraphsExt = response.ext?.find(item => item.type === 'downstream_subgraph_search');
                 const nodeInstallGuideExt = response.ext?.find(item => item.type === 'node_install_guide');
                 
-                console.log('[MessageList] Found extensions:', {
-                    workflowExt,
-                    nodeExt,
-                    nodeRecommendExt,
-                    downstreamSubgraphsExt,
-                    nodeInstallGuideExt
-                });
+                // 移除频繁的日志输出
+                // console.log('[MessageList] Found extensions:', {
+                //     workflowExt,
+                //     nodeExt,
+                //     nodeRecommendExt,
+                //     downstreamSubgraphsExt,
+                //     nodeInstallGuideExt
+                // });
 
                 // 根据扩展类型添加对应组件
                 let ExtComponent = null;
@@ -244,11 +248,17 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
         }
 
         return null;
-    };
+    }, []); // 依赖项为空数组，因为函数内部没有使用任何外部变量
+
+    // 使用useMemo缓存消息列表
+    const messageElements = React.useMemo(() => 
+        messages?.map(renderMessage),
+        [messages, renderMessage]
+    );
 
     return (
         <div className="flex flex-col gap-4 w-full">
-            {messages?.map(renderMessage)}
+            {messageElements}
             {loading && <LoadingMessage />}
         </div>
     );

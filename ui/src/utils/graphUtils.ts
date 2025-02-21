@@ -6,6 +6,23 @@ import { app } from "./comfyapp";
 
 export function addNodeOnGraph(type: string, options: any = {}) {
     const node = LiteGraph.createNode(type, "", options);
+    
+    // 只在没有指定位置时，才设置节点到中心位置
+    if (!options.pos) {
+        // 获取画布的可视区域大小
+        const rect = app.canvas.canvas.getBoundingClientRect();
+        
+        // 计算画布中心点
+        const centerX = (rect.width / 2) / app.canvas.ds.scale + (-app.canvas.ds.offset[0]) / app.canvas.ds.scale;
+        const centerY = (rect.height / 2) / app.canvas.ds.scale + (-app.canvas.ds.offset[1]) / app.canvas.ds.scale;
+        
+        // 设置节点位置到画布中心
+        node.pos = [
+            centerX - node.size[0] / 2,
+            centerY - node.size[1] / 2
+        ];
+    }
+    
     app.graph.add(node);
     return node;
 }

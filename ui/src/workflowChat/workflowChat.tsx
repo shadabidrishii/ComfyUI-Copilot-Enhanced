@@ -13,6 +13,7 @@ import { generateUUID } from "../utils/uuid";
 import { getInstalledNodes, getObjectInfo } from "../apis/comfyApiCustom";
 import { UploadedImage } from '../components/chat/ChatInput';
 import React from "react";
+import { debounce } from "lodash";
 
 interface WorkflowChatProps {
     onClose?: () => void;
@@ -73,38 +74,83 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     }, []);
 
-    useEffect(() => {
-        const handleNodeSelection = () => {
-            const selectedNodes = app.canvas.selected_nodes;
-            if (Object.keys(selectedNodes ?? {}).length) {
-                // Object.values(app.canvas.selected_nodes)[0].comfyClass
-                const nodeInfo = Object.values(selectedNodes)[0];
-                setSelectedNodeInfo(nodeInfo);
-            } else {
-                setSelectedNodeInfo(null);
-            }
-        };
-
-        // Add event listeners
-        document.addEventListener("click", handleNodeSelection);
-
-        // Cleanup
-        return () => {
-            document.removeEventListener("click", handleNodeSelection);
-        };
+    // 使用防抖处理节点选择事件
+    const handleNodeSelection = React.useCallback(() => {
+        const selectedNodes = app.canvas.selected_nodes;
+        if (Object.keys(selectedNodes ?? {}).length) {
+            const nodeInfo = Object.values(selectedNodes)[0];
+            setSelectedNodeInfo(nodeInfo);
+        } else {
+            setSelectedNodeInfo(null);
+        }
     }, []);
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-            document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-        };
+    // 使用防抖优化事件处理
+    const debouncedHandleNodeSelection = React.useMemo(
+        () => debounce(handleNodeSelection, 100),
+        [handleNodeSelection]
+    );
 
-        document.addEventListener('mousemove', handleMouseMove);
+    useEffect(() => {
+        // 添加事件监听器
+        document.addEventListener("click", debouncedHandleNodeSelection);
+
+        // 清理
         return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener("click", debouncedHandleNodeSelection);
+            debouncedHandleNodeSelection.cancel(); // 取消未执行的防抖函数
         };
+    }, [debouncedHandleNodeSelection]);
+
+    // 使用防抖处理鼠标移动事件 - 用于更新鼠标位置
+    const handleMouseMoveForPosition = React.useCallback((e: MouseEvent) => {
+        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
     }, []);
+
+    const debouncedHandleMouseMoveForPosition = React.useMemo(
+        () => debounce(handleMouseMoveForPosition, 16), // 约60fps
+        [handleMouseMoveForPosition]
+    );
+
+    useEffect(() => {
+        document.addEventListener('mousemove', debouncedHandleMouseMoveForPosition);
+        return () => {
+            document.removeEventListener('mousemove', debouncedHandleMouseMoveForPosition);
+            debouncedHandleMouseMoveForPosition.cancel();
+        };
+    }, [debouncedHandleMouseMoveForPosition]);
+
+    // 使用防抖处理宽度调整
+    const handleMouseMoveForResize = React.useCallback((e: MouseEvent) => {
+        if (!isResizing) return;
+        
+        const newWidth = window.innerWidth - e.clientX;
+        const clampedWidth = Math.min(
+            Math.max(300, newWidth),
+            window.innerWidth * 0.8
+        );
+        
+        setWidth(clampedWidth);
+    }, [isResizing]);
+
+    const debouncedHandleMouseMoveForResize = React.useMemo(
+        () => debounce(handleMouseMoveForResize, 16),
+        [handleMouseMoveForResize]
+    );
+
+    useEffect(() => {
+        if (isResizing) {
+            document.addEventListener('mousemove', debouncedHandleMouseMoveForResize);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', debouncedHandleMouseMoveForResize);
+            document.removeEventListener('mouseup', handleMouseUp);
+            debouncedHandleMouseMoveForResize.cancel();
+        };
+    }, [isResizing, debouncedHandleMouseMoveForResize]);
 
     const handleMessageChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setInput(event.target.value);
@@ -260,33 +306,9 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         e.preventDefault();
     };
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isResizing) return;
-            
-            const newWidth = window.innerWidth - e.clientX;
-            const clampedWidth = Math.min(
-                Math.max(300, newWidth),
-                window.innerWidth * 0.8
-            );
-            
-            setWidth(clampedWidth);
-        };
-
-        const handleMouseUp = () => {
-            setIsResizing(false);
-        };
-
-        if (isResizing) {
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        }
-
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isResizing]);
+    const handleMouseUp = () => {
+        setIsResizing(false);
+    };
 
     const handleUploadImages = (files: FileList) => {
         const newImages = Array.from(files).map(file => ({
@@ -320,14 +342,14 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     return (
         <div 
             className="fixed top-0 right-0 h-full shadow-lg bg-white
-                      transition-all duration-300 ease-in-out hover:shadow-xl text-gray-700" 
+                      transition-transform duration-200 ease-out"
             style={{ 
                 display: visible ? 'block' : 'none',
                 width: `${width}px`
             }}
         >
             <div
-                className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300 active:bg-gray-400"
+                className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300"
                 onMouseDown={handleMouseDown}
             />
             
