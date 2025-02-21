@@ -10,7 +10,7 @@ import { ChatInput } from "../components/chat/ChatInput";
 import { SelectedNodeInfo } from "../components/chat/SelectedNodeInfo";
 import { MessageList } from "../components/chat/MessageList";
 import { generateUUID } from "../utils/uuid";
-import { getInstalledNodes, getObjectInfo } from "../apis/comfyApiCustom";
+import { getInstalledNodes } from "../apis/comfyApiCustom";
 import { UploadedImage } from '../components/chat/ChatInput';
 import React from "react";
 import { debounce } from "lodash";
