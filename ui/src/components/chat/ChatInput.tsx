@@ -128,8 +128,9 @@ export function ChatInput({
                              focus:border-transparent hover:bg-gray-50
                              transition-colors border-0"
                 >
-                    <option value="gpt-4o">gpt-4o</option>
+                    
                     <option value="gpt-4o-mini">gpt-4o-mini</option>
+                    <option value="gpt-4o">gpt-4o</option>
                     <option value="DeepSeek-V3">DeepSeek-V3</option>
                 </select>
 

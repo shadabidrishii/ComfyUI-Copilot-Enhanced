@@ -24,7 +24,8 @@ export namespace WorkflowChatAPI {
     prompt: string, 
     images: File[] = [], 
     intent: string | null = null, 
-    ext: any | null = null
+    ext: any | null = null,
+    trace_id?: string
   ): AsyncGenerator<ChatResponse> {
     try {
       const apiKey = getApiKey();
@@ -59,7 +60,7 @@ export namespace WorkflowChatAPI {
           'accept': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Authorization': `Bearer ${apiKey}`,
-          'trace-id': generateUUID(),
+          'trace-id': trace_id || generateUUID(),
         },
         body: JSON.stringify({
           session_id: sessionId,

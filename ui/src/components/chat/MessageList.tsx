@@ -13,6 +13,7 @@ import { LoadingMessage } from "./messages/LoadingMessage";
 import { generateUUID } from "../../utils/uuid";
 import { app } from "../../utils/comfyapp";
 import { addNodeOnGraph } from "../../utils/graphUtils";
+import React, { lazy } from "react";
 
 interface MessageListProps {
     messages: Message[];
@@ -27,12 +28,25 @@ const getAvatar = (name?: string) => {
     return `https://ui-avatars.com/api/?name=${name || 'User'}&background=random`;
 };
 
+// 使用动态导入替换直接导入
+// const AIMessage = lazy(() => import('./messages/AIMessage').then(m => ({ default: m.AIMessage })));
+// const UserMessage = lazy(() => import('./messages/UserMessage').then(m => ({ default: m.UserMessage })));
+const WorkflowOption = lazy(() => import('./messages/WorkflowOption').then(m => ({ default: m.WorkflowOption })));
+const NodeSearch = lazy(() => import('./messages/NodeSearch').then(m => ({ default: m.NodeSearch })));
+const NodeRecommend = lazy(() => import('./messages/NodeRecommend').then(m => ({ default: m.NodeRecommend })));
+const DownstreamSubgraphs = lazy(() => import('./messages/DownstreamSubgraphs').then(m => ({ default: m.DownstreamSubgraphs })));
+const NodeInstallGuide = lazy(() => import('./messages/NodeInstallGuide').then(m => ({ default: m.NodeInstallGuide })));
+
 export function MessageList({ messages, latestInput, onOptionClick, installedNodes, onAddMessage, loading }: MessageListProps) {
-const renderMessage = (message: Message) => {
+    const renderMessage = (message: Message) => {
         console.log('[MessageList] Rendering message:', message);
         
         if (message.role === 'user') {
-            return <UserMessage key={message.id} content={message.content} />;
+            return <UserMessage 
+                key={message.id} 
+                content={message.content} 
+                trace_id={message.trace_id} 
+            />;
         }
 
         if (message.role === 'ai' || message.role === 'tool') {

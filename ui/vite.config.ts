@@ -1,6 +1,15 @@
+/*
+ * @Author: 晴知 qingli.hql@alibaba-inc.com
+ * @Date: 2024-12-10 22:11:57
+ * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
+ * @LastEditTime: 2025-02-21 11:50:22
+ * @FilePath: /comfyui_copilot/ui/vite.config.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { exec } from 'child_process';
+import path from 'path';
 
 const rewriteImportPlugin = ({ isDev }) => {
   return {
@@ -72,8 +81,42 @@ export default defineConfig(({ mode }) => ({
         entryFileNames: "copilot_web/[name].js",
         chunkFileNames: `copilot_web/[name]-[hash].js`,
         assetFileNames: `copilot_web/assets/[name]-[hash].[ext]`,
+        manualChunks: {
+          // 只包含实际使用的 React 相关依赖
+          'vendor-react': ['react', 'react-dom'],
+          
+          // Markdown 相关依赖
+          'vendor-markdown': [
+            'react-markdown',
+            'remark-gfm',
+            'remark-math',
+            'rehype-katex',
+            'rehype-external-links'
+          ],
+          
+          // UI 组件
+          'vendor-ui': [
+            '@heroicons/react',
+            '@tabler/icons-react'
+          ],
+          
+          // 消息组件
+          'message-components': [
+            './src/components/chat/messages/AIMessage',
+            './src/components/chat/messages/UserMessage',
+            './src/components/chat/messages/NodeInstallGuide',
+            './src/components/chat/messages/NodeSearch',
+            './src/components/chat/messages/NodeRecommend',
+            './src/components/chat/messages/DownstreamSubgraphs',
+          ],
+        }
       },
     },
+    // Enable compression
+    target: 'esnext',
+    minify: 'esbuild',
+    cssMinify: true,
+    chunkSizeWarningLimit: 600 // 适当调整警告阈值
   },
   plugins: [react(), rewriteImportPlugin({ isDev: mode === "development" })],
 }));

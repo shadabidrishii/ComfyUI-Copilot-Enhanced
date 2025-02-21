@@ -78,12 +78,14 @@ export interface ChatResponse {
 
 export interface Message {
   id: string;
+  role: string;
   content: string;
-  role: 'user' | 'ai' | 'tool';
   name?: string;
-  type?: string;
   format?: string;
   finished?: boolean;
+  type?: string;
+  metadata?: any;
+  trace_id?: string;
 }
 
 export interface ToolCall {

@@ -33,7 +33,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const [width, setWidth] = useState(window.innerWidth / 3);
     const [isResizing, setIsResizing] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-    const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
+    const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -114,11 +114,14 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         if ((input.trim() === "" && !selectedNodeInfo) || !sessionId) return;
         setLoading(true);
         setLatestInput(input);
+        
+        const traceId = generateUUID(); // Generate trace_id for this request
 
         const userMessage: Message = {
             id: generateUUID(),
             role: "user",
             content: input,
+            trace_id: traceId, // Add trace_id to user message
         };
 
         setMessages(prev => [...prev, userMessage]);
@@ -133,7 +136,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 input, 
                 uploadedImages.map(img => img.file),
                 null,  // intent
-                modelExt  // ext
+                modelExt,  // ext
+                traceId  // Pass trace_id to API call
             )) {
                 const aiMessage: Message = {
                     id: generateUUID(),
@@ -195,16 +199,26 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         if (!sessionId || !selectedNodeInfo) return;
         setLoading(true);
 
+        const traceId = generateUUID(); // Generate trace_id for this request
+
         const userMessage: Message = {
             id: generateUUID(),
             role: "user",
             content: selectedNodeInfo.comfyClass || selectedNodeInfo.type,
+            trace_id: traceId, // Add trace_id to user message
         };
 
         setMessages(prev => [...prev, userMessage]);
 
         try {
-            for await (const response of WorkflowChatAPI.streamInvokeServer(sessionId, selectedNodeInfo.comfyClass || selectedNodeInfo.type, [], intent, ext)) {
+            for await (const response of WorkflowChatAPI.streamInvokeServer(
+                sessionId, 
+                selectedNodeInfo.comfyClass || selectedNodeInfo.type, 
+                [], 
+                intent, 
+                ext,
+                traceId // Pass trace_id to API call
+            )) {
                 const aiMessage: Message = {
                     id: generateUUID(),
                     role: "ai",

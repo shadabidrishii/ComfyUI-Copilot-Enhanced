@@ -5,7 +5,9 @@ import React, { useRef, useState, useEffect } from "react";
 import { DRAWER_Z_INDEX } from "./const";
 import { COPILOT_EVENTS } from "./constants/events";
 import logoImage from '../../assets/logo.png'; 
-const WorkflowChat = React.lazy(() => import("./workflowChat/workflowChat"));
+const WorkflowChat = React.lazy(() => import("./workflowChat/workflowChat").then(module => ({
+  default: module.default
+})));
 
 export default function App() {
   const workspaceContainerRef = useRef(null);
@@ -95,15 +97,18 @@ export default function App() {
           />
           <span className="text-[14px] font-medium text-gray-800">ComfyUI-Copilot</span>
         </button>
-        <WorkflowChat 
-          onClose={() => {
-            setShowChat(false);
-            setShouldTriggerUsage(false);
-          }}
-          visible={showChat}
-          triggerUsage={shouldTriggerUsage}
-          onUsageTriggered={() => setShouldTriggerUsage(false)}
-        />
+        
+        <React.Suspense fallback={<div>Loading...</div>}>
+          <WorkflowChat 
+            onClose={() => {
+              setShowChat(false);
+              setShouldTriggerUsage(false);
+            }}
+            visible={showChat}
+            triggerUsage={shouldTriggerUsage}
+            onUsageTriggered={() => setShouldTriggerUsage(false)}
+          />
+        </React.Suspense>
       </div>
     </div>
   );
