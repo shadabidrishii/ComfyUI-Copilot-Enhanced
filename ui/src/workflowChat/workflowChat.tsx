@@ -35,6 +35,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const [isResizing, setIsResizing] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
+    const [height, setHeight] = useState<number>(window.innerHeight);
+    const [topPosition, setTopPosition] = useState<number>(0);
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -339,13 +341,29 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     }, [triggerUsage]);
 
+    const handleHeightResize = (deltaY: number) => {
+        setHeight(prevHeight => {
+            const newHeight = prevHeight - deltaY;
+            // 限制最小高度为 300px，最大高度为窗口高度
+            return Math.min(Math.max(300, newHeight), window.innerHeight);
+        });
+        
+        setTopPosition(prevTop => {
+            const newTop = prevTop + deltaY;
+            // 确保不会超出屏幕顶部
+            return Math.max(0, newTop);
+        });
+    };
+
     return (
         <div 
-            className="fixed top-0 right-0 h-full shadow-lg bg-white
+            className="fixed right-0 shadow-lg bg-white
                       transition-transform duration-200 ease-out"
             style={{ 
                 display: visible ? 'block' : 'none',
-                width: `${width}px`
+                width: `${width}px`,
+                height: `${height}px`,
+                top: `${topPosition}px`
             }}
         >
             <div
@@ -358,6 +376,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     onClose={onClose}
                     onClear={handleClearMessages}
                     hasMessages={messages.length > 0}
+                    onHeightResize={handleHeightResize}
                 />
                 <div>
                     {installedNodes.map((node: any) => (

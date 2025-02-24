@@ -1,8 +1,8 @@
 /*
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2024-12-12 21:28:03
- * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
- * @LastEditTime: 2025-02-17 19:34:17
+ * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
+ * @LastEditTime: 2025-02-24 11:46:49
  * @FilePath: /comfyui_copilot/ui/src/components/chat/ApiKeyModal.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -29,20 +29,27 @@ export function ApiKeyModal({ isOpen, onClose, onSave, initialApiKey = '' }: Api
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-25 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-96 shadow-xl">
-                <h2 className="text-lg font-semibold mb-4">Set API Key</h2>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 w-[480px] shadow-2xl">
+                <h2 className="text-xl text-gray-900 dark:text-white font-semibold mb-6">Set API Key</h2>
                 <div className="relative">
                     <input
                         type={showApiKey ? "text" : "password"}
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
                         placeholder="Enter your API key"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 pr-10 bg-gray-50"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg mb-4 pr-12
+                        bg-gray-50 dark:bg-gray-700 
+                        text-gray-900 dark:text-white
+                        placeholder-gray-500 dark:placeholder-gray-400
+                        focus:border-blue-500 dark:focus:border-blue-400 
+                        focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20
+                        focus:outline-none"
                     />
                     <button
                         type="button"
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 dark:text-gray-400 
+                        hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                         onClick={() => setShowApiKey(!showApiKey)}
                     >
                         {showApiKey ? (
@@ -57,21 +64,22 @@ export function ApiKeyModal({ isOpen, onClose, onSave, initialApiKey = '' }: Api
                         )}
                     </button>
                 </div>
-                <div className="mb-4 text-sm text-gray-600">
+                <div className="mb-6 text-sm text-gray-600 dark:text-gray-300">
                     <span>Don't have an API key? </span>
                     <a 
                         href="https://form.typeform.com/to/tkg91K8D"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-600 underline"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
                     >
                         Click here to request one
                     </a>
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-3">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+                        className="px-5 py-2.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 
+                        rounded-lg font-medium transition-colors"
                     >
                         Cancel
                     </button>
@@ -80,7 +88,8 @@ export function ApiKeyModal({ isOpen, onClose, onSave, initialApiKey = '' }: Api
                             onSave(apiKey);
                             onClose();
                         }}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 
+                        text-white rounded-lg font-medium transition-colors"
                     >
                         Save
                     </button>
