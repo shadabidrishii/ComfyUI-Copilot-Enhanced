@@ -14,6 +14,10 @@ import { getInstalledNodes } from "../apis/comfyApiCustom";
 import { UploadedImage } from '../components/chat/ChatInput';
 import React from "react";
 import { debounce } from "lodash";
+import { useChatContext } from '../context/ChatContext';
+import { useMousePosition } from '../hooks/useMousePosition';
+import { useResizable } from '../hooks/useResizable';
+import { useNodeSelection } from '../hooks/useNodeSelection';
 
 interface WorkflowChatProps {
     onClose?: () => void;
@@ -23,20 +27,32 @@ interface WorkflowChatProps {
 }
 
 export default function WorkflowChat({ onClose, visible = true, triggerUsage = false, onUsageTriggered }: WorkflowChatProps) {
-    const [messages, setMessages] = useState<Message[]>([]);
+    const { state, dispatch } = useChatContext();
+    const { messages, installedNodes, loading, sessionId, selectedNode } = state;
+    const messageDivRef = useRef<HTMLDivElement>(null);
     const [input, setInput] = useState<string>('');
     const [latestInput, setLatestInput] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
-    const [sessionId, setSessionId] = useState<string>();
-    const messageDivRef = useRef<HTMLDivElement>(null);
-    const [selectedNodeInfo, setSelectedNodeInfo] = useState<any>(null);
-    const [installedNodes, setInstalledNodes] = useState<any[]>([]);
     const [width, setWidth] = useState(window.innerWidth / 3);
     const [isResizing, setIsResizing] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
     const [height, setHeight] = useState<number>(window.innerHeight);
     const [topPosition, setTopPosition] = useState<number>(0);
+
+    // 使用自定义 hooks，只在visible为true时启用
+    useMousePosition(visible);
+    useNodeSelection(visible);
+    const { 
+        isResizing: resizableIsResizing, 
+        setIsResizing: resizableSetIsResizing, 
+        dimensions, 
+        handleHeightResize 
+    } = useResizable({
+        minWidth: 300,
+        maxWidth: window.innerWidth * 0.8,
+        minHeight: 300,
+        maxHeight: window.innerHeight
+    }, visible);
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -49,7 +65,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             console.log('[WorkflowChat] Fetching installed nodes');
             const nodes = await getInstalledNodes();
             console.log('[WorkflowChat] Received installed nodes:', nodes);
-            setInstalledNodes(nodes);
+            dispatch({ type: 'SET_INSTALLED_NODES', payload: nodes });
         };
         fetchInstalledNodes();
     }, []);
@@ -58,7 +74,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const fetchMessages = async (sid: string) => {
         try {
             const data = await WorkflowChatAPI.fetchMessages(sid);
-            setMessages(data);
+            dispatch({ type: 'SET_MESSAGES', payload: data });
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
@@ -67,61 +83,14 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     useEffect(() => {
         let sid = localStorage.getItem("sessionId");
         if (sid) {
-            setSessionId(sid);
+            dispatch({ type: 'SET_SESSION_ID', payload: sid });
             fetchMessages(sid);
         } else {
             sid = generateUUID();
-            setSessionId(sid);
+            dispatch({ type: 'SET_SESSION_ID', payload: sid });
             localStorage.setItem("sessionId", sid);
         }
     }, []);
-
-    // 使用防抖处理节点选择事件
-    const handleNodeSelection = React.useCallback(() => {
-        const selectedNodes = app.canvas.selected_nodes;
-        if (Object.keys(selectedNodes ?? {}).length) {
-            const nodeInfo = Object.values(selectedNodes)[0];
-            setSelectedNodeInfo(nodeInfo);
-        } else {
-            setSelectedNodeInfo(null);
-        }
-    }, []);
-
-    // 使用防抖优化事件处理
-    const debouncedHandleNodeSelection = React.useMemo(
-        () => debounce(handleNodeSelection, 100),
-        [handleNodeSelection]
-    );
-
-    useEffect(() => {
-        // 添加事件监听器
-        document.addEventListener("click", debouncedHandleNodeSelection);
-
-        // 清理
-        return () => {
-            document.removeEventListener("click", debouncedHandleNodeSelection);
-            debouncedHandleNodeSelection.cancel(); // 取消未执行的防抖函数
-        };
-    }, [debouncedHandleNodeSelection]);
-
-    // 使用防抖处理鼠标移动事件 - 用于更新鼠标位置
-    const handleMouseMoveForPosition = React.useCallback((e: MouseEvent) => {
-        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-    }, []);
-
-    const debouncedHandleMouseMoveForPosition = React.useMemo(
-        () => debounce(handleMouseMoveForPosition, 16), // 约60fps
-        [handleMouseMoveForPosition]
-    );
-
-    useEffect(() => {
-        document.addEventListener('mousemove', debouncedHandleMouseMoveForPosition);
-        return () => {
-            document.removeEventListener('mousemove', debouncedHandleMouseMoveForPosition);
-            debouncedHandleMouseMoveForPosition.cancel();
-        };
-    }, [debouncedHandleMouseMoveForPosition]);
 
     // 使用防抖处理宽度调整
     const handleMouseMoveForResize = React.useCallback((e: MouseEvent) => {
@@ -159,8 +128,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     }
 
     const handleSendMessage = async () => {
-        if ((input.trim() === "" && !selectedNodeInfo) || !sessionId) return;
-        setLoading(true);
+        dispatch({ type: 'SET_LOADING', payload: true });
+        if ((input.trim() === "" && !selectedNode) || !sessionId) return;
         setLatestInput(input);
         
         const traceId = generateUUID(); // Generate trace_id for this request
@@ -169,16 +138,20 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             id: generateUUID(),
             role: "user",
             content: input,
-            trace_id: traceId, // Add trace_id to user message
+            trace_id: traceId,
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
         setInput("");
 
         try {
             // Create ext array with model selection
             const modelExt = { type: "model_select", data: [selectedModel] };
             
+            // 创建一个AI消息ID
+            const aiMessageId = generateUUID();
+            let isFirstChunk = true;
+
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
                 input, 
@@ -188,7 +161,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 traceId  // Pass trace_id to API call
             )) {
                 const aiMessage: Message = {
-                    id: generateUUID(),
+                    id: aiMessageId, // 使用同一个ID
                     role: "ai",
                     content: JSON.stringify(response),
                     type: response.type,
@@ -197,21 +170,20 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     name: "Assistant"
                 };
 
-                setMessages(prev => {
-                    const lastMessage = prev[prev.length - 1];
-                    if (lastMessage.role === 'ai') {
-                        return [...prev.slice(0, -1), aiMessage];
-                    }
-                    return [...prev, aiMessage];
-                });
+                if (isFirstChunk) {
+                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
+                    isFirstChunk = false;
+                } else {
+                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                }
 
                 if (response.finished) {
-                    setLoading(false);
+                    dispatch({ type: 'SET_LOADING', payload: false });
                 }
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            setLoading(false);
+            dispatch({ type: 'SET_LOADING', payload: false });
         } finally {
             setUploadedImages([]);
         }
@@ -224,10 +196,10 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     }
 
     const handleClearMessages = () => {
-        setMessages([]);
+        dispatch({ type: 'CLEAR_MESSAGES' });
         localStorage.removeItem("sessionId");
         const newSessionId = generateUUID();
-        setSessionId(newSessionId);
+        dispatch({ type: 'SET_SESSION_ID', payload: newSessionId });
         localStorage.setItem("sessionId", newSessionId);
     };
 
@@ -244,31 +216,35 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     };
 
     const handleSendMessageWithIntent = async (intent: string, ext?: any) => {
-        if (!sessionId || !selectedNodeInfo) return;
-        setLoading(true);
+        if (!sessionId || !selectedNode) return;
+        dispatch({ type: 'SET_LOADING', payload: true });
 
-        const traceId = generateUUID(); // Generate trace_id for this request
+        const traceId = generateUUID();
 
         const userMessage: Message = {
             id: generateUUID(),
             role: "user",
-            content: selectedNodeInfo.comfyClass || selectedNodeInfo.type,
-            trace_id: traceId, // Add trace_id to user message
+            content: selectedNode.comfyClass || selectedNode.type,
+            trace_id: traceId,
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
 
         try {
+            // 创建一个AI消息ID
+            const aiMessageId = generateUUID();
+            let isFirstChunk = true;
+
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
-                selectedNodeInfo.comfyClass || selectedNodeInfo.type, 
+                selectedNode.comfyClass || selectedNode.type,
                 [], 
                 intent, 
                 ext,
-                traceId // Pass trace_id to API call
+                traceId
             )) {
                 const aiMessage: Message = {
-                    id: generateUUID(),
+                    id: aiMessageId, // 使用同一个ID
                     role: "ai",
                     content: JSON.stringify(response),
                     format: response.format,
@@ -276,31 +252,26 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     name: "Assistant"
                 };
 
-                setMessages(prev => {
-                    const lastMessage = prev[prev.length - 1];
-                    if (lastMessage.role === 'ai') {
-                        return [...prev.slice(0, -1), aiMessage];
-                    }
-                    return [...prev, aiMessage];
-                });
+                if (isFirstChunk) {
+                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
+                    isFirstChunk = false;
+                } else {
+                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                }
 
                 if (response.finished) {
-                    setLoading(false);
+                    dispatch({ type: 'SET_LOADING', payload: false });
                 }
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            setLoading(false);
+            dispatch({ type: 'SET_LOADING', payload: false });
         }
     };
 
     const handleAddMessage = (message: Message) => {
         console.log('[WorkflowChat] Adding new message:', message);
-        setMessages(prev => {
-            const newMessages = [...prev, message];
-            console.log('[WorkflowChat] Updated messages:', newMessages);
-            return newMessages;
-        });
+        dispatch({ type: 'ADD_MESSAGE', payload: message });
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -341,33 +312,22 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     }, [triggerUsage]);
 
-    const handleHeightResize = (deltaY: number) => {
-        setHeight(prevHeight => {
-            const newHeight = prevHeight - deltaY;
-            // 限制最小高度为 300px，最大高度为窗口高度
-            return Math.min(Math.max(300, newHeight), window.innerHeight);
-        });
-        
-        setTopPosition(prevTop => {
-            const newTop = prevTop + deltaY;
-            // 确保不会超出屏幕顶部
-            return Math.max(0, newTop);
-        });
-    };
-
     return (
         <div 
             className="fixed right-0 shadow-lg bg-white duration-200 ease-out"
             style={{ 
                 display: visible ? 'block' : 'none',
-                width: `${width}px`,
-                height: `${height}px`,
-                top: `${topPosition}px`
+                width: `${dimensions.width}px`,
+                height: `${dimensions.height}px`,
+                top: `${dimensions.top}px`
             }}
         >
             <div
                 className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300"
-                onMouseDown={handleMouseDown}
+                onMouseDown={(e) => {
+                    resizableSetIsResizing(true);
+                    e.preventDefault();
+                }}
             />
             
             <div className="flex h-full flex-col">
@@ -395,9 +355,9 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 </div>
 
                 <div className="border-t px-4 py-3 border-gray-200 bg-white sticky bottom-0">
-                    {selectedNodeInfo && (
+                    {selectedNode && (
                         <SelectedNodeInfo 
-                            nodeInfo={selectedNodeInfo}
+                            nodeInfo={selectedNode}
                             onSendWithIntent={handleSendMessageWithIntent}
                             loading={loading}
                         />

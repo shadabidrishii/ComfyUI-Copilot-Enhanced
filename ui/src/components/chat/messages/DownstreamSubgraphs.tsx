@@ -8,16 +8,18 @@ import { Network } from 'vis-network';
 import { WorkflowChatAPI } from "../../../apis/workflowChatApi";
 import { generateUUID } from "../../../utils/uuid";
 import { addNodeOnGraph } from "../../../utils/graphUtils";
+import { useChatContext } from '../../../context/ChatContext';
 
 interface DownstreamSubgraphsProps {
     content: string;
     name?: string;
     avatar: string;
-    installedNodes: any[];
     onAddMessage?: (message: Message) => void;
 }
 
-export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, installedNodes, onAddMessage }: DownstreamSubgraphsProps) {
+export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAddMessage }: DownstreamSubgraphsProps) {
+    const { state, dispatch } = useChatContext();
+    const { selectedNode, installedNodes } = state;
     const response = JSON.parse(content) as ChatResponse;
     const [hoveredNode, setHoveredNode] = useState<string | null>(null);
     const networkRef = useRef<Network | null>(null);
@@ -242,6 +244,24 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, insta
             app.canvas.emitAfterChange();
         }
     };
+
+    useEffect(() => {
+        // 只在组件挂载时添加事件监听
+        const handleNodeSelection = () => {
+            const selectedNodes = app.canvas.selected_nodes;
+            if (Object.keys(selectedNodes ?? {}).length) {
+                const nodeInfo = Object.values(selectedNodes)[0];
+                dispatch({ type: 'SET_SELECTED_NODE', payload: nodeInfo });
+            } else {
+                dispatch({ type: 'SET_SELECTED_NODE', payload: null });
+            }
+        };
+
+        document.addEventListener("click", handleNodeSelection);
+        return () => {
+            document.removeEventListener("click", handleNodeSelection);
+        };
+    }, []);
 
     return (
         <div className="rounded-lg bg-green-50 p-3 text-gray-700 text-xs break-words overflow-visible">
