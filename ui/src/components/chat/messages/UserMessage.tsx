@@ -1,3 +1,4 @@
+
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
@@ -24,11 +25,11 @@ export function UserMessage({ content, trace_id }: UserMessageProps) {
 
     return (
         <BaseMessage name="User" isUser={true}>
-            <div className="w-full rounded-lg border border-gray-700 p-4 text-gray-700 text-sm break-words relative">
-                <p className="whitespace-pre-wrap">{content}</p>
+            <div className="w-full rounded-lg border-[0.5px] border-solid border-gray-700 py-1 px-4 text-gray-700 text-sm break-words relative">
+                <p className="whitespace-pre-wrap leading-snug">{content}</p>
                 {trace_id && (
                     <div 
-                        className="absolute bottom-1.5 right-1.5 cursor-pointer opacity-40 hover:opacity-100 transition-opacity"
+                        className="absolute bottom-1 right-1.5 cursor-pointer opacity-40 hover:opacity-100 transition-opacity"
                         onMouseEnter={() => setShowTooltip(true)}
                         onMouseLeave={() => setShowTooltip(false)}
                         onClick={handleCopyTraceId}

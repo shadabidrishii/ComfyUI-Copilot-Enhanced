@@ -79,7 +79,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                     </button>
                                 </div>
                                 {hoveredNode === node.name && node.description && (
-                                    <div className="fixed transform -translate-y-full z-[9999] w-64 p-2 
+                                    <div className="fixed -translate-y-full z-[9999] w-64 p-2 
                                                 bg-gray-800 text-white text-xs rounded-md shadow-lg mb-2"
                                         style={{
                                             left: 'calc(var(--mouse-x, 0) + 16px)',
@@ -134,7 +134,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                     </a>
                                 </div>
                                 {hoveredNode === node.name && node.description && (
-                                    <div className="fixed transform -translate-y-full z-[9999] w-64 p-2 
+                                    <div className="fixed -translate-y-full z-[9999] w-64 p-2 
                                                 bg-gray-800 text-white text-xs rounded-md shadow-lg mb-2"
                                         style={{
                                             left: 'calc(var(--mouse-x, 0) + 16px)',

@@ -83,7 +83,7 @@ export function ChatInput({
                             />
                             <button
                                 onClick={() => onRemoveImage(image.id)}
-                                className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5
+                                className="absolute -top-1 -right-1 bg-white border-none text-gray-500 rounded-full p-0.5
                                          opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                                 <XIcon className="w-3 h-3" />
@@ -138,7 +138,7 @@ export function ChatInput({
                 <button
                     type="button"
                     onClick={() => setShowUploadModal(true)}
-                    className="p-1.5 text-gray-500 
+                    className="p-1.5 text-gray-500 bg-white border-none
                              hover:bg-gray-100 hover:text-gray-600 
                              transition-all duration-200 outline-none">
                     <ImageIcon className="h-4 w-4" />
@@ -150,15 +150,14 @@ export function ChatInput({
                 type="submit"
                 onClick={onSend}
                 disabled={loading}
-                className="absolute bottom-3 right-3 p-2 rounded-md text-gray-500 
+                className="absolute bottom-3 right-3 p-2 rounded-md text-gray-500 bg-white border-none 
                          hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50 
                          transition-all duration-200 active:scale-95">
                 {loading ? (
                     <div className="h-5 w-5 animate-spin rounded-full 
                                   border-2 border-gray-300 border-t-blue-500" />
                 ) : (
-                    <SendIcon className="h-5 w-5 transform transition-transform 
-                                       group-hover:translate-x-1" />
+                    <SendIcon className="h-5 w-5 group-hover:translate-x-1" />
                 )}
             </button>
 
@@ -168,12 +167,12 @@ export function ChatInput({
                     <div className="bg-white rounded-lg p-6 w-96 relative">
                         <button 
                             onClick={() => setShowUploadModal(false)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                            className="absolute top-2 right-2 bg-white border-none text-gray-500 hover:text-gray-700"
                         >
                             <XIcon className="w-5 h-5" />
                         </button>
                         
-                        <h3 className="text-lg font-medium mb-4">Upload Images</h3>
+                        <h3 className="text-lg text-gray-800 font-medium mb-4">Upload Images</h3>
                         
                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-8
                                       flex flex-col items-center justify-center gap-4
@@ -215,7 +214,7 @@ export function ChatInput({
                                         />
                                         <button
                                             onClick={() => onRemoveImage(image.id)}
-                                            className="absolute -top-1 -right-1 bg-red-500 text-white 
+                                            className="absolute -top-1 -right-1 bg-white border-none text-gray-500 
                                                      rounded-full p-0.5 opacity-0 group-hover:opacity-100 
                                                      transition-opacity"
                                         >

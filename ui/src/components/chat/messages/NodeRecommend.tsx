@@ -67,7 +67,7 @@ export function NodeRecommend({ content, name = 'Assistant', avatar, installedNo
                                             </a>
                                         )}
                                         {hoveredNode === node.name && node.description && (
-                                            <div className="fixed transform -translate-y-full 
+                                            <div className="fixed -translate-y-full 
                                                         z-[9999] w-64 p-2 bg-gray-800 text-white text-xs 
                                                         rounded-md shadow-lg mb-2"
                                                 style={{
@@ -106,7 +106,7 @@ export function NodeRecommend({ content, name = 'Assistant', avatar, installedNo
                                         {node.name}
                                     </a>
                                     {hoveredNode === node.name && node.description && (
-                                        <div className="fixed transform -translate-y-full 
+                                        <div className="fixed -translate-y-full 
                                                     z-[9999] w-64 p-2 bg-gray-800 text-white text-xs 
                                                     rounded-md shadow-lg mb-2"
                                             style={{

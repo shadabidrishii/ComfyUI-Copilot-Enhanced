@@ -357,8 +357,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
     return (
         <div 
-            className="fixed right-0 shadow-lg bg-white
-                      transition-transform duration-200 ease-out"
+            className="fixed right-0 shadow-lg bg-white duration-200 ease-out"
             style={{ 
                 display: visible ? 'block' : 'none',
                 width: `${width}px`,

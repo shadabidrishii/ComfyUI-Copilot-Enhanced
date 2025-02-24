@@ -81,21 +81,21 @@ export function ChatHeader({ onClose, onClear, hasMessages, onHeightResize }: Ch
                     <h3 className="text-[16px] font-medium text-gray-800">ComfyUI-Copilot</h3>
                     <button
                         onClick={handleApiKeyClick}
-                        className="p-1 hover:bg-gray-100 rounded text-gray-500"
+                        className="p-1 bg-white border-none hover:bg-gray-100 rounded text-gray-500"
                     >
                         <CogIcon className="h-5 w-5" />
                     </button>
                 </div>
                 <div className="flex items-center gap-1">
                     <button
-                        className="inline-flex items-center justify-center rounded-md p-2 
+                        className="inline-flex bg-white border-none items-center justify-center rounded-md p-2 
                                  text-gray-500 hover:bg-gray-100"
                         disabled={!hasMessages}
                         onClick={onClear}>
                         <TrashIcon className="h-5 w-5" />
                     </button>
                     <button
-                        className="inline-flex items-center justify-center rounded-md p-2 
+                        className="inline-flex bg-white border-none items-center justify-center rounded-md p-2 
                                  text-gray-500 hover:bg-gray-100"
                         onClick={onClose}>
                         <XIcon className="h-5 w-5" />

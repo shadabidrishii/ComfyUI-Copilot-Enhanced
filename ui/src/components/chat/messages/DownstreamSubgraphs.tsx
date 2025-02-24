@@ -264,7 +264,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, insta
                                 </p>
                                 {hoveredNode === node.name && (
                                     <div 
-                                        className="fixed transform -translate-y-full 
+                                        className="fixed -translate-y-full 
                                                  z-[9999] w-[500px] p-4 bg-gray-800 text-white text-xs 
                                                  rounded-md shadow-lg mb-2 border border-gray-700"
                                         style={{

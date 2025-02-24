@@ -27,6 +27,7 @@ function waitForDocumentBody() {
 waitForDocumentBody()
   .then(() => waitForApp())
   .then(() => {
+    // todo： 创建一个web component
     const topbar = document.createElement("div");
     document.body.append(topbar);
     ReactDOM.createRoot(topbar).render(

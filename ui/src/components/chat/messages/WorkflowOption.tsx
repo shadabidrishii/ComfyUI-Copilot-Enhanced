@@ -155,7 +155,7 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                                                     </svg>
                                                 </div>
                                                 <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block">
-                                                    <div className="bg-gray-900 text-white text-xs rounded-md py-1 px-2 max-w-xs">
+                                                    <div className="bg-gray-900 text-white text-xs rounded-md py-2 px-3 min-w-[400px] whitespace-normal break-words">
                                                         {workflow.description}
                                                     </div>
                                                 </div>
