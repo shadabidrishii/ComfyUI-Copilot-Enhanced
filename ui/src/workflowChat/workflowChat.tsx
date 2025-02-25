@@ -147,19 +147,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         try {
             const modelExt = { type: "model_select", data: [selectedModel] };
             let aiMessageId = generateUUID(); // 生成一个固定的消息ID
+            let isFirstResponse = true;
 
-            // 添加初始AI消息
-            const initialAiMessage: Message = {
-                id: aiMessageId,
-                role: "ai",
-                content: "",
-                type: "stream",
-                format: "markdown",
-                finished: false,
-                name: "Assistant"
-            };
-            dispatch({ type: 'ADD_MESSAGE', payload: initialAiMessage });
-            
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
                 input, 
@@ -169,7 +158,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 traceId
             )) {
                 const aiMessage: Message = {
-                    id: aiMessageId, // 使用相同的消息ID
+                    id: aiMessageId,
                     role: "ai",
                     content: JSON.stringify(response),
                     type: response.type,
@@ -178,7 +167,12 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     name: "Assistant"
                 };
 
-                dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                if (isFirstResponse) {
+                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
+                    isFirstResponse = false;
+                } else {
+                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                }
 
                 if (response.finished) {
                     dispatch({ type: 'SET_LOADING', payload: false });
@@ -234,15 +228,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
         try {
             let aiMessageId = generateUUID();
-            const initialAiMessage: Message = {
-                id: aiMessageId,
-                role: "ai",
-                content: "",
-                format: "markdown",
-                finished: false,
-                name: "Assistant"
-            };
-            dispatch({ type: 'ADD_MESSAGE', payload: initialAiMessage });
+            let isFirstResponse = true;
 
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
@@ -261,7 +247,12 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     name: "Assistant"
                 };
 
-                dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                if (isFirstResponse) {
+                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
+                    isFirstResponse = false;
+                } else {
+                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                }
 
                 if (response.finished) {
                     dispatch({ type: 'SET_LOADING', payload: false });

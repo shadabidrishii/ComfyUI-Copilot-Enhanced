@@ -1,8 +1,8 @@
 /*
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2024-12-10 22:11:57
- * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
- * @LastEditTime: 2025-02-21 11:50:22
+ * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
+ * @LastEditTime: 2025-02-25 20:58:44
  * @FilePath: /comfyui_copilot/ui/vite.config.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -106,7 +106,6 @@ export default defineConfig(({ mode }) => ({
             './src/components/chat/messages/UserMessage',
             './src/components/chat/messages/NodeInstallGuide',
             './src/components/chat/messages/NodeSearch',
-            './src/components/chat/messages/NodeRecommend',
             './src/components/chat/messages/DownstreamSubgraphs',
           ],
         }

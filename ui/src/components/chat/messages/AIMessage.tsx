@@ -87,10 +87,23 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
                     )
                   },
                   code: ({ children }) => {
-                    return <code className="text-xs bg-gray-100 rounded px-1">{children}</code>
+                    return (
+                      <div className="relative group">
+                        <code className="text-xs bg-gray-100 text-gray-800 rounded px-1">{children}</code>
+                        <button 
+                          onClick={() => navigator.clipboard.writeText(children as string)}
+                          className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1 shadow hover:bg-gray-50"
+                        >
+                          <svg className="w-3 h-3" fill="black" viewBox="0 0 20 20">
+                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                          </svg>
+                        </button>
+                      </div>
+                    )
                   },
                   pre: ({ children }) => {
-                    return <pre className="text-xs bg-gray-100 rounded p-2 overflow-x-auto">{children}</pre>
+                    return <pre className="text-xs bg-gray-100 text-gray-800 rounded p-2 overflow-x-auto">{children}</pre>
                   },
                   img: ({ node, ...props }) => (
                     <div className="w-1/2 mx-auto">

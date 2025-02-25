@@ -1,8 +1,8 @@
 /*
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2025-02-17 20:53:45
- * @LastEditors: ai-business-hql ai-business-hql@gmail.com
- * @LastEditTime: 2025-02-21 17:06:35
+ * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
+ * @LastEditTime: 2025-02-25 21:05:13
  * @FilePath: /comfyui_copilot/ui/src/components/chat/SelectedNodeInfo.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -62,14 +62,14 @@ export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading }: Select
                         Usage
                     </button>
                     <button
-                        className="px-3 py-1 text-xs rounded bg-green-100 
+                        className="px-3 py-1 text-xs rounded-md bg-green-100 
                                  text-green-700 hover:bg-green-200"
                         onClick={() => onSendWithIntent('node_params')}
                         disabled={loading}>
                         Parameters
                     </button>
                     <button
-                        className="px-3 py-1 text-xs rounded bg-purple-100 
+                        className="px-3 py-1 text-xs rounded-md bg-purple-100 
                                  text-purple-700 hover:bg-purple-200"
                         onClick={() => onSendWithIntent('downstream_subgraph_search', getDownstreamSubgraphExt())}
                         disabled={loading}>

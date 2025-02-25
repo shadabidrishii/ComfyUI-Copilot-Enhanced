@@ -1,7 +1,7 @@
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
-import { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useState, useRef, useEffect } from 'react';
 import { SendIcon, ImageIcon, PlusIcon, XIcon } from './Icons';
 import React from 'react';
 
@@ -41,6 +41,17 @@ export function ChatInput({
 }: ChatInputProps) {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Auto-resize textarea based on content
+    useEffect(() => {
+        if (textareaRef.current) {
+            // Reset height to auto to get the correct scrollHeight
+            textareaRef.current.style.height = 'auto';
+            // Set the height to scrollHeight to fit all content
+            textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 400)}px`;
+        }
+    }, [input]);
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -94,6 +105,7 @@ export function ChatInput({
             )}
 
             <textarea
+                ref={textareaRef}
                 onChange={onChange}
                 onKeyDown={(e: KeyboardEvent) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
@@ -108,11 +120,11 @@ export function ChatInput({
                 value={input}
                 placeholder="Type your message..."
                 className="w-full min-h-[80px] max-h-[400px] resize-none rounded-md border 
-                         border-gray-200 px-3 py-2 pr-12 pb-10 text-sm shadow-sm 
+                         border-gray-200 px-3 py-2 pr-12 pb-10 text-[14px] shadow-sm 
                          focus:outline-none focus:ring-2 focus:ring-blue-500 
                          focus:border-transparent bg-white transition-all 
                          duration-200 text-gray-700 overflow-y-auto"
-                style={{ height: 'auto' }}
+                style={{ height: '80px' }}
             />
 
             {/* Bottom toolbar */}

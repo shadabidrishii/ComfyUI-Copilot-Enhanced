@@ -6,7 +6,6 @@ import { UserMessage } from "./messages/UserMessage";
 import { AIMessage } from "./messages/AIMessage";
 import { WorkflowOption } from "./messages/WorkflowOption";
 import { NodeSearch } from "./messages/NodeSearch";
-import { NodeRecommend } from "./messages/NodeRecommend";
 import { DownstreamSubgraphs } from "./messages/DownstreamSubgraphs";
 import { NodeInstallGuide } from "./messages/NodeInstallGuide";
 import { LoadingMessage } from "./messages/LoadingMessage";
@@ -33,7 +32,6 @@ const getAvatar = (name?: string) => {
 // const UserMessage = lazy(() => import('./messages/UserMessage').then(m => ({ default: m.UserMessage })));
 const WorkflowOption = lazy(() => import('./messages/WorkflowOption').then(m => ({ default: m.WorkflowOption })));
 const NodeSearch = lazy(() => import('./messages/NodeSearch').then(m => ({ default: m.NodeSearch })));
-const NodeRecommend = lazy(() => import('./messages/NodeRecommend').then(m => ({ default: m.NodeRecommend })));
 const DownstreamSubgraphs = lazy(() => import('./messages/DownstreamSubgraphs').then(m => ({ default: m.DownstreamSubgraphs })));
 const NodeInstallGuide = lazy(() => import('./messages/NodeInstallGuide').then(m => ({ default: m.NodeInstallGuide })));
 
@@ -62,7 +60,6 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                 // 获取扩展类型
                 const workflowExt = response.ext?.find(item => item.type === 'workflow');
                 const nodeExt = response.ext?.find(item => item.type === 'node');
-                const nodeRecommendExt = response.ext?.find(item => item.type === 'node_recommend');
                 const downstreamSubgraphsExt = response.ext?.find(item => item.type === 'downstream_subgraph_search');
                 const nodeInstallGuideExt = response.ext?.find(item => item.type === 'node_install_guide');
                 
@@ -85,15 +82,6 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                             latestInput={latestInput}
                             installedNodes={installedNodes}
                             onAddMessage={onAddMessage}
-                        />
-                    );
-                } else if (nodeRecommendExt) {
-                    ExtComponent = (
-                        <NodeRecommend
-                            content={message.content}
-                            name={message.name}
-                            avatar={avatar}
-                            installedNodes={installedNodes}
                         />
                     );
                 } else if (nodeExt) {
