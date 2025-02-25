@@ -40,7 +40,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return {
         ...state,
         messages: state.messages.map(msg => 
-          msg.id === action.payload.id ? action.payload : msg
+          msg.role === action.payload.role && !msg.finished ? action.payload : msg
         )
       };
     case 'SET_SELECTED_NODE':

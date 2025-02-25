@@ -132,7 +132,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         if ((input.trim() === "" && !selectedNode) || !sessionId) return;
         setLatestInput(input);
         
-        const traceId = generateUUID(); // Generate trace_id for this request
+        const traceId = generateUUID();
 
         const userMessage: Message = {
             id: generateUUID(),
@@ -145,23 +145,31 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         setInput("");
 
         try {
-            // Create ext array with model selection
             const modelExt = { type: "model_select", data: [selectedModel] };
-            
-            // 创建一个AI消息ID
-            const aiMessageId = generateUUID();
-            let isFirstChunk = true;
+            let aiMessageId = generateUUID(); // 生成一个固定的消息ID
 
+            // 添加初始AI消息
+            const initialAiMessage: Message = {
+                id: aiMessageId,
+                role: "ai",
+                content: "",
+                type: "stream",
+                format: "markdown",
+                finished: false,
+                name: "Assistant"
+            };
+            dispatch({ type: 'ADD_MESSAGE', payload: initialAiMessage });
+            
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
                 input, 
                 uploadedImages.map(img => img.file),
-                null,  // intent
-                modelExt,  // ext
-                traceId  // Pass trace_id to API call
+                null,
+                modelExt,
+                traceId
             )) {
                 const aiMessage: Message = {
-                    id: aiMessageId, // 使用同一个ID
+                    id: aiMessageId, // 使用相同的消息ID
                     role: "ai",
                     content: JSON.stringify(response),
                     type: response.type,
@@ -170,12 +178,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     name: "Assistant"
                 };
 
-                if (isFirstChunk) {
-                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
-                    isFirstChunk = false;
-                } else {
-                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
-                }
+                dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
 
                 if (response.finished) {
                     dispatch({ type: 'SET_LOADING', payload: false });
@@ -220,7 +223,6 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         dispatch({ type: 'SET_LOADING', payload: true });
 
         const traceId = generateUUID();
-
         const userMessage: Message = {
             id: generateUUID(),
             role: "user",
@@ -231,9 +233,16 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
 
         try {
-            // 创建一个AI消息ID
-            const aiMessageId = generateUUID();
-            let isFirstChunk = true;
+            let aiMessageId = generateUUID();
+            const initialAiMessage: Message = {
+                id: aiMessageId,
+                role: "ai",
+                content: "",
+                format: "markdown",
+                finished: false,
+                name: "Assistant"
+            };
+            dispatch({ type: 'ADD_MESSAGE', payload: initialAiMessage });
 
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
@@ -244,7 +253,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 traceId
             )) {
                 const aiMessage: Message = {
-                    id: aiMessageId, // 使用同一个ID
+                    id: aiMessageId,
                     role: "ai",
                     content: JSON.stringify(response),
                     format: response.format,
@@ -252,12 +261,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     name: "Assistant"
                 };
 
-                if (isFirstChunk) {
-                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
-                    isFirstChunk = false;
-                } else {
-                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
-                }
+                dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
 
                 if (response.finished) {
                     dispatch({ type: 'SET_LOADING', payload: false });

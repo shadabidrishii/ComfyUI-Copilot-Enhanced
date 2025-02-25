@@ -17,6 +17,11 @@ const getApiKey = () => {
     return apiKey;
 };
 
+// Get browser language
+const getBrowserLanguage = () => {
+    return navigator.language || 'zh-CN'; // Default to Chinese if language is not available
+};
+
 export namespace WorkflowChatAPI {
 
   export async function* streamInvokeServer(
@@ -29,6 +34,7 @@ export namespace WorkflowChatAPI {
   ): AsyncGenerator<ChatResponse> {
     try {
       const apiKey = getApiKey();
+      const browserLanguage = getBrowserLanguage();
 
       if (!apiKey) {
         yield {
@@ -61,6 +67,7 @@ export namespace WorkflowChatAPI {
           'Access-Control-Allow-Origin': '*',
           'Authorization': `Bearer ${apiKey}`,
           'trace-id': trace_id || generateUUID(),
+          'Accept-Language': browserLanguage,
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -109,6 +116,7 @@ export namespace WorkflowChatAPI {
   ): Promise<OptimizedWorkflowResponse> {
     try {
       const apiKey = getApiKey();
+      const browserLanguage = getBrowserLanguage();
       
       const response = await fetch(`${BASE_URL}/api/chat/get_optimized_workflow`, {
         method: 'POST',
@@ -118,6 +126,7 @@ export namespace WorkflowChatAPI {
           'Access-Control-Allow-Origin': '*',
           'Authorization': `Bearer ${apiKey}`,
           'trace-id': generateUUID(),
+          'Accept-Language': browserLanguage,
         },
         body: JSON.stringify({
           workflow_id: workflowId,
@@ -142,14 +151,19 @@ export namespace WorkflowChatAPI {
 
   export async function batchGetNodeInfo(nodeTypes: string[]): Promise<any> {
     const apiKey = getApiKey();
+    const browserLanguage = getBrowserLanguage();
+    
     const response = await fetch(`${BASE_URL}/api/chat/get_node_info_by_types`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
         'trace-id': generateUUID(),
+        'Accept-Language': browserLanguage,
       },
-      body: JSON.stringify({ node_types: nodeTypes }),
+      body: JSON.stringify({ 
+        node_types: nodeTypes
+      }),
     });
     const result = await response.json();
     if (!result.success) {
@@ -163,12 +177,15 @@ export namespace WorkflowChatAPI {
   export async function fetchMessages(sessionId: string): Promise<Message[]> {
     try {
       const apiKey = getApiKey();
+      const browserLanguage = getBrowserLanguage();
+      
       const response = await fetch(`${BASE_URL}/api/chat/get_messages_by_session_id?session_id=${sessionId}`, {
         method: 'GET',
         headers: {
           'accept': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
           'trace-id': generateUUID(),
+          'Accept-Language': browserLanguage,
         }
       });
 
