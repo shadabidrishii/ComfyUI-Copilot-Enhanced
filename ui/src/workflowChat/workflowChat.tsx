@@ -62,9 +62,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
     useEffect(() => {
         const fetchInstalledNodes = async () => {
-            console.log('[WorkflowChat] Fetching installed nodes');
             const nodes = await getInstalledNodes();
-            console.log('[WorkflowChat] Received installed nodes:', nodes);
+            console.log('[WorkflowChat] Received installed nodes:', nodes.length);
             dispatch({ type: 'SET_INSTALLED_NODES', payload: nodes });
         };
         fetchInstalledNodes();
@@ -161,7 +160,6 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     id: aiMessageId,
                     role: "ai",
                     content: JSON.stringify(response),
-                    type: response.type,
                     format: response.format,
                     finished: response.finished,
                     name: "Assistant"
