@@ -1,5 +1,5 @@
 const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["copilot_web/WorkflowOption-BYhdO540.js","copilot_web/vendor-markdown-Dek94WS0.js","copilot_web/vendor-react-V04_Axys.js","copilot_web/message-components-DjFRyC2j.js"])))=>i.map(i=>d[i]);
-import{j as v}from"./vendor-markdown-Dek94WS0.js";import{r as D,R as it,c as It}from"./vendor-react-V04_Axys.js";import{a as re,B as vg,U as xg,b as mg,g as xe,A as Xi,c as wg,u as Ts,W as Ji}from"./message-components-DjFRyC2j.js";import{l as yg}from"./App-CZpp8dzt.js";import{_ as br}from"./input.js";/**
+import{j as v}from"./vendor-markdown-Dek94WS0.js";import{r as D,R as it,c as It}from"./vendor-react-V04_Axys.js";import{a as re,B as vg,U as xg,b as mg,g as xe,A as Xi,c as wg,u as Ts,W as Ji}from"./message-components-DjFRyC2j.js";import{l as yg}from"./App-aZLaPGhc.js";import{_ as br}from"./input.js";/**
  * @license lucide-react v0.475.0 - ISC
  *
  * This source code is licensed under the ISC license.
