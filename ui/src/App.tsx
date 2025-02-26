@@ -18,7 +18,8 @@ export default function App() {
   const [shouldTriggerUsage, setShouldTriggerUsage] = useState(false);
 
   const { position, isDragging, handleMouseDown } = useDraggable({
-    boundaryPadding: { right: 100, bottom: 40 }
+    boundaryPadding: { right: 100, bottom: 40 },
+    onClick: () => setShowChat(true)
   });
 
   useEffect(() => {
@@ -47,7 +48,6 @@ export default function App() {
         >
           <button 
             onMouseDown={handleMouseDown}
-            onClick={() => setShowChat(true)}
             className="px-2 py-1 border border-gray-300 rounded-md bg-white text-black hover:bg-blue-300 hover:font-bold transition-colors select-none w-40 flex items-center space-x-1"
             style={{ marginLeft: "-40px" }}
           >
