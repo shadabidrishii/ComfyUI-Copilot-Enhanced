@@ -1,8 +1,8 @@
 /*
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2024-12-26 17:16:51
- * @LastEditors: 晴知 qingli.hql@alibaba-inc.com
- * @LastEditTime: 2025-02-21 13:14:49
+ * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
+ * @LastEditTime: 2025-02-26 14:14:07
  * @FilePath: /comfyui_copilot/ui/src/components/chat/messages/NodeInstallGuide.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -18,12 +18,12 @@ interface NodeInstallGuideProps {
 
 export function NodeInstallGuide({ content, onLoadSubgraph }: NodeInstallGuideProps) {
     const response = JSON.parse(content);
-    const nodeInfos = response.ext?.find(item => item.type === 'node_install_guide')?.data || [];
+    const nodeInfos = response.ext?.find((item: { type: string }) => item.type === 'node_install_guide')?.data || [];
 
     return (
         <div>
             <p>在加载graph到画布前，以下节点有待安装，请跳转到对应的github安装节点：</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
                 {nodeInfos.map((node: any, index: number) => (
                     <div 
                         key={index}
