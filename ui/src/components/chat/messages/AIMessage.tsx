@@ -8,7 +8,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeExternalLinks from 'rehype-external-links';
 import { BaseMessage } from './BaseMessage';
 import { ChatResponse } from "../../../types/types";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 interface AIMessageProps {
   content: string;
   name?: string;
@@ -87,20 +87,39 @@ export function AIMessage({ content, name = 'Assistant', format, onOptionClick, 
                     )
                   },
                   code: ({ children }) => {
+                    const [copied, setCopied] = useState(false);
+                    
+                    const handleCopy = async () => {
+                      try {
+                        await navigator.clipboard.writeText(children as string);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      } catch (err) {
+                        console.error('Failed to copy text:', err);
+                      }
+                    };
+                    
                     return (
                       <div className="relative group">
                         <code className="text-xs bg-gray-100 text-gray-800 rounded px-1">{children}</code>
                         <button 
-                          onClick={() => navigator.clipboard.writeText(children as string)}
-                          className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1 shadow hover:bg-gray-50"
+                          onClick={handleCopy}
+                          className="absolute top-0 right-0 bg-gray-200 rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-300 z-10"
+                          aria-label="Copy code"
                         >
-                          <svg className="w-3 h-3" fill="black" viewBox="0 0 20 20">
-                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                          </svg>
+                          {copied ? (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+                              <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z" />
+                            </svg>
+                          )}
                         </button>
                       </div>
-                    )
+                    );
                   },
                   pre: ({ children }) => {
                     return <pre className="text-xs bg-gray-100 text-gray-800 rounded p-2 overflow-x-auto">{children}</pre>

@@ -10,6 +10,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { exec } from 'child_process';
 import path from 'path';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
+import postcssNesting from 'postcss-nesting';
 
 const rewriteImportPlugin = ({ isDev }) => {
   return {
@@ -33,6 +36,15 @@ const rewriteImportPlugin = ({ isDev }) => {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   envDir: ".",
+  css: {
+    postcss: {
+      plugins: [
+        postcssNesting(),
+        tailwindcss(),
+        autoprefixer(),
+      ],
+    },
+  },
   build: {
     watch: mode === "development" ? {
       include: ["src/**"],
@@ -40,7 +52,7 @@ export default defineConfig(({ mode }) => ({
         // 只在开发模式下启动 Tailwind CSS watch 进程
         console.log("Starting Tailwind CSS watch process...");
         const tailwindProcess = exec(
-          'npx tailwindcss -i ./src/input.css -o ./src/output.css --watch',
+          'npx tailwindcss -i ./src/scoped-tailwind.css -o ./src/output.css --watch',
           (error, stdout, stderr) => {
             if (error) {
               console.error(`Tailwind CSS watch error: ${error}`);

@@ -622,17 +622,11 @@
   .-right-1 {
     right: -0.25rem;
   }
-  .-right-2 {
-    right: -0.5rem;
-  }
   .-top-1 {
     top: -0.25rem;
   }
   .-top-10 {
     top: -2.5rem;
-  }
-  .-top-2 {
-    top: -0.5rem;
   }
   .-top-6 {
     top: -1.5rem;
@@ -1031,9 +1025,6 @@
   .border-4 {
     border-width: 4px;
   }
-  .border-\[0\.5px\] {
-    border-width: 0.5px;
-  }
   .border-b {
     border-bottom-width: 1px;
   }
@@ -1110,6 +1101,10 @@
   .bg-gray-100 {
     --tw-bg-opacity: 1;
     background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+  }
+  .bg-gray-200 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
   }
   .bg-gray-400 {
     --tw-bg-opacity: 1;
@@ -1228,6 +1223,10 @@
   .py-3 {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
+  }
+  .py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
   .pb-10 {
     padding-bottom: 2.5rem;
