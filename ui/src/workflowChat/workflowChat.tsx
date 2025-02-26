@@ -358,6 +358,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                             nodeInfo={selectedNode}
                             onSendWithIntent={handleSendMessageWithIntent}
                             loading={loading}
+                            setInput={setInput}
                         />
                     )}
 
