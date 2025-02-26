@@ -43,7 +43,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
             {installedNodesList.length > 0 && (
                 <div className="space-y-3">
                     <p className="text-xs font-medium">Installed nodes:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                         {installedNodesList.map((node: Node) => (
                             <div
                                 key={node.name}
@@ -100,7 +100,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
             {uninstalledNodesList.length > 0 && (
                 <div className={`space-y-3 ${installedNodesList.length > 0 ? 'mt-4' : ''}`}>
                     <p className="text-xs font-medium">Uninstalled nodes:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                         {uninstalledNodesList.map((node: Node) => (
                             <div
                                 key={node.name}

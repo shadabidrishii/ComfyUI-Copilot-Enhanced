@@ -2,7 +2,7 @@
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2025-02-17 20:53:45
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-02-25 21:05:13
+ * @LastEditTime: 2025-02-26 14:45:03
  * @FilePath: /comfyui_copilot/ui/src/components/chat/SelectedNodeInfo.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */

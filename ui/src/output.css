@@ -912,9 +912,6 @@
   .resize {
     resize: both;
   }
-  .grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1633,12 +1630,6 @@
 .prose-li\:text-xs :is(:where(li):not(:where([class~="not-prose"],[class~="not-prose"] *))) {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-@media (min-width: 640px) {
-  .sm\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (prefers-color-scheme: dark) {

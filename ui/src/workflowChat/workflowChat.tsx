@@ -244,8 +244,13 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     content: JSON.stringify(response),
                     format: response.format,
                     finished: response.finished,
-                    name: "Assistant"
+                    name: "Assistant",
                 };
+                if (intent && intent !== '') {
+                    aiMessage.metadata = {
+                        intent: intent
+                    }
+                }
 
                 if (isFirstResponse) {
                     dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });

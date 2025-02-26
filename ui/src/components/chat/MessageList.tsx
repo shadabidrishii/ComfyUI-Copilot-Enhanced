@@ -200,6 +200,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                             format={message.format}
                             onOptionClick={onOptionClick}
                             extComponent={ExtComponent}
+                            metadata={message.metadata}
                         />
                     );
                 }
@@ -217,6 +218,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                         name={message.name}
                         format={message.format}
                         onOptionClick={onOptionClick}
+                        metadata={message.metadata}
                     />
                 );
             } catch (error) {
@@ -230,6 +232,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                         name={message.name}
                         format={message.format}
                         onOptionClick={onOptionClick}
+                        metadata={message.metadata}
                     />
                 );
             }
