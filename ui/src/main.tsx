@@ -12,7 +12,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { waitForApp } from "./utils/comfyapp.ts";
-import "./output.css";
+import "./scoped-tailwind.css";
 
 const App = React.lazy(() =>
   import("./App.tsx").then(({ default: App }) => ({
@@ -37,6 +37,7 @@ waitForDocumentBody()
   .then(() => {
     // todo： 创建一个web component
     const topbar = document.createElement("div");
+    topbar.id = "comfyui-copilot-plugin";
     document.body.append(topbar);
     ReactDOM.createRoot(topbar).render(
       <React.StrictMode>

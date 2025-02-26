@@ -25,7 +25,7 @@ export function UserMessage({ content, trace_id }: UserMessageProps) {
 
     return (
         <BaseMessage name="User" isUser={true}>
-            <div className="w-full rounded-lg border-[0.5px] border-solid border-gray-700 py-1 px-4 text-gray-700 text-sm break-words relative">
+            <div className="w-full rounded-lg border border-gray-700 py-4 px-4 text-gray-700 text-sm break-words relative">
                 <p className="whitespace-pre-wrap leading-snug">{content}</p>
                 {trace_id && (
                     <div 

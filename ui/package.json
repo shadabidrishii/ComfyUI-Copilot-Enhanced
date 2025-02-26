@@ -46,6 +46,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
     "postcss": "^8.4.49",
+    "postcss-nesting": "^13.0.1",
     "prettier": "^3.2.4",
     "rollup-plugin-watch": "^1.0.4",
     "tailwindcss": "^3.4.15",

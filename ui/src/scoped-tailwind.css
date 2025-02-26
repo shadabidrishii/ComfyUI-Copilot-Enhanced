@@ -1,0 +1,34 @@
+#comfyui-copilot-plugin {
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+}
+
+/* Specifically reset basic elements within our scope to counter preflight:false */
+#comfyui-copilot-plugin {
+  /* Reset common elements */
+  h1, h2, h3, h4, h5, h6, p, ul, ol, button, input, textarea, select {
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+    font-weight: normal;
+  }
+
+  /* Add basic styles that would normally come from preflight */
+  * {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+  }
+
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+
+  /* Specific resets for buttons that might be affected by ComfyUI styles */
+  button {
+    background-color: transparent;
+    background-image: none;
+  }
+} 
