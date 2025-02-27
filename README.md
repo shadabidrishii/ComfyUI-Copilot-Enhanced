@@ -1,3 +1,5 @@
+[中文](./README_CN.md) ｜ English
+
 <div align="center">
 
 # 🎯 ComfyUI-Copilot: Your Intelligent Assistant for Comfy-UI
