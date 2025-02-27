@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# 🎯 ComfyUI-Copilot: 您的智能 ComfyUI 助手
+# 🎯 ComfyUI-Copilot: ComfyUI 智能助手
 
 <h4 align="center">
 
@@ -18,7 +18,7 @@
 👾 _**阿里巴巴国际数字商业集团**_ 👾
 
 <p align="center">
-          :octocat: <a href="https://github.com/AIDC-AI/ComfyUI-Copilot"><b>Github</b></a>&nbsp&nbsp | &nbsp&nbsp 📑 <b>说明文档</b> &nbsp&nbsp  | &nbsp&nbsp 💬 <b>微信</b>&nbsp&nbsp
+          :octocat: <a href="https://github.com/AIDC-AI/ComfyUI-Copilot"><b>Github</b></a>&nbsp&nbsp | &nbsp&nbsp 💬 <a href="https://github.com/imryanxu/ComfyUI-Copilot/blob/main/assets/qrcode.png"><b>微信</b></a>&nbsp&nbsp
 </p>
 
 </div>
@@ -125,6 +125,10 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 ## 📞 联系我们
 
 如有任何疑问或建议，请随时联系：ComfyUI-Copilot@service.alibaba.com。
+
+微信服务群：
+
+<img src='https://github.com/imryanxu/ComfyUI-Copilot/blob/main/assets/qrcode.png' width='300'>
 
 
 ## 📚 许可证
