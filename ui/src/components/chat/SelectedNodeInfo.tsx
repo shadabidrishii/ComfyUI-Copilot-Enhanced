@@ -58,14 +58,14 @@ export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading, setInput
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-blue-50 
                                  text-blue-700 hover:bg-blue-100"
-                        onClick={() => setInput(`How does the ${nodeInfo.type} node work? I need its official usage guide.`)}
+                        onClick={() => setInput(`Reply in ${navigator.language} language: How does the ${nodeInfo.type} node work? I need its official usage guide.`)}
                         disabled={loading}>
                         Usage
                     </button>
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-green-100 
                                  text-green-700 hover:bg-green-200"
-                        onClick={() => setInput(`Show me the technical specifications for the ${nodeInfo.type} node's inputs and outputs.`)}
+                        onClick={() => setInput(`Reply in ${navigator.language} language: Show me the technical specifications for the ${nodeInfo.type} node's inputs and outputs.`)}
                         disabled={loading}>
                         Parameters
                     </button>
