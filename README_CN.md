@@ -127,9 +127,9 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 如有任何疑问或建议，请随时联系：ComfyUI-Copilot@service.alibaba.com。
 
 微信服务群：
-
+<div align="center">
 <img src='https://github.com/imryanxu/ComfyUI-Copilot/blob/main/assets/qrcode.png' width='300'>
-
+</div>
 
 ## 📚 许可证
 
