@@ -2,7 +2,7 @@
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2025-02-17 20:53:45
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-02-26 14:45:03
+ * @LastEditTime: 2025-02-27 19:22:25
  * @FilePath: /comfyui_copilot/ui/src/components/chat/SelectedNodeInfo.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -15,6 +15,7 @@ interface SelectedNodeInfoProps {
     nodeInfo: any;
     onSendWithIntent: (intent: string, ext?: any) => void;
     loading: boolean;
+    onSendWithContent: (text: string) => void;
 }
 
 
@@ -48,7 +49,7 @@ function getDownstreamSubgraphExt() {
     return null;
 }
 
-export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading }: SelectedNodeInfoProps) {
+export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading, onSendWithContent }: SelectedNodeInfoProps) {
     return (
         <div className="mb-3 p-3 rounded-md bg-gray-50 border border-gray-200">
             <div className="text-sm text-gray-700">
@@ -57,14 +58,14 @@ export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading }: Select
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-blue-50 
                                  text-blue-700 hover:bg-blue-100"
-                        onClick={() => onSendWithIntent('node_explain')}
+                        onClick={() => onSendWithContent(`Reply in ${navigator.language} language: How does the ${nodeInfo.type} node work? I need its official usage guide.`)}
                         disabled={loading}>
                         Usage
                     </button>
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-green-100 
                                  text-green-700 hover:bg-green-200"
-                        onClick={() => onSendWithIntent('node_params')}
+                        onClick={() => onSendWithContent(`Reply in ${navigator.language} language: Show me the technical specifications for the ${nodeInfo.type} node's inputs and outputs.`)}
                         disabled={loading}>
                         Parameters
                     </button>
