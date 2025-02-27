@@ -115,6 +115,8 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 3.  **KeyGeneration**：Enter your email address on the link, the api-key will automatically be sent to your email address later.    
 <img src="assets/keygen.png"/>
 
+4. **Note:** This project is in its early stages. Please regularly update to the latest code to access new features. You can either use `git pull` to fetch the latest code or click "Update" in the ComfyUI Manager.
+
 ---
 
 ## 🤝 Contributions
