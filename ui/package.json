@@ -10,7 +10,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "setupGithooks": "node ../scripts/setupGitHooks",
-    "build:prod": "VITE_API_BASE_URL=https://comfyui-copilot-server.onrender.com npx tailwindcss -i ./src/scoped-tailwind.css -o ./src/output.css && vite build && node scripts/post-build.js"
+    "build:prod": "npx tailwindcss -i ./src/scoped-tailwind.css -o ./src/output.css && VITE_API_BASE_URL=https://comfyui-copilot-server.onrender.com vite build && node scripts/post-build.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
