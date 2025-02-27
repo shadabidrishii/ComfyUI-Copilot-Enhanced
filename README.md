@@ -47,21 +47,17 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ---
 
-## 🔥 New Features
+## ✨ Updates
 
-### 2025.02.27
-#### Product Enhancements
-* **Multiple Model Support**: Integrated DeepSeek AI, qwen-plus, allowing users to switch between GPT, DeepSeek and qwen models
-* **Node Installation Guide**: Added intelligent redirection to GitHub repositories or relevant Google search results when users attempt to load uninstalled nodes
-* **Prompt Generation Improvement**: Enhanced SD prompt generation capabilities and enhanced error log analysis capabilities based on user behavior analysis showing high demand for this feature; 
+### 2025.02.27 Release
 
-#### Experience Improvements
-* **Performance Optimization**: Resolved lag issues reported in GitHub issues when using Copilot
-* **Localization Support**: Implemented Chinese language responses for node information queries based on user feedback
-
-#### Algorithm Enhancements
-* **Subgraph Recommendation**: Redesigned downstream subgraph generation logic to filter redundant subgraphs, remove oversized recommendations, and implement upstream node filtering for improved user experience
-* **Model Database Optimization**: Enhanced 60,000+ LoRA and Checkpoint entries with multimodal understanding and tagging to improve embedding performance
+* **Multiple Model Support**: Added DeepSeek AI and Qwen-plus models
+* **Node Installation Guide**: Smart redirection to GitHub repos or Google search results for uninstalled nodes
+* **Prompt Generation**: Enhanced SD prompt generation and error log analysis
+* **Performance**: Fixed lag issues reported in GitHub Issues when using Copilot
+* **Multilingual Support**: Implemented multilingual responses for node queries
+* **Subgraph Recommendation**: Redesigned downstream subgraph generation with improved filtering
+* **Model Database**: Added coverage for 60,000+ LoRA and Checkpoint models
 
 ---
 
