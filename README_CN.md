@@ -65,6 +65,24 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 
 ---
 
+## ✨ 新功能
+
+### 2025.02.27
+#### 产品增强
+* **多模型支持**：集成了 DeepSeek AI 和 Qwen-plus，允许用户在 GPT、DeepSeek 和 Qwen 模型之间切换。
+* **节点安装指南**：当用户尝试加载未安装的节点时，增加了智能跳转至 GitHub 仓库或相关谷歌搜索结果的功能。
+* **提示生成改进**：增强了 SD 提示生成能力，改进了错误日志分析能力，基于用户行为分析显示该功能为高需求。
+
+#### 体验改进
+* **性能优化**：解决了在使用 Copilot 时在 GitHub Issue中报告的延迟问题。
+* **本地化支持**：根据用户反馈，为节点信息查询实现了中文语言响应。
+
+#### 算法增强
+* **子图推荐**：重新设计了下游子图生成逻辑，以过滤冗余子图，移除过大的子图推荐，并过滤上游节点以改善用户体验。
+* **模型数据库优化**：通过多模态理解和标注，增强了 60,000 多个 LoRA 和 Checkpoint 条目的嵌入性能。
+
+---
+
 ## 🚀 快速开始
 
 **仓库概览**：访问 [GitHub 仓库](https://github.com/AIDC-AI/ComfyUI-Copilot) 以获取完整代码库。
@@ -92,8 +110,10 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 2. **激活**：在运行 ComfyUI 项目后，在面板右上角找到 Copilot 激活按钮以启动其服务。
 <img src="assets/start.png"/>
 
-3.  **KeyGeneration**：在链接中输入您的电子邮件地址，api-key 将稍后自动发送到您的电子邮件地址。
+3.  **API Key 生成**：在链接中输入您的电子邮件地址，API Key 将稍后自动发送到您的电子邮件地址。
 <img src="assets/keygen.png"/>
+
+4. **注意**：本项目处于早期阶段。请更新到最新代码以获取新功能。您可以使用 git pull 获取最新代码，或在 ComfyUI Manager 插件中点击“更新”。
 
 ---
 
