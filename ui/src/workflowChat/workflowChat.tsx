@@ -126,6 +126,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         setInput(event.target.value);
     }
 
+
     const handleSendMessage = async () => {
         dispatch({ type: 'SET_LOADING', payload: true });
         if ((input.trim() === "" && !selectedNode) || !sessionId) return;
@@ -151,6 +152,63 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
                 input, 
+                uploadedImages.map(img => img.file),
+                null,
+                modelExt,
+                traceId
+            )) {
+                const aiMessage: Message = {
+                    id: aiMessageId,
+                    role: "ai",
+                    content: JSON.stringify(response),
+                    format: response.format,
+                    finished: response.finished,
+                    name: "Assistant"
+                };
+
+                if (isFirstResponse) {
+                    dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
+                    isFirstResponse = false;
+                } else {
+                    dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                }
+
+                if (response.finished) {
+                    dispatch({ type: 'SET_LOADING', payload: false });
+                }
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            dispatch({ type: 'SET_LOADING', payload: false });
+        } finally {
+            setUploadedImages([]);
+        }
+    };
+
+    const handleSendMessageWithContent = async (content: string) => {
+        if (!sessionId) return;
+        dispatch({ type: 'SET_LOADING', payload: true });
+        setLatestInput(content);
+        
+        const traceId = generateUUID();
+
+        const userMessage: Message = {
+            id: generateUUID(),
+            role: "user",
+            content: content,
+            trace_id: traceId,
+        };
+
+        dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
+
+        try {
+            const modelExt = { type: "model_select", data: [selectedModel] };
+            let aiMessageId = generateUUID();
+            let isFirstResponse = true;
+
+            for await (const response of WorkflowChatAPI.streamInvokeServer(
+                sessionId, 
+                content, 
                 uploadedImages.map(img => img.file),
                 null,
                 modelExt,
@@ -358,7 +416,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                             nodeInfo={selectedNode}
                             onSendWithIntent={handleSendMessageWithIntent}
                             loading={loading}
-                            setInput={setInput}
+                            onSendWithContent={handleSendMessageWithContent}
                         />
                     )}
 
