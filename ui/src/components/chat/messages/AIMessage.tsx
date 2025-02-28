@@ -137,7 +137,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
             };
             
             return (
-              <div className="relative group">
+              <span className="relative group inline-flex items-center">
                 <code className="text-xs bg-gray-100 text-gray-800 rounded px-1">{children}</code>
                 <button 
                   onClick={handleCopy}
@@ -155,7 +155,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
                     </svg>
                   )}
                 </button>
-              </div>
+              </span>
             );
           },
           pre: ({ children }) => {
