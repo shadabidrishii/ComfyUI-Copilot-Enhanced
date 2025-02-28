@@ -5,6 +5,7 @@ import { config } from '../config'
 import { fetchApi } from "../Api";
 import { Message, ChatResponse, OptimizedWorkflowRequest, OptimizedWorkflowResponse, Node, ExtItem } from "../types/types";
 import { generateUUID } from '../utils/uuid';
+import { encryptWithRsaPublicKey } from '../utils/crypto';
 
 const BASE_URL = config.apiBaseUrl
 
@@ -15,6 +16,19 @@ const getApiKey = () => {
         // throw new Error('API key is required. Please set your API key first.');
     }
     return apiKey;
+};
+
+// Get OpenAI configuration from localStorage
+const getOpenAiConfig = () => {
+    const openaiApiKey = localStorage.getItem('openaiApiKey');
+    const openaiBaseUrl = localStorage.getItem('openaiBaseUrl') || 'https://api.openai.com/v1';
+    const rsaPublicKey = localStorage.getItem('rsaPublicKey');
+    
+    return { 
+        openaiApiKey: openaiApiKey || '', 
+        openaiBaseUrl, 
+        rsaPublicKey 
+    };
 };
 
 // Get browser language
@@ -35,6 +49,7 @@ export namespace WorkflowChatAPI {
     try {
       const apiKey = getApiKey();
       const browserLanguage = getBrowserLanguage();
+      const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
 
       if (!apiKey) {
         yield {
@@ -59,16 +74,30 @@ export namespace WorkflowChatAPI {
       // Handle ext parameter
       let finalExt = ext ? (Array.isArray(ext) ? ext : [ext]) : [];
       
+      // Prepare headers
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Authorization': `Bearer ${apiKey}`,
+        'trace-id': trace_id || generateUUID(),
+        'Accept-Language': browserLanguage,
+      };
+      
+      // Add OpenAI configuration headers if available
+      if (openaiApiKey && openaiApiKey.trim() !== '' && rsaPublicKey) {
+        try {
+          const encryptedApiKey = await encryptWithRsaPublicKey(openaiApiKey, rsaPublicKey);
+          headers['Encrypted-Openai-Api-Key'] = encryptedApiKey;
+          headers['Openai-Base-Url'] = openaiBaseUrl;
+        } catch (error) {
+          console.error('Error encrypting OpenAI API key:', error);
+        }
+      }
+      
       const response = await fetch(`${BASE_URL}/api/chat/invoke`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Authorization': `Bearer ${apiKey}`,
-          'trace-id': trace_id || generateUUID(),
-          'Accept-Language': browserLanguage,
-        },
+        headers,
         body: JSON.stringify({
           session_id: sessionId,
           prompt: prompt,
@@ -117,17 +146,32 @@ export namespace WorkflowChatAPI {
     try {
       const apiKey = getApiKey();
       const browserLanguage = getBrowserLanguage();
+      const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
+      
+      // Prepare headers
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Authorization': `Bearer ${apiKey}`,
+        'trace-id': generateUUID(),
+        'Accept-Language': browserLanguage,
+      };
+      
+      // Add OpenAI configuration headers if available
+      if (openaiApiKey && openaiApiKey.trim() !== '' && rsaPublicKey) {
+        try {
+          const encryptedApiKey = await encryptWithRsaPublicKey(openaiApiKey, rsaPublicKey);
+          headers['Encrypted-Openai-Api-Key'] = encryptedApiKey;
+          headers['Openai-Base-Url'] = openaiBaseUrl;
+        } catch (error) {
+          console.error('Error encrypting OpenAI API key:', error);
+        }
+      }
       
       const response = await fetch(`${BASE_URL}/api/chat/get_optimized_workflow`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'accept': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Authorization': `Bearer ${apiKey}`,
-          'trace-id': generateUUID(),
-          'Accept-Language': browserLanguage,
-        },
+        headers,
         body: JSON.stringify({
           workflow_id: workflowId,
           prompt: prompt
@@ -152,15 +196,30 @@ export namespace WorkflowChatAPI {
   export async function batchGetNodeInfo(nodeTypes: string[]): Promise<any> {
     const apiKey = getApiKey();
     const browserLanguage = getBrowserLanguage();
+    const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
+    
+    // Prepare headers
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'trace-id': generateUUID(),
+      'Accept-Language': browserLanguage,
+    };
+    
+    // Add OpenAI configuration headers if available
+    if (openaiApiKey && openaiApiKey.trim() !== '' && rsaPublicKey) {
+      try {
+        const encryptedApiKey = await encryptWithRsaPublicKey(openaiApiKey, rsaPublicKey);
+        headers['Encrypted-Openai-Api-Key'] = encryptedApiKey;
+        headers['Openai-Base-Url'] = openaiBaseUrl;
+      } catch (error) {
+        console.error('Error encrypting OpenAI API key:', error);
+      }
+    }
     
     const response = await fetch(`${BASE_URL}/api/chat/get_node_info_by_types`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'trace-id': generateUUID(),
-        'Accept-Language': browserLanguage,
-      },
+      headers,
       body: JSON.stringify({ 
         node_types: nodeTypes
       }),
@@ -178,15 +237,30 @@ export namespace WorkflowChatAPI {
     try {
       const apiKey = getApiKey();
       const browserLanguage = getBrowserLanguage();
+      const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
+      
+      // Prepare headers
+      const headers: Record<string, string> = {
+        'accept': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'trace-id': generateUUID(),
+        'Accept-Language': browserLanguage,
+      };
+      
+      // Add OpenAI configuration headers if available
+      if (openaiApiKey && openaiApiKey.trim() !== '' && rsaPublicKey) {
+        try {
+          const encryptedApiKey = await encryptWithRsaPublicKey(openaiApiKey, rsaPublicKey);
+          headers['Encrypted-Openai-Api-Key'] = encryptedApiKey;
+          headers['Openai-Base-Url'] = openaiBaseUrl;
+        } catch (error) {
+          console.error('Error encrypting OpenAI API key:', error);
+        }
+      }
       
       const response = await fetch(`${BASE_URL}/api/chat/get_messages_by_session_id?session_id=${sessionId}`, {
         method: 'GET',
-        headers: {
-          'accept': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'trace-id': generateUUID(),
-          'Accept-Language': browserLanguage,
-        }
+        headers,
       });
 
       const result = await response.json();
@@ -217,6 +291,50 @@ export namespace WorkflowChatAPI {
       console.error('Error fetching messages:', error);
       alert(error instanceof Error ? error.message : 'Failed to fetch messages' + ', please refresh the page and try again.');
       throw error;
+    }
+  }
+
+  export async function fetchAnnouncement(): Promise<string> {
+    try {
+      const apiKey = getApiKey();
+      const browserLanguage = getBrowserLanguage();
+      const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
+      
+      // Prepare headers
+      const headers: Record<string, string> = {
+        'accept': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'trace-id': generateUUID(),
+        'Accept-Language': browserLanguage,
+      };
+      
+      // Add OpenAI configuration headers if available
+      if (openaiApiKey && openaiApiKey.trim() !== '' && rsaPublicKey) {
+        try {
+          const encryptedApiKey = await encryptWithRsaPublicKey(openaiApiKey, rsaPublicKey);
+          headers['Encrypted-Openai-Api-Key'] = encryptedApiKey;
+          headers['Openai-Base-Url'] = openaiBaseUrl;
+        } catch (error) {
+          console.error('Error encrypting OpenAI API key:', error);
+        }
+      }
+      
+      const response = await fetch(`${BASE_URL}/api/chat/announcement`, {
+        method: 'GET',
+        headers,
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        const message = result.message || 'Failed to fetch announcement';
+        console.error(message);
+        return '';
+      }
+
+      return result.data as string;
+    } catch (error) {
+      console.error('Error fetching announcement:', error);
+      return '';
     }
   }
 }
