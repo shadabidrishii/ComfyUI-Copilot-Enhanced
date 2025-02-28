@@ -3,6 +3,17 @@
 
 import { config } from '../config';
 
+// 添加 JSEncrypt 的类型定义
+declare module 'jsencrypt' {
+  export default class JSEncrypt {
+    constructor();
+    setPublicKey(key: string): void;
+    encrypt(data: string): string | false;
+  }
+}
+
+import JSEncrypt from 'jsencrypt';
+
 /**
  * Utility functions for handling cryptographic operations
  */
@@ -35,50 +46,62 @@ export async function fetchRsaPublicKey(): Promise<string> {
  */
 export async function encryptWithRsaPublicKey(data: string, publicKey: string): Promise<string> {
   try {
-    // Extract the PEM contents between the header and footer
-    const pemHeader = "-----BEGIN PUBLIC KEY-----";
-    const pemFooter = "-----END PUBLIC KEY-----";
-    const pemContents = publicKey.substring(
-      publicKey.indexOf(pemHeader) + pemHeader.length,
-      publicKey.indexOf(pemFooter)
-    ).replace(/\s/g, '');
-    
-    // Base64 decode the PEM contents
-    const binaryDer = window.atob(pemContents);
-    
-    // Convert binary to ArrayBuffer
-    const buffer = new ArrayBuffer(binaryDer.length);
-    const bufView = new Uint8Array(buffer);
-    for (let i = 0; i < binaryDer.length; i++) {
-      bufView[i] = binaryDer.charCodeAt(i);
+    // 检查是否可以使用 Web Crypto API
+    if (window.crypto && window.crypto.subtle) {
+      // Extract the PEM contents between the header and footer
+      const pemHeader = "-----BEGIN PUBLIC KEY-----";
+      const pemFooter = "-----END PUBLIC KEY-----";
+      const pemContents = publicKey.substring(
+        publicKey.indexOf(pemHeader) + pemHeader.length,
+        publicKey.indexOf(pemFooter)
+      ).replace(/\s/g, '');
+      
+      // Base64 decode the PEM contents
+      const binaryDer = window.atob(pemContents);
+      
+      // Convert binary to ArrayBuffer
+      const buffer = new ArrayBuffer(binaryDer.length);
+      const bufView = new Uint8Array(buffer);
+      for (let i = 0; i < binaryDer.length; i++) {
+        bufView[i] = binaryDer.charCodeAt(i);
+      }
+      
+      // Import the key
+      const cryptoKey = await window.crypto.subtle.importKey(
+        "spki",
+        buffer,
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-256"
+        },
+        false,
+        ["encrypt"]
+      );
+      
+      // Encrypt the data
+      const encoder = new TextEncoder();
+      const dataBuffer = encoder.encode(data);
+      const encryptedBuffer = await window.crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP"
+        },
+        cryptoKey,
+        dataBuffer
+      );
+      
+      // Convert the encrypted data to base64
+      return arrayBufferToBase64(encryptedBuffer);
+    } else {
+      // 使用 JSEncrypt 作为备选方案（适用于 HTTP 环境）
+      console.warn('Web Crypto API 不可用，使用 JSEncrypt 作为备选方案');
+      const encrypt = new JSEncrypt();
+      encrypt.setPublicKey(publicKey);
+      const encrypted = encrypt.encrypt(data);
+      if (!encrypted) {
+        throw new Error('JSEncrypt 加密失败');
+      }
+      return encrypted;
     }
-    
-    // Import the key
-    const cryptoKey = await window.crypto.subtle.importKey(
-      "spki",
-      buffer,
-      {
-        name: "RSA-OAEP",
-        hash: "SHA-256"
-      },
-      false,
-      ["encrypt"]
-    );
-    
-    // Encrypt the data
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(data);
-    const encryptedBuffer = await window.crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP"
-      },
-      cryptoKey,
-      dataBuffer
-    );
-    
-    // Convert the encrypted data to base64 using a more reliable method
-    // This ensures compatibility with the backend's base64.b64decode function
-    return arrayBufferToBase64(encryptedBuffer);
   } catch (error) {
     console.error('Error encrypting data with RSA public key:', error);
     throw error;
