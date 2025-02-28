@@ -18,6 +18,9 @@ import { useChatContext } from '../context/ChatContext';
 import { useMousePosition } from '../hooks/useMousePosition';
 import { useResizable } from '../hooks/useResizable';
 import { useNodeSelection } from '../hooks/useNodeSelection';
+import { MemoizedReactMarkdown } from "../components/markdown";
+import remarkGfm from 'remark-gfm';
+import rehypeExternalLinks from 'rehype-external-links';
 
 interface WorkflowChatProps {
     onClose?: () => void;
@@ -25,6 +28,64 @@ interface WorkflowChatProps {
     triggerUsage?: boolean;
     onUsageTriggered?: () => void;
 }
+
+// 优化公告组件样式 - 更加美观和专业，支持Markdown
+const Announcement = ({ message, onClose }: { message: string, onClose: () => void }) => {
+    if (!message) return null;
+    
+    return (
+        <div className="bg-gradient-to-r from-amber-50 to-amber-100 border-b border-amber-200 px-5 py-2 mt-2 relative shadow-sm">
+            <div className="flex items-center">
+                <div className="flex-shrink-0 mr-2">
+                    <svg className="w-3.5 h-3.5 text-amber-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path>
+                    </svg>
+                </div>
+                <div className="text-amber-800 font-medium leading-relaxed pr-6 markdown-content" style={{ fontSize: '11px' }}>
+                    <MemoizedReactMarkdown
+                        rehypePlugins={[
+                            [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }]
+                        ]}
+                        remarkPlugins={[remarkGfm]}
+                        className="prose !text-[11px] prose-a:text-amber-700 prose-a:underline prose-a:font-medium hover:prose-a:text-amber-800"
+                        components={{
+                            a: ({ node, ...props }) => (
+                                <a {...props} className="text-amber-700 underline hover:text-amber-800 transition-colors" style={{ fontSize: '11px' }} />
+                            ),
+                            p: ({ children }) => (
+                                <span className="inline" style={{ fontSize: '11px' }}>{children}</span>
+                            ),
+                            // Add explicit styling for all text elements
+                            span: ({ children }) => (
+                                <span style={{ fontSize: '11px' }}>{children}</span>
+                            ),
+                            li: ({ children }) => (
+                                <li style={{ fontSize: '11px' }}>{children}</li>
+                            ),
+                            ul: ({ children }) => (
+                                <ul style={{ fontSize: '11px' }}>{children}</ul>
+                            ),
+                            ol: ({ children }) => (
+                                <ol style={{ fontSize: '11px' }}>{children}</ol>
+                            )
+                        }}
+                    >
+                        {message}
+                    </MemoizedReactMarkdown>
+                </div>
+            </div>
+            <button 
+                onClick={onClose}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-amber-500 hover:text-amber-700 transition-colors p-1 rounded-full hover:bg-amber-200/50"
+                aria-label="Close announcement"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    );
+};
 
 export default function WorkflowChat({ onClose, visible = true, triggerUsage = false, onUsageTriggered }: WorkflowChatProps) {
     const { state, dispatch } = useChatContext();
@@ -38,6 +99,9 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
     const [height, setHeight] = useState<number>(window.innerHeight);
     const [topPosition, setTopPosition] = useState<number>(0);
+    // 添加公告状态
+    const [announcement, setAnnouncement] = useState<string>('');
+    const [showAnnouncement, setShowAnnouncement] = useState<boolean>(false);
 
     // 使用自定义 hooks，只在visible为true时启用
     useMousePosition(visible);
@@ -368,6 +432,39 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     }, [triggerUsage]);
 
+    // 获取公告内容
+    useEffect(() => {
+        const fetchAnnouncement = async () => {
+            try {
+                // 检查今天是否已经显示过公告
+                const today = new Date().toDateString();
+                const lastShownDate = localStorage.getItem('announcementLastShownDate');
+                
+                // 如果今天没有显示过公告，则显示
+                if (lastShownDate !== today) {
+                    const message = await WorkflowChatAPI.fetchAnnouncement();
+                    if (message && message.trim() !== '') {
+                        setAnnouncement(message);
+                        setShowAnnouncement(true);
+                        // 记录今天的日期
+                        localStorage.setItem('announcementLastShownDate', today);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching announcement:', error);
+            }
+        };
+        
+        if (visible) {
+            fetchAnnouncement();
+        }
+    }, [visible]);
+
+    // 关闭公告
+    const handleCloseAnnouncement = () => {
+        setShowAnnouncement(false);
+    };
+
     return (
         <div 
             className="fixed right-0 shadow-lg bg-white duration-200 ease-out"
@@ -393,6 +490,15 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     hasMessages={messages.length > 0}
                     onHeightResize={handleHeightResize}
                 />
+                
+                {/* 将公告移到 ChatHeader 下方 */}
+                {showAnnouncement && announcement && (
+                    <Announcement 
+                        message={announcement} 
+                        onClose={handleCloseAnnouncement} 
+                    />
+                )}
+                
                 <div>
                     {installedNodes.map((node: any) => (
                         <div key={node.name}>{node.name}</div>
