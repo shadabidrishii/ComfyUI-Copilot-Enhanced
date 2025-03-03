@@ -125,3 +125,11 @@ export interface OptimizedWorkflowResponse {
   workflow: any;  // 工作流数据
   optimized_params: [number, string, number, string, string | number | boolean][];  // 优化后的参数
 }
+
+export interface TrackEventRequest {
+  event_type: string;
+  message_type: string;
+  user_id?: string | null;
+  session_id?: string | null;
+  data: any;
+}

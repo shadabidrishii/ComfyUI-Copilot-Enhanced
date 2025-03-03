@@ -6,6 +6,7 @@ import { BaseMessage } from './BaseMessage';
 import { useState } from 'react';
 import { ChatResponse, Node } from "../../../types/types";
 import { addNodeOnGraph } from "../../../utils/graphUtils";
+import { WorkflowChatAPI } from "../../../apis/workflowChatApi";
 
 interface NodeSearchProps {
     content: string;
@@ -69,6 +70,13 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                             const addNode = addNodeOnGraph(node.name);
                                             if (addNode) {
                                                 addNode.connect(node.from_index, addNode, node.to_index);
+                                                WorkflowChatAPI.trackEvent({
+                                                    event_type: 'node_add_to_canvas',
+                                                    message_type: 'node',
+                                                    data: {
+                                                        node_name: node.name
+                                                    }
+                                                });
                                             }
                                         }}
                                     >
@@ -126,6 +134,16 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                         className="px-2 py-1 bg-white text-gray-900 rounded-md 
                                                  border border-gray-900 hover:bg-gray-100 
                                                  transition-colors text-[10px] flex items-center gap-1"
+                                        onClick={() => {
+                                            WorkflowChatAPI.trackEvent({
+                                                event_type: 'node_download',
+                                                message_type: 'node',
+                                                data: {
+                                                    node_name: node.name,
+                                                    github_url: node.github_url
+                                                }
+                                            });
+                                        }}
                                     >
                                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
