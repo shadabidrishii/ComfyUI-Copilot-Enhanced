@@ -44,8 +44,7 @@ export namespace WorkflowChatAPI {
       // Use non-blocking fetch to avoid interrupting the main flow
       const apiKey = getApiKey();
       const browserLanguage = getBrowserLanguage();
-      request.user_id = localStorage.getItem('user_id') || null;
-      request.session_id = localStorage.getItem('session_id') || null;
+      request.session_id = localStorage.getItem("sessionId") || null;
       fetch(`${BASE_URL}/api/chat/track_event`, {
         method: 'POST',
         headers: {
