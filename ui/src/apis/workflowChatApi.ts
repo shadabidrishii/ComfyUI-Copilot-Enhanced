@@ -42,12 +42,19 @@ export namespace WorkflowChatAPI {
   ): Promise<void> {
     try {
       // Use non-blocking fetch to avoid interrupting the main flow
+      const apiKey = getApiKey();
+      const browserLanguage = getBrowserLanguage();
       request.user_id = localStorage.getItem('user_id') || null;
       request.session_id = localStorage.getItem('session_id') || null;
       fetch(`${BASE_URL}/api/chat/track_event`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'accept': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': `Bearer ${apiKey}`,
+          'trace-id': generateUUID(),
+          'Accept-Language': browserLanguage,
         },
         body: JSON.stringify(request),
       }).catch(err => {
