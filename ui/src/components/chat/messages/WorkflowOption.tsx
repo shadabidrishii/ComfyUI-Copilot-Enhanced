@@ -28,6 +28,15 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
             return;
         }
 
+        WorkflowChatAPI.trackEvent({
+            event_type: 'workflow_accept',
+            message_type: 'workflow',
+            data: {
+                workflow_id: workflow.id,
+                workflow_name: workflow.name
+            }
+        });
+
         try {
             // 获取优化后的工作流
             const optimizedResult = await WorkflowChatAPI.getOptimizedWorkflow(

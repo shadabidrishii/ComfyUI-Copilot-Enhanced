@@ -135,6 +135,16 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
 
     const checkAndLoadSubgraph = async (node: Subgraph) => {
         console.log('[DownstreamSubgraphs] Starting checkAndLoadSubgraph with node:', node);
+        
+        WorkflowChatAPI.trackEvent({
+            event_type: 'subgraph_accept',
+            message_type: 'subgraph',
+            data: {
+                subgraph_name: node.name,
+                subgraph_tags: node.tags
+            }
+        });
+
         const nodes = node.json.nodes;
         const selectedNode = Object.values(app.canvas.selected_nodes)[0];
 

@@ -9,6 +9,7 @@ import rehypeExternalLinks from 'rehype-external-links';
 import { BaseMessage } from './BaseMessage';
 import { ChatResponse } from "../../../types/types";
 import { useRef, useState } from "react";
+import { WorkflowChatAPI } from "../../../apis/workflowChatApi";
 
 interface AIMessageProps {
   content: string;
@@ -174,6 +175,27 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
               />
             </div>
           ),
+          a: ({ href, children }) => {
+            return (
+              <a 
+                href={href} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => {
+                  WorkflowChatAPI.trackEvent({
+                    event_type: 'markdown_link_click',
+                    message_type: 'markdown',
+                    data: {
+                      link_url: href,
+                      link_text: children
+                    }
+                  });
+                }}
+              >
+                {children}
+              </a>
+            );
+          },
         }}
       >
         {text}

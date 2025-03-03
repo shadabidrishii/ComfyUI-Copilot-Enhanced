@@ -3,7 +3,7 @@
 
 import { config } from '../config'
 import { fetchApi } from "../Api";
-import { Message, ChatResponse, OptimizedWorkflowRequest, OptimizedWorkflowResponse, Node, ExtItem } from "../types/types";
+import { Message, ChatResponse, OptimizedWorkflowRequest, OptimizedWorkflowResponse, Node, ExtItem, TrackEventRequest } from "../types/types";
 import { generateUUID } from '../utils/uuid';
 import { encryptWithRsaPublicKey } from '../utils/crypto';
 
@@ -37,6 +37,32 @@ const getBrowserLanguage = () => {
 };
 
 export namespace WorkflowChatAPI {
+  export async function trackEvent(
+    request: TrackEventRequest
+  ): Promise<void> {
+    try {
+      // Use non-blocking fetch to avoid interrupting the main flow
+      request.user_id = localStorage.getItem('user_id') || null;
+      request.session_id = localStorage.getItem('session_id') || null;
+      fetch(`${BASE_URL}/api/chat/track_event`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request),
+      }).catch(err => {
+        // Silently log errors without throwing exceptions
+        console.warn('Track event failed:', err);
+      });
+    } catch (error) {
+      // Catch any synchronous errors but don't interrupt the business flow
+      console.warn('Error preparing track event:', error);
+    }
+    // Return immediately without waiting for the response
+    return Promise.resolve();
+  }
+  
+
 
   export async function* streamInvokeServer(
     sessionId: string, 
