@@ -82,6 +82,8 @@ export namespace WorkflowChatAPI {
       const apiKey = getApiKey();
       const browserLanguage = getBrowserLanguage();
       const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
+      // Generate a unique message ID for this chat request
+      const messageId = generateUUID();
 
       if (!apiKey) {
         yield {
@@ -156,13 +158,19 @@ export namespace WorkflowChatAPI {
 
         for (const line of lines) {
           if (line.trim()) {
-            yield JSON.parse(line) as ChatResponse;
+            yield {
+              ...JSON.parse(line) as ChatResponse,
+              message_id: messageId
+            };
           }
         }
       }
 
       if (buffer.trim()) {
-        yield JSON.parse(buffer) as ChatResponse;
+        yield {
+          ...JSON.parse(buffer) as ChatResponse,
+          message_id: messageId
+        };
       }
     } catch (error) {
       console.error('Error in streamInvokeServer:', error);
@@ -267,6 +275,13 @@ export namespace WorkflowChatAPI {
 
   export async function fetchMessages(sessionId: string): Promise<Message[]> {
     try {
+      // First check if we have cached messages in localStorage
+      const cachedMessages = localStorage.getItem(`messages_${sessionId}`);
+      if (cachedMessages) {
+        console.log('Using cached messages from localStorage');
+        return JSON.parse(cachedMessages) as Message[];
+      }
+      
       const apiKey = getApiKey();
       const browserLanguage = getBrowserLanguage();
       const { openaiApiKey, openaiBaseUrl, rsaPublicKey } = getOpenAiConfig();
@@ -302,7 +317,7 @@ export namespace WorkflowChatAPI {
         throw new Error(message);
       }
 
-      return result.data.map((msg: any) => {
+      const messages = result.data.map((msg: any) => {
         console.log("msg.ext", msg.ext);
         return {
           id: msg.id.toString(),
@@ -319,6 +334,11 @@ export namespace WorkflowChatAPI {
           finished: msg.finished
         }
       });
+      
+      // Cache the messages in localStorage
+      localStorage.setItem(`messages_${sessionId}`, JSON.stringify(messages));
+      
+      return messages;
     } catch (error) {
       console.error('Error fetching messages:', error);
       alert(error instanceof Error ? error.message : 'Failed to fetch messages' + ', please refresh the page and try again.');

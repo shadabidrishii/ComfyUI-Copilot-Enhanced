@@ -54,6 +54,7 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
         WorkflowChatAPI.trackEvent({
             event_type: 'workflow_accept',
             message_type: 'workflow',
+            message_id: response.message_id,
             data: {
                 workflow_id: workflow.id,
                 workflow_name: workflow.name

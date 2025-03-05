@@ -76,6 +76,13 @@ const ChatContext = createContext<{
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(chatReducer, initialState);
 
+  // Update localStorage cache when messages or sessionId changes
+  React.useEffect(() => {
+    if (state.sessionId && state.messages.length > 0) {
+      localStorage.setItem(`messages_${state.sessionId}`, JSON.stringify(state.messages));
+    }
+  }, [state.messages, state.sessionId]);
+
   return (
     <ChatContext.Provider value={{ state, dispatch }}>
       {children}

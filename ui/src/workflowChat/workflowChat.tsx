@@ -138,6 +138,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         try {
             const data = await WorkflowChatAPI.fetchMessages(sid);
             dispatch({ type: 'SET_MESSAGES', payload: data });
+            // Note: The localStorage cache is already updated in the fetchMessages API function
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
@@ -235,6 +236,11 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     isFirstResponse = false;
                 } else {
                     dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                    // Update localStorage cache
+                    const updatedMessages = state.messages.map(msg => 
+                        msg.id === aiMessage.id && !msg.finished ? aiMessage : msg
+                    );
+                    updateMessagesCache(updatedMessages);
                 }
 
                 if (response.finished) {
@@ -292,6 +298,11 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     isFirstResponse = false;
                 } else {
                     dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                    // Update localStorage cache
+                    const updatedMessages = state.messages.map(msg => 
+                        msg.id === aiMessage.id && !msg.finished ? aiMessage : msg
+                    );
+                    updateMessagesCache(updatedMessages);
                 }
 
                 if (response.finished) {
@@ -314,7 +325,14 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
     const handleClearMessages = () => {
         dispatch({ type: 'CLEAR_MESSAGES' });
+        // Remove old session data
+        const oldSessionId = state.sessionId;
+        if (oldSessionId) {
+            localStorage.removeItem(`messages_${oldSessionId}`);
+        }
         localStorage.removeItem("sessionId");
+        
+        // Create new session
         const newSessionId = generateUUID();
         dispatch({ type: 'SET_SESSION_ID', payload: newSessionId });
         localStorage.setItem("sessionId", newSessionId);
@@ -377,6 +395,11 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     isFirstResponse = false;
                 } else {
                     dispatch({ type: 'UPDATE_MESSAGE', payload: aiMessage });
+                    // Update localStorage cache
+                    const updatedMessages = state.messages.map(msg => 
+                        msg.id === aiMessage.id && !msg.finished ? aiMessage : msg
+                    );
+                    updateMessagesCache(updatedMessages);
                 }
 
                 if (response.finished) {
@@ -389,9 +412,20 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     };
 
+    // Utility function to update localStorage cache for messages
+    const updateMessagesCache = (messages: Message[]) => {
+        if (state.sessionId) {
+            localStorage.setItem(`messages_${state.sessionId}`, JSON.stringify(messages));
+        }
+    };
+
     const handleAddMessage = (message: Message) => {
         console.log('[WorkflowChat] Adding new message:', message);
+        const updatedMessages = [...state.messages, message];
         dispatch({ type: 'ADD_MESSAGE', payload: message });
+        
+        // Update the localStorage cache with the new message
+        updateMessagesCache(updatedMessages);
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {

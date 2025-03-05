@@ -139,6 +139,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
         WorkflowChatAPI.trackEvent({
             event_type: 'subgraph_accept',
             message_type: 'subgraph',
+            message_id: response.message_id,
             data: {
                 subgraph_name: node.name,
                 subgraph_tags: node.tags
