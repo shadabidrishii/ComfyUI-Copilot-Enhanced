@@ -177,9 +177,11 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
           ),
           a: ({ href, children }) => {
             let messageType = 'markdown';
+            let messageId = null;
             try {
               const response = JSON.parse(content);
               messageType = response.ext?.[0]?.type || 'markdown';
+              messageId = response?.message_id;
             } catch (e) {
               console.error('Error parsing content:', e);
             }
@@ -192,6 +194,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
                   WorkflowChatAPI.trackEvent({
                     event_type: 'markdown_link_click',
                     message_type: messageType,
+                    message_id: messageId,
                     data: {
                       link_url: href,
                       link_text: children

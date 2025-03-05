@@ -69,6 +69,7 @@ export interface ExtItem {
 }
 
 export interface ChatResponse {
+  message_id?: string;
   session_id: string;
   text?: string;
   finished: boolean;
@@ -131,5 +132,6 @@ export interface TrackEventRequest {
   message_type: string;
   user_id?: string | null;
   session_id?: string | null;
+  message_id?: string | null;
   data: any;
 }

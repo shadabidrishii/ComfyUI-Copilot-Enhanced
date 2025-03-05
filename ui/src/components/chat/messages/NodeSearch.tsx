@@ -73,6 +73,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                                 WorkflowChatAPI.trackEvent({
                                                     event_type: 'node_add_to_canvas',
                                                     message_type: 'node',
+                                                    message_id: response.message_id,
                                                     data: {
                                                         node_name: node.name
                                                     }
@@ -138,6 +139,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                             WorkflowChatAPI.trackEvent({
                                                 event_type: 'node_download',
                                                 message_type: 'node',
+                                                message_id: response.message_id,
                                                 data: {
                                                     node_name: node.name,
                                                     github_url: node.github_url
