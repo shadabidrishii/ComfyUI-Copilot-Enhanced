@@ -18,7 +18,7 @@
 👾 _**阿里巴巴国际数字商业集团**_ 👾
 
 <p align="center">
-          :octocat: <a href="https://github.com/AIDC-AI/ComfyUI-Copilot"><b>Github</b></a>&nbsp&nbsp | &nbsp&nbsp 💬 <a href="https://github.com/imryanxu/ComfyUI-Copilot/blob/main/assets/qrcode.png"><b>微信</b></a>&nbsp&nbsp
+          :octocat: <a href="https://github.com/AIDC-AI/ComfyUI-Copilot"><b>Github</b></a>&nbsp&nbsp | &nbsp&nbsp 💬 <a href="https://github.com/AIDC-AI/ComfyUI-Copilot/blob/main/assets/qrcode.png"><b>微信</b></a>&nbsp&nbsp
 </p>
 
 </div>
@@ -120,7 +120,7 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 
 微信服务群：
 <div align="center">
-<img src='https://github.com/imryanxu/ComfyUI-Copilot/blob/main/assets/qrcode.png' width='300'>
+<img src='https://github.com/AIDC-AI/ComfyUI-Copilot/blob/main/assets/qrcode.png' width='300'>
 </div>
 
 ## 📚 许可证
