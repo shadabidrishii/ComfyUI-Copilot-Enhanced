@@ -85,13 +85,13 @@ export namespace WorkflowChatAPI {
       // Generate a unique message ID for this chat request
       const messageId = generateUUID();
 
-      if (!apiKey) {
-        yield {
-            text: 'API key is required. Please set your API key first.⚙\nIf you don\'t have an API key, please email us at ComfyUI-Copilot@service.alibaba.com and we will get back to you as soon as possible.',
-            finished: true
-        } as ChatResponse;
-        return;
-      }
+      // if (!apiKey) {
+      //   yield {
+      //       text: 'API key is required. Please set your API key first.⚙\nIf you don\'t have an API key, please email us at ComfyUI-Copilot@service.alibaba.com and we will get back to you as soon as possible.',
+      //       finished: true
+      //   } as ChatResponse;
+      //   return;
+      // }
       
       // Convert images to base64
       const imagePromises = (images || []).map(file => 
