@@ -1,3 +1,11 @@
+/*
+ * @Author: ai-business-hql ai.bussiness.hql@gmail.com
+ * @Date: 2025-03-20 15:15:20
+ * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
+ * @LastEditTime: 2025-03-20 17:50:09
+ * @FilePath: /comfyui_copilot/ui/src/workflowChat/workflowChat.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
@@ -21,6 +29,9 @@ import { useNodeSelection } from '../hooks/useNodeSelection';
 import { MemoizedReactMarkdown } from "../components/markdown";
 import remarkGfm from 'remark-gfm';
 import rehypeExternalLinks from 'rehype-external-links';
+
+// Define the Tab type - We should import this from context to ensure consistency
+import type { TabType } from '../context/ChatContext';
 
 interface WorkflowChatProps {
     onClose?: () => void;
@@ -87,9 +98,52 @@ const Announcement = ({ message, onClose }: { message: string, onClose: () => vo
     );
 };
 
+// Parameter Debug Tab Component
+const ParameterDebugTab = () => {
+    const { state } = useChatContext();
+    const { selectedNode } = state;
+    const selectedNodes = selectedNode ? selectedNode : [];
+    
+    const ParameterDebugInterface = React.lazy(() => 
+      import("../components/debug/ParameterDebugInterface").then(module => ({
+          default: module.ParameterDebugInterface
+      }))
+    );
+    
+    return (
+        <div className="flex-1 flex flex-col overflow-y-auto">
+            <React.Suspense fallback={<div>Loading...</div>}>
+                <ParameterDebugInterface selectedNodes={selectedNodes} visible={true} />
+            </React.Suspense>
+        </div>
+    );
+};
+
+// Tab component
+const TabButton = ({ 
+    active, 
+    onClick, 
+    children 
+}: { 
+    active: boolean; 
+    onClick: () => void; 
+    children: React.ReactNode 
+}) => (
+    <button
+        onClick={onClick}
+        className={`px-4 py-2 font-medium text-sm transition-colors duration-200 ${
+            active 
+                ? "text-blue-600 border-b-2 border-blue-600" 
+                : "text-gray-600 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"
+        }`}
+    >
+        {children}
+    </button>
+);
+
 export default function WorkflowChat({ onClose, visible = true, triggerUsage = false, onUsageTriggered }: WorkflowChatProps) {
     const { state, dispatch } = useChatContext();
-    const { messages, installedNodes, loading, sessionId, selectedNode } = state;
+    const { messages, installedNodes, loading, sessionId, selectedNode, activeTab } = state;
     const messageDivRef = useRef<HTMLDivElement>(null);
     const [input, setInput] = useState<string>('');
     const [latestInput, setLatestInput] = useState<string>('');
@@ -103,8 +157,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const [announcement, setAnnouncement] = useState<string>('');
     const [showAnnouncement, setShowAnnouncement] = useState<boolean>(false);
 
-    // 使用自定义 hooks，只在visible为true时启用
-    useMousePosition(visible);
+    // 使用自定义 hooks，只在visible为true且activeTab为chat时启用
+    useMousePosition(visible && activeTab === 'chat');
     useNodeSelection(visible);
     const { 
         isResizing: resizableIsResizing, 
@@ -125,13 +179,15 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     }, [messages])
 
     useEffect(() => {
+        if (activeTab !== 'chat') return;
+        
         const fetchInstalledNodes = async () => {
             const nodes = await getInstalledNodes();
             console.log('[WorkflowChat] Received installed nodes:', nodes.length);
             dispatch({ type: 'SET_INSTALLED_NODES', payload: nodes });
         };
         fetchInstalledNodes();
-    }, []);
+    }, [activeTab]);
 
     // 获取历史消息
     const fetchMessages = async (sid: string) => {
@@ -145,6 +201,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     };
 
     useEffect(() => {
+        if (activeTab !== 'chat') return;
+        
         let sid = localStorage.getItem("sessionId");
         if (sid) {
             dispatch({ type: 'SET_SESSION_ID', payload: sid });
@@ -154,7 +212,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             dispatch({ type: 'SET_SESSION_ID', payload: sid });
             localStorage.setItem("sessionId", sid);
         }
-    }, []);
+    }, [activeTab]);
 
     // 使用防抖处理宽度调整
     const handleMouseMoveForResize = React.useCallback((e: MouseEvent) => {
@@ -460,14 +518,16 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     }, [uploadedImages]);
 
     useEffect(() => {
-        if (triggerUsage && onUsageTriggered) {
+        if (triggerUsage && onUsageTriggered && activeTab === 'chat') {
             handleSendMessageWithIntent('node_explain');
             onUsageTriggered();
         }
-    }, [triggerUsage]);
+    }, [triggerUsage, activeTab]);
 
     // 获取公告内容
     useEffect(() => {
+        if (!visible || activeTab !== 'chat') return;
+        
         const fetchAnnouncement = async () => {
             try {
                 // 检查今天是否已经显示过公告
@@ -489,14 +549,17 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             }
         };
         
-        if (visible) {
-            fetchAnnouncement();
-        }
-    }, [visible]);
+        fetchAnnouncement();
+    }, [visible, activeTab]);
 
     // 关闭公告
     const handleCloseAnnouncement = () => {
         setShowAnnouncement(false);
+    };
+
+    // Handle tab change
+    const handleTabChange = (tab: TabType) => {
+        dispatch({ type: 'SET_ACTIVE_TAB', payload: tab });
     };
 
     return (
@@ -523,56 +586,74 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     onClear={handleClearMessages}
                     hasMessages={messages.length > 0}
                     onHeightResize={handleHeightResize}
+                    title={`ComfyUI-Copilot`}
                 />
                 
-                {/* 将公告移到 ChatHeader 下方 */}
-                {showAnnouncement && announcement && (
+                {/* Tab navigation */}
+                <div className="flex border-b border-gray-200 mt-2">
+                    <TabButton 
+                        active={activeTab === 'chat'}
+                        onClick={() => handleTabChange('chat')}
+                    >
+                        Chat
+                    </TabButton>
+                    <TabButton 
+                        active={activeTab === 'parameter-debug'}
+                        onClick={() => handleTabChange('parameter-debug')}
+                    >
+                        Parameter Lab
+                    </TabButton>
+                </div>
+                
+                {/* 将公告移到 ChatHeader 下方和Tab导航下方 */}
+                {showAnnouncement && announcement && activeTab === 'chat' && (
                     <Announcement 
                         message={announcement} 
                         onClose={handleCloseAnnouncement} 
                     />
                 )}
                 
-                <div>
-                    {installedNodes.map((node: any) => (
-                        <div key={node.name}>{node.name}</div>
-                    ))}
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-4 scroll-smooth" ref={messageDivRef}>
-                    <MessageList 
-                        messages={messages}
-                        latestInput={latestInput}
-                        onOptionClick={handleOptionClick}
-                        installedNodes={installedNodes}
-                        onAddMessage={handleAddMessage}
-                        loading={loading}
-                    />
-                </div>
+                {/* Tab content */}
+                {activeTab === 'chat' ? (
+                    <>
+                        <div className="flex-1 overflow-y-auto p-4 scroll-smooth" ref={messageDivRef}>
+                            <MessageList 
+                                messages={messages}
+                                latestInput={latestInput}
+                                onOptionClick={handleOptionClick}
+                                installedNodes={installedNodes}
+                                onAddMessage={handleAddMessage}
+                                loading={loading}
+                            />
+                        </div>
 
-                <div className="border-t px-4 py-3 border-gray-200 bg-white sticky bottom-0">
-                    {selectedNode && (
-                        <SelectedNodeInfo 
-                            nodeInfo={selectedNode}
-                            onSendWithIntent={handleSendMessageWithIntent}
-                            loading={loading}
-                            onSendWithContent={handleSendMessageWithContent}
-                        />
-                    )}
+                        <div className="border-t px-4 py-3 border-gray-200 bg-white sticky bottom-0">
+                            {selectedNode && (
+                                <SelectedNodeInfo 
+                                    nodeInfo={selectedNode}
+                                    onSendWithIntent={handleSendMessageWithIntent}
+                                    loading={loading}
+                                    onSendWithContent={handleSendMessageWithContent}
+                                />
+                            )}
 
-                    <ChatInput 
-                        input={input}
-                        loading={loading}
-                        onChange={handleMessageChange}
-                        onSend={handleSendMessage}
-                        onKeyPress={handleKeyPress}
-                        onUploadImages={handleUploadImages}
-                        uploadedImages={uploadedImages}
-                        onRemoveImage={handleRemoveImage}
-                        selectedModel={selectedModel}
-                        onModelChange={setSelectedModel}
-                    />
-                </div>
+                            <ChatInput 
+                                input={input}
+                                loading={loading}
+                                onChange={handleMessageChange}
+                                onSend={handleSendMessage}
+                                onKeyPress={handleKeyPress}
+                                onUploadImages={handleUploadImages}
+                                uploadedImages={uploadedImages}
+                                onRemoveImage={handleRemoveImage}
+                                selectedModel={selectedModel}
+                                onModelChange={setSelectedModel}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <ParameterDebugTab />
+                )}
             </div>
         </div>
     );

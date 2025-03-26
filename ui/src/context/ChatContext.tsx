@@ -9,6 +9,9 @@
 import React, { createContext, useContext, useReducer, Dispatch } from 'react';
 import { Message } from '../types/types';
 
+// Add tab type definition
+export type TabType = 'chat' | 'parameter-debug';
+
 interface ChatState {
   messages: Message[];
   selectedNode: any | null;
@@ -16,6 +19,7 @@ interface ChatState {
   loading: boolean;
   sessionId: string | null;
   showChat: boolean;
+  activeTab: TabType; // Add active tab state
 }
 
 type ChatAction = 
@@ -27,6 +31,7 @@ type ChatAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SESSION_ID'; payload: string }
   | { type: 'SET_SHOW_CHAT'; payload: boolean }
+  | { type: 'SET_ACTIVE_TAB'; payload: TabType } // Add action for changing tab
   | { type: 'CLEAR_MESSAGES' };
 
 const initialState: ChatState = {
@@ -36,6 +41,7 @@ const initialState: ChatState = {
   loading: false,
   sessionId: null,
   showChat: false,
+  activeTab: 'chat', // Default to chat tab
 };
 
 function chatReducer(state: ChatState, action: ChatAction): ChatState {
@@ -61,6 +67,8 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, sessionId: action.payload };
     case 'SET_SHOW_CHAT':
       return { ...state, showChat: action.payload };
+    case 'SET_ACTIVE_TAB':
+      return { ...state, activeTab: action.payload };
     case 'CLEAR_MESSAGES':
       return { ...state, messages: [] };
     default:
