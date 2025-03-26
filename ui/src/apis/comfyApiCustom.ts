@@ -2,7 +2,7 @@
  * @Author: ai-business-hql ai.bussiness.hql@gmail.com
  * @Date: 2025-02-17 20:53:45
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-03-25 20:22:38
+ * @LastEditTime: 2025-03-26 17:59:13
  * @FilePath: /comfyui_copilot/ui/src/apis/comfyApiCustom.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -33,6 +33,77 @@ export async function runPrompt(json_data: any): Promise<any> {
   });
   return await response.json();
 }
+
+/**
+ * Clear the prompt queue or delete specific queue items
+ * 
+ * @param options Configuration options
+ * @param options.clear If true, clears the entire queue
+ * @param options.delete Array of prompt IDs to delete from the queue
+ * @returns Promise with the response
+ * 
+ * @example
+ * // Clear the entire queue
+ * await manageQueue({ clear: true });
+ * 
+ * // Delete specific prompts from the queue
+ * await manageQueue({ delete: ["prompt-123", "prompt-456"] });
+ * 
+ * // Both clear the queue and delete specific prompts
+ * await manageQueue({ clear: true, delete: ["prompt-789"] });
+ */
+export async function manageQueue(options: { 
+  clear?: boolean; 
+  delete?: string[];
+}): Promise<Response> {
+  try {
+    const response = await api.fetchApi("/queue", {
+      method: "POST",
+      body: JSON.stringify(options),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to manage queue: ${response.status} ${response.statusText}`);
+    }
+    
+    return response;
+  } catch (error) {
+    console.error("Error managing queue:", error);
+    throw error;
+  }
+}
+
+
+/**
+ * Interrupts the current processing/generation
+ * 
+ * This function sends a request to the server to stop the current
+ * processing operation. It's useful for canceling ongoing image generations.
+ * 
+ * @returns Promise with the response
+ * 
+ * @example
+ * // Interrupt the current generation process
+ * await interruptProcessing();
+ */
+export async function interruptProcessing(): Promise<Response> {
+  try {
+    const response = await api.fetchApi("/interrupt", {
+      method: "POST",
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to interrupt processing: ${response.status} ${response.statusText}`);
+    }
+    
+    return response;
+  } catch (error) {
+    console.error("Error interrupting processing:", error);
+    throw error;
+  }
+}
+
+
 
 export async function getImage(filename: string, subfolder: string, folderType: string): Promise<Blob> {
   try {

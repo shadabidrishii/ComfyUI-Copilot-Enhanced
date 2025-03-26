@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getOutputImageByPromptId, queuePrompt, WidgetParamConf, WidgetPair } from '../../utils/queuePrompt';
 import { app } from '../../utils/comfyapp';
+import { interruptProcessing, manageQueue } from '../../apis/comfyApiCustom';
 
 // Add CSS for the highlight pulse effect
 const highlightPulseStyle = `
@@ -94,6 +95,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
 
   // Add state to store notification visibility
   const [notificationVisible, setNotificationVisible] = useState(false);
+
+  // Add new state for modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState('');
 
   // Add style to document head
   useEffect(() => {
@@ -634,6 +639,23 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setSelectedImageIndex(index);
   };
 
+  // Add new function to open image modal
+  const openImageModal = (imageUrl: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setModalImageUrl(imageUrl);
+    setModalVisible(true);
+  };
+
+  // Add new function to close image modal
+  const closeImageModal = (event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setModalVisible(false);
+  };
+
   // Handle applying selected image
   const handleApplySelected = (event?: React.MouseEvent) => {
     if (event) {
@@ -689,37 +711,37 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       >
         <div className="max-w-lg p-8 bg-white rounded-lg shadow-sm border border-blue-100 relative">
           <div className="mb-6 text-center">
-            <h3 className="text-xl font-bold text-blue-800 mb-2">GenLab</h3>
+            <h3 className="text-base font-bold text-blue-800 mb-2">GenLab</h3>
             <div className="h-1 w-16 bg-blue-500 mx-auto rounded-full mb-4"></div>
           </div>
           
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
               <div className="bg-blue-100 p-2 rounded-full text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
               </div>
               <div>
-                <h4 className="font-medium text-gray-800">Batch Test Parameter Pairs</h4>
-                <p className="text-gray-600 text-sm">Select a node to batch test parameter pairs</p>
+                <h4 className="text-sm font-medium text-gray-800">Batch Test Parameter Pairs</h4>
+                <p className="text-xs text-gray-600">Select a node to batch test parameter pairs</p>
               </div>
             </div>
 
             <div className="flex items-start space-x-3">
               <div className="bg-indigo-100 p-2 rounded-full text-indigo-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
               </div>
               <div>
-                <h4 className="font-medium text-gray-800">How To Use</h4>
-                <p className="text-gray-600 text-sm">Click on any node in your workflow to start the parameter testing process</p>
+                <h4 className="text-sm font-medium text-gray-800">How To Use</h4>
+                <p className="text-xs text-gray-600">Click on any node in your workflow to start the parameter testing process</p>
               </div>
             </div>
             
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600 mb-3">No node is currently selected</p>
+              <p className="text-xs text-gray-600 mb-3">No node is currently selected</p>
             </div>
           </div>
         </div>
@@ -745,11 +767,11 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="mb-4 border-b pb-2 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-medium text-gray-800">Generation Complete</h3>
-              <p className="text-sm text-gray-500">All {generatedImages.length} images have been generated.</p>
+              <h3 className="text-base font-medium text-gray-800">Generation Complete</h3>
+              <p className="text-xs text-gray-500">All {generatedImages.length} images have been generated.</p>
             </div>
             <button className="text-gray-400 hover:text-gray-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -757,14 +779,37 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           
           {/* Notification toast */}
           {notificationVisible && (
-            <div className="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 shadow-md rounded animate-fade-in-out z-50">
+            <div className="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-3 shadow-md rounded animate-fade-in-out z-50">
               <div className="flex items-center">
                 <div className="py-1">
-                  <svg className="h-6 w-6 text-green-500 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-4 w-4 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p>Parameters has been applied.</p>
+                <p className="text-xs">Parameters has been applied.</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Image Modal */}
+          {modalVisible && (
+            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeImageModal}>
+              <div className="bg-white rounded-lg p-2 max-w-4xl max-h-[90vh] relative" onClick={(e) => e.stopPropagation()}>
+                <button 
+                  className="absolute top-2 right-2 text-gray-700 hover:text-gray-900 rounded-full hover:bg-gray-200 p-1"
+                  onClick={closeImageModal}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div className="overflow-auto max-h-[calc(90vh-4rem)]">
+                  <img 
+                    src={modalImageUrl} 
+                    alt="Enlarged image" 
+                    className="max-w-full h-auto"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -778,6 +823,15 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                   className={`relative rounded-lg overflow-hidden border ${selectedImageIndex === actualIndex ? 'border-pink-500 ring-2 ring-pink-300' : 'border-gray-200'}`}
                   onClick={(e) => handleSelectImage(actualIndex, e)}
                 >
+                  {/* Zoom icon */}
+                  <button 
+                    className="absolute top-2 right-2 bg-white bg-opacity-75 rounded-full p-0.5 text-gray-600 hover:text-gray-900 shadow-sm z-10"
+                    onClick={(e) => openImageModal(image.url, e)}
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                    </svg>
+                  </button>
                   <div className="aspect-square">
                     <img 
                       src={image.url} 
@@ -825,7 +879,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                 </svg>
               </button>
 
-              <div className="px-2 py-1 text-sm text-gray-800">
+              <div className="px-2 py-1 text-xs text-gray-800">
                 Page {currentPage} of {actualTotalPages}
               </div>
 
@@ -854,13 +908,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           <div className="mt-6 flex justify-between">
             <button
               onClick={(e) => handlePrevious(e)}
-              className="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={(e) => handleApplySelected(e)}
-              className="px-4 py-2 bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
+              className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
               disabled={selectedImageIndex === null}
             >
               Apply Selected
@@ -882,8 +936,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           {/* Semi-transparent overlay */}
           <div className="absolute inset-0 bg-gray-500 bg-opacity-30 flex flex-col items-center justify-center z-10">
             <div className="text-center text-gray-800 bg-white p-4 rounded-lg shadow-lg">
-              <div className="mb-2 font-medium">Processing...</div>
-              <div className="text-sm mb-3">Completed {completedCount} of {totalCount} runs</div>
+              <div className="mb-2 text-sm font-medium">Processing...</div>
+              <div className="text-xs mb-3">Completed {completedCount} of {totalCount} runs</div>
               <div className="w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-pink-500 transition-all duration-200"
@@ -893,19 +947,32 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               <div className="mt-2 text-xs text-gray-600">
                 Already generated {completedCount} images
               </div>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  manageQueue({clear: true});
+                  interruptProcessing();
+                  setIsProcessing(false);
+                  setCurrentScreen(2);
+                }}
+                className="mt-4 px-3 py-1.5 text-xs bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
             </div>
           </div>
 
           {/* Background content (same as screen 3 content) */}
           <div className="mb-4 border-b pb-2 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-medium text-gray-800">Confirm Test Configuration</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="text-base font-medium text-gray-800">Confirm Test Configuration</h3>
+              <p className="text-xs text-gray-500">
                 In the selected parameter combinations, there are {totalCount} total runs. Each run will generate a separate image.
               </p>
             </div>
             <button className="text-gray-400 hover:text-gray-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -913,10 +980,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           
           {/* Display error message */}
           {errorMessage && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-xs">
               <div className="flex items-start">
                 <div className="flex-shrink-0 mt-0.5">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
@@ -933,7 +1000,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               
               return (
                 <div key={nodeIndex} className="border rounded-md mb-4 overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-2 font-medium text-gray-700 border-b">
+                  <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 border-b">
                     {nodeType} (ID: {nodeId})
                   </div>
                   <div className="p-4 space-y-3">
@@ -978,13 +1045,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           <div className="mt-6 flex justify-between">
             <button
               onClick={(e) => handlePrevious(e)}
-              className="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={(e) => handleStartGeneration(e)}
-              className="px-4 py-2 bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
+              className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
             >
               Start Generation
             </button>
@@ -1004,11 +1071,11 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="mb-4 border-b pb-2 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-medium text-gray-800">Select Parameters for Testing</h3>
-              <p className="text-sm text-gray-500">Choose the parameters you want to include in your batch test</p>
+              <h3 className="text-base font-medium text-gray-800">Select Parameters for Testing</h3>
+              <p className="text-xs text-gray-500">Choose the parameters you want to include in your batch test</p>
             </div>
             <button className="text-gray-400 hover:text-gray-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -1024,7 +1091,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             
             return (
               <div key={`node-${nodeIndex}`} className="border rounded-md mb-4 overflow-hidden">
-                <div className="bg-gray-50 px-4 py-2 font-medium text-gray-700 border-b">
+                <div className="bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 border-b">
                   {nodeTitle}
                 </div>
                 <div className="p-4 space-y-3">
@@ -1041,7 +1108,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                           >
                             {selectedParams[paramName] && <div className="w-3 h-3 rounded-full bg-red-500"></div>}
                           </div>
-                          <span className="ml-2 text-gray-700">{paramName}</span>
+                          <span className="ml-2 text-gray-700 text-xs">{paramName}</span>
                         </div>
                       );
                     })}
@@ -1054,7 +1121,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           <div className="mt-6 flex justify-center">
             <button
               onClick={(e) => handleNext(e)}
-              className="px-8 py-2 bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
+              className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
             >
               Next
             </button>
@@ -1074,14 +1141,14 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="mb-4 border-b pb-2 flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-medium text-gray-800">Parameter Options</h3>
-              <p className="text-sm text-gray-500">Configure the test values for each parameter</p>
+              <h3 className="text-base font-medium text-gray-800">Parameter Options</h3>
+              <p className="text-xs text-gray-500">Configure the test values for each parameter</p>
             </div>
             <button 
               className="text-gray-400 hover:text-gray-600"
               onClick={(e) => setCurrentScreen(0)}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -1095,7 +1162,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               
               return (
                 <div key={nodeIndex} className="border rounded-md mb-4 overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-2 font-medium text-gray-700 border-b">
+                  <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 border-b">
                     {node.type} (ID: {nodeId})
                   </div>
                   <div className="p-4 space-y-4">
@@ -1138,14 +1205,14 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                         return (
                           <div key={widgetIndex} className="border-b pb-3">
                             <div className="flex justify-between items-center">
-                              <label className="font-medium text-gray-700">{paramName}:</label>
+                              <label className="text-xs font-medium text-gray-700">{paramName}:</label>
                               <div className="w-4"></div>
                             </div>
                             <div className="flex space-x-2 items-center">
-                              <label className="text-sm text-gray-600">Min</label>
+                              <label className="text-xs text-gray-600">Min</label>
                               <input 
                                 type="text" 
-                                className="w-12 h-7 border border-gray-300 rounded text-sm px-2" 
+                                className="w-12 h-6 border border-gray-300 rounded text-xs px-2" 
                                 value={currentInputs.min}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -1175,10 +1242,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                   }
                                 }}
                               />
-                              <label className="text-sm text-gray-600">Max</label>
+                              <label className="text-xs text-gray-600">Max</label>
                               <input 
                                 type="text" 
-                                className="w-12 h-7 border border-gray-300 rounded text-sm px-2" 
+                                className="w-12 h-6 border border-gray-300 rounded text-xs px-2" 
                                 value={currentInputs.max}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -1208,10 +1275,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                   }
                                 }}
                               />
-                              <label className="text-sm text-gray-600">Step</label>
+                              <label className="text-xs text-gray-600">Step</label>
                               <input 
                                 type="text" 
-                                className="w-12 h-7 border border-gray-300 rounded text-sm px-2" 
+                                className="w-12 h-6 border border-gray-300 rounded text-xs px-2" 
                                 value={currentInputs.step}
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -1242,13 +1309,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                 }}
                               />
                             </div>
-                            <div className="mt-2">
-                              <label className="text-sm text-gray-600">Test values</label>
-                              <div className="mt-1 flex flex-wrap gap-2">
+                            <div className="mt-1">
+                              <label className="text-xs text-gray-600">Test values</label>
+                              <div className="mt-1 flex flex-wrap gap-1">
                                 {(paramTestValues[nodeId]?.[paramName] || defaultValues).map((value, idx) => (
                                   <div 
                                     key={idx}
-                                    className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center text-sm cursor-pointer hover:bg-blue-200"
+                                    className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs cursor-pointer hover:bg-blue-200"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleTestValueSelect(nodeId, paramName, value, e);
@@ -1279,10 +1346,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                         return (
                           <div key={widgetIndex} className="border-b pb-3">
                             <div className="flex justify-between items-center">
-                              <label className="font-medium text-gray-700">{paramName}</label>
+                              <label className="text-xs font-medium text-gray-700">{paramName}</label>
                               <div className="relative dropdown-container">
                                 <button 
-                                  className="appearance-none border border-gray-300 rounded px-3 py-1 pr-8 text-sm flex items-center bg-white text-gray-700"
+                                  className="appearance-none border border-gray-300 rounded px-2 py-0.5 pr-6 text-xs flex items-center bg-white text-gray-700"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -1319,7 +1386,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                     <div className="p-2 border-b sticky top-0 bg-white">
                                       <input
                                         type="text"
-                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                                        className="w-full px-2 py-0.5 text-xs border border-gray-300 rounded"
                                         placeholder="Search..."
                                         value={searchTerms[dropdownKey] || ''}
                                         onChange={(e) => {
@@ -1337,7 +1404,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                     
                                     {/* Select all option */}
                                     <div 
-                                      className="px-3 py-2 bg-gray-50 border-b cursor-pointer text-sm flex items-center text-gray-700 hover:bg-gray-100"
+                                      className="px-3 py-1.5 bg-gray-50 border-b cursor-pointer text-xs flex items-center text-gray-700 hover:bg-gray-100"
                                       onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -1380,7 +1447,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                         .map((value: string, i: number) => (
                                           <div 
                                             key={i} 
-                                            className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm flex items-center text-gray-700"
+                                            className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs flex items-center text-gray-700"
                                             onClick={(e) => {
                                               e.preventDefault();
                                               e.stopPropagation();
@@ -1413,55 +1480,12 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                               </div>
                             </div>
                             <div className="mt-2">
-                              <label className="text-sm text-gray-600">Test values</label>
-                              <div className="mt-1 flex flex-wrap gap-2 min-h-[30px]">
-                                {(paramTestValues[nodeId]?.[paramName] || []).length > 0 ? (
-                                  (paramTestValues[nodeId]?.[paramName] || []).map((value: string, idx: number) => (
-                                    <div 
-                                      key={idx}
-                                      className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center text-sm"
-                                    >
-                                      <span>{value}</span>
-                                      <svg 
-                                        className="w-4 h-4 ml-1 cursor-pointer hover:text-blue-600" 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                          handleTestValueSelect(nodeId, paramName, value, e);
-                                        }}
-                                      >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                      </svg>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <div className="text-sm text-gray-500">No values selected</div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      } else {
-                        // 初始化其他类型参数的测试值
-                        if (!paramTestValues[nodeId] || !paramTestValues[nodeId][paramName]) {
-                          updateParamTestValues(nodeId, paramName, [`${paramName}1`, `${paramName}2`, `${paramName}3`]);
-                        }
-                        
-                        return (
-                          <div key={widgetIndex} className="border-b pb-3">
-                            <div className="flex justify-between items-center">
-                              <label className="font-medium text-gray-700">{paramName}</label>
-                            </div>
-                            <div className="mt-2">
-                              <label className="text-sm text-gray-600">Test values</label>
-                              <div className="mt-1 flex flex-wrap gap-2">
+                              <label className="text-xs text-gray-600">Test values</label>
+                              <div className="mt-1 flex flex-wrap gap-1">
                                 {(paramTestValues[nodeId]?.[paramName] || []).map((value: string, idx: number) => (
                                   <div 
                                     key={idx}
-                                    className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md flex items-center text-sm"
+                                    className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs"
                                   >
                                     <span>{value}</span>
                                     <svg 
@@ -1480,7 +1504,60 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                                   </div>
                                 ))}
                                 <button 
-                                  className="px-2 py-1 border border-dashed border-blue-300 text-blue-600 rounded-md text-sm flex items-center hover:bg-blue-50"
+                                  className="px-2 py-0.5 border border-dashed border-blue-300 text-blue-600 rounded-md text-xs flex items-center hover:bg-blue-50"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const newValue = `${paramName}${(paramTestValues[nodeId]?.[paramName] || []).length + 1}`;
+                                    updateParamTestValues(nodeId, paramName, [...(paramTestValues[nodeId]?.[paramName] || []), newValue]);
+                                  }}
+                                >
+                                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                  </svg>
+                                  <span>Add</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        // 初始化其他类型参数的测试值
+                        if (!paramTestValues[nodeId] || !paramTestValues[nodeId][paramName]) {
+                          updateParamTestValues(nodeId, paramName, [`${paramName}1`, `${paramName}2`, `${paramName}3`]);
+                        }
+                        
+                        return (
+                          <div key={widgetIndex} className="border-b pb-3">
+                            <div className="flex justify-between items-center">
+                              <label className="text-xs font-medium text-gray-700">{paramName}</label>
+                            </div>
+                            <div className="mt-2">
+                              <label className="text-xs text-gray-600">Test values</label>
+                              <div className="mt-1 flex flex-wrap gap-1">
+                                {(paramTestValues[nodeId]?.[paramName] || []).map((value: string, idx: number) => (
+                                  <div 
+                                    key={idx}
+                                    className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs"
+                                  >
+                                    <span>{value}</span>
+                                    <svg 
+                                      className="w-4 h-4 ml-1 cursor-pointer hover:text-blue-600" 
+                                      fill="none" 
+                                      stroke="currentColor" 
+                                      viewBox="0 0 24 24"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleTestValueSelect(nodeId, paramName, value, e);
+                                      }}
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </div>
+                                ))}
+                                <button 
+                                  className="px-2 py-0.5 border border-dashed border-blue-300 text-blue-600 rounded-md text-xs flex items-center hover:bg-blue-50"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -1512,13 +1589,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           <div className="mt-6 flex justify-between">
             <button
               onClick={(e) => handlePrevious(e)}
-              className="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={(e) => handleNext(e)}
-              className="px-4 py-2 bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
+              className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
             >
               Next
             </button>
@@ -1537,8 +1614,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div className="mb-4 border-b pb-2 flex justify-between items-center">
           <div>
-            <h3 className="text-lg font-medium text-gray-800">Confirm Test Configuration</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-base font-medium text-gray-800">Confirm Test Configuration</h3>
+            <p className="text-xs text-gray-500">
               In the selected parameter combinations, there are {totalCount} total runs. Each run will generate a separate image.
             </p>
           </div>
@@ -1546,7 +1623,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             className="text-gray-400 hover:text-gray-600"
             onClick={(e) => setCurrentScreen(0)}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -1554,10 +1631,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         
         {/* Display error message */}
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-xs">
             <div className="flex items-start">
               <div className="flex-shrink-0 mt-0.5">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
@@ -1574,7 +1651,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             
             return (
               <div key={nodeIndex} className="border rounded-md mb-4 overflow-hidden">
-                <div className="bg-gray-50 px-4 py-2 font-medium text-gray-700 border-b">
+                <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 border-b">
                   {nodeType} (ID: {nodeId})
                 </div>
                 <div className="p-4 space-y-3">
@@ -1592,11 +1669,11 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                       
                     return (
                       <div key={widgetIndex} className={widgetIndex < widgets.length - 1 ? "flex justify-between items-center border-b pb-2" : "flex justify-between items-center"}>
-                        <label className="font-medium text-gray-700">{paramName}</label>
+                        <label className="font-medium text-gray-700 text-xs">{paramName}</label>
                         <div className="flex space-x-2 items-center">
                           <input 
                             type="text" 
-                            className="w-64 h-7 border border-gray-300 rounded text-sm px-2 bg-gray-50 cursor-not-allowed text-gray-500" 
+                            className="w-64 h-7 border border-gray-300 rounded text-xs px-2 bg-gray-50 cursor-not-allowed text-gray-500" 
                             readOnly 
                             disabled
                             value={displayValues} 
@@ -1611,7 +1688,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             );
           })
         ) : (
-          <div className="border rounded-md mb-4 p-4 text-center text-gray-500">
+          <div className="border rounded-md mb-4 p-4 text-center text-gray-500 text-xs">
             No nodes selected. Please select a node in the workflow to configure parameters.
           </div>
         )}
@@ -1619,13 +1696,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         <div className="mt-6 flex justify-between">
           <button
             onClick={(e) => handlePrevious(e)}
-            className="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+            className="px-3 py-1.5 text-xs bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
           >
             Previous
           </button>
           <button
             onClick={(e) => handleStartGeneration(e)}
-            className="px-4 py-2 bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
+            className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
           >
             Start Generation
           </button>

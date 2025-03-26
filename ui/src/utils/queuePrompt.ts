@@ -71,11 +71,26 @@ export async function queuePrompt(paramConfigs: WidgetParamConf[]): Promise<any>
 //     return responses;
 // }
 
+function createErrorImage(errorMessage: string): Blob {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = 512;
+    const height = 512;
+    canvas.width = width;
+    canvas.height = height;
+    if(ctx) {
+        ctx.fillStyle = 'red';
+        ctx.font = '20px Arial';
+        ctx.fillText(errorMessage, 10, 30);
+    }
+    return new Blob([canvas.toDataURL('image/png')], { type: 'image/png' });
+}
+
 export async function getOutputImagesByPromptId(promptId: string): Promise<{[nodeId: string]: Blob[]}> {
     try {
       if(!promptId || promptId === "") {
         console.log("No prompt ID provided");
-        return {};
+        return { "1": [createErrorImage("Fail to generate prompt ID")] };
       }
   
       // Get the history for the prompt
@@ -85,8 +100,22 @@ export async function getOutputImagesByPromptId(promptId: string): Promise<{[nod
         console.log("Not finished for prompt ID:", promptId);
         return {};
       }
-      
+
       const promptHistory = history[promptId];
+      if(promptHistory.status && promptHistory.status.status_str === "error") {
+        console.error("Error for prompt ID:", promptId);
+        const messages = promptHistory.status.messages;
+        if(messages && messages.length > 0) {
+            const lastMessage = messages[messages.length - 1];
+            if(lastMessage && lastMessage.length > 0) {
+                const errorMessage = lastMessage[0];
+                // Return an error image with the error message
+                const errorImage = createErrorImage(errorMessage);
+                return { "1": [errorImage] }; // Return with default nodeId of 1
+            }
+        }
+      }
+      
       const outputImages: {[nodeId: string]: Blob[]} = {};
       
       // Process all outputs in the history
