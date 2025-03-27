@@ -156,18 +156,20 @@ export async function getOutputImagesByPromptId(promptId: string): Promise<{[nod
       // Process all outputs in the history
       if (promptHistory.outputs) {
         for (const nodeId in promptHistory.outputs) {
-          const node = app.graph._nodes_by_id[nodeId];
-          console.log("app.graph._nodes_by_id node:", nodeId, node);
-          if (node && node.imgs && node.imgs.length > 0 && node.imgs[0].currentSrc) {
+          const nodeOutput = promptHistory.outputs[nodeId];
+          if (nodeOutput && nodeOutput.images) {
             outputImages[nodeId] = [];
-            for(const img of node.imgs) {
-              outputImages[nodeId].push(img.currentSrc);
+            
+            // Process each image for this node
+            for (const img of nodeOutput.images) {
+              if (img && img.filename && img.type) {
+                // Construct the image URL using the ComfyUI view endpoint
+                const imageUrl = `${window.location.origin}/view?filename=${encodeURIComponent(img.filename)}&type=${encodeURIComponent(img.type)}${img.subfolder ? '&subfolder=' + encodeURIComponent(img.subfolder) : ''}`;
+                outputImages[nodeId].push(imageUrl);
+              }
             }
-            console.log("outputImages:", outputImages);
-          } else {
-            // console.error("No image found for node:", nodeId);
-            // outputImages[nodeId] = [createErrorImage("No image found for node:" + nodeId)];
-            return {};
+            
+            console.log("outputImages for nodeId:", nodeId, outputImages[nodeId]);
           }
         }
       }
