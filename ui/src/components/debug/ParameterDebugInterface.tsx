@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getOutputImageByPromptId, queuePrompt, WidgetParamConf } from '../../utils/queuePrompt';
+import { getOnlyOneImageNode, getOutputImageByPromptId, queuePrompt, WidgetParamConf } from '../../utils/queuePrompt';
 import { app } from '../../utils/comfyapp';
 import { interruptProcessing, manageQueue } from '../../apis/comfyApiCustom';
 import { useChatContext } from '../../context/ChatContext';
@@ -732,10 +732,11 @@ const generateParameterCombinations = () => {
     // Get parameter combinations
     const paramCombinations = generateParameterCombinations();
     const totalCombinations = paramCombinations.length;
+    const showNodeId = getOnlyOneImageNode();
     
-    // Check if total runs exceed 20
-    if (totalCombinations > 20) {
-      setErrorMessage(`Cannot generate more than 20 images at once (currently: ${totalCombinations} images)`);
+    // Check if total runs exceed 100
+    if (totalCombinations > 100) {
+      setErrorMessage(`Cannot generate more than 100 images at once (currently: ${totalCombinations} images)`);
       return;
     }
     
@@ -792,16 +793,16 @@ const generateParameterCombinations = () => {
         let completedImagesCount = 0;
         
         // Check each prompt id to see if images are ready
+        
         for (let i = 0; i < prompt_ids.length; i++) {
           const promptId = prompt_ids[i];
           if (!promptId) continue;
           
           try {
-            const images = await getOutputImageByPromptId(promptId);
+            const imageUrl = await getOutputImageByPromptId(promptId, showNodeId);
             
-            if (images && images.length > 0) {
-              // If we have an image, update the URL in our array
-              const imageUrl = URL.createObjectURL(images[0]);
+            if (imageUrl) {
+              // If we have an image URL, update in our array
               newImages[i] = {
                 ...newImages[i],
                 url: imageUrl
