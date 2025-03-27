@@ -572,6 +572,11 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         dispatch({ type: 'SET_ACTIVE_TAB', payload: tab });
     };
 
+    // Initialize the parameter debug tab component with lazy loading
+    const parameterDebugTabComponent = React.useMemo(() => (
+        <ParameterDebugTab />
+    ), []);
+
     return (
         <div 
             className="fixed right-0 shadow-lg bg-white duration-200 ease-out"
@@ -623,47 +628,56 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     />
                 )}
                 
-                {/* Tab content */}
-                {activeTab === 'chat' ? (
-                    <>
-                        <div className="flex-1 overflow-y-auto p-4 scroll-smooth" ref={messageDivRef}>
-                            <MessageList 
-                                messages={messages}
-                                latestInput={latestInput}
-                                onOptionClick={handleOptionClick}
-                                installedNodes={installedNodes}
-                                onAddMessage={handleAddMessage}
-                                loading={loading}
-                            />
-                        </div>
+                {/* Tab content - Both tabs are mounted but only the active one is displayed */}
+                <div 
+                    className="flex-1 overflow-y-auto p-4 scroll-smooth"
+                    style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
+                    ref={messageDivRef}
+                >
+                    <MessageList 
+                        messages={messages}
+                        latestInput={latestInput}
+                        onOptionClick={handleOptionClick}
+                        installedNodes={installedNodes}
+                        onAddMessage={handleAddMessage}
+                        loading={loading}
+                    />
+                </div>
 
-                        <div className="border-t px-4 py-3 border-gray-200 bg-white sticky bottom-0">
-                            {selectedNode && (
-                                <SelectedNodeInfo 
-                                    nodeInfo={selectedNode}
-                                    onSendWithIntent={handleSendMessageWithIntent}
-                                    loading={loading}
-                                    onSendWithContent={handleSendMessageWithContent}
-                                />
-                            )}
+                <div 
+                    className="border-t px-4 py-3 border-gray-200 bg-white sticky bottom-0"
+                    style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
+                >
+                    {selectedNode && (
+                        <SelectedNodeInfo 
+                            nodeInfo={selectedNode}
+                            onSendWithIntent={handleSendMessageWithIntent}
+                            loading={loading}
+                            onSendWithContent={handleSendMessageWithContent}
+                        />
+                    )}
 
-                            <ChatInput 
-                                input={input}
-                                loading={loading}
-                                onChange={handleMessageChange}
-                                onSend={handleSendMessage}
-                                onKeyPress={handleKeyPress}
-                                onUploadImages={handleUploadImages}
-                                uploadedImages={uploadedImages}
-                                onRemoveImage={handleRemoveImage}
-                                selectedModel={selectedModel}
-                                onModelChange={setSelectedModel}
-                            />
-                        </div>
-                    </>
-                ) : (
-                    <ParameterDebugTab />
-                )}
+                    <ChatInput 
+                        input={input}
+                        loading={loading}
+                        onChange={handleMessageChange}
+                        onSend={handleSendMessage}
+                        onKeyPress={handleKeyPress}
+                        onUploadImages={handleUploadImages}
+                        uploadedImages={uploadedImages}
+                        onRemoveImage={handleRemoveImage}
+                        selectedModel={selectedModel}
+                        onModelChange={setSelectedModel}
+                    />
+                </div>
+
+                {/* ParameterDebugTab - Always mounted but conditionally displayed */}
+                <div 
+                    className="flex-1 flex flex-col"
+                    style={{ display: activeTab === 'parameter-debug' ? 'flex' : 'none' }}
+                >
+                    {parameterDebugTabComponent}
+                </div>
             </div>
         </div>
     );
