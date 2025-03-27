@@ -1,14 +1,10 @@
 import { getHistory, getImage, runPrompt } from "../apis/comfyApiCustom";
 import { app } from "../utils/comfyapp";
 
-export type WidgetPair = {
-    paramName: string;
-    paramValue: string;
-}
-
 export type WidgetParamConf = {
     nodeId: number;
-    params: WidgetPair[];
+    paramName: string;
+    paramValue: string;
 }
 
 function updatePrompt(prompt_output: any, paramConfigs: WidgetParamConf[]): any {
@@ -31,9 +27,8 @@ function updatePrompt(prompt_output: any, paramConfigs: WidgetParamConf[]): any 
             }
             
             // Update each parameter for this node
-            for (const param of config.params) {
-                prompt_output[config.nodeId]["inputs"][param.paramName] = param.paramValue;
-            }
+            prompt_output[config.nodeId]["inputs"][config.paramName] = config.paramValue;
+            
         }
         
         return prompt_output;
@@ -61,15 +56,6 @@ export async function queuePrompt(paramConfigs: WidgetParamConf[]): Promise<any>
     console.debug("queuePrompt response:", response);
     return response;
 }
-
-// export async function batchQueuePrompt(paramsBatch: WidgetParamConf[]): Promise<any> {
-//     const responses = [];
-//     for (const params of paramsBatch) {
-//         const response = await queuePrompt(params);
-//         responses.push(response);
-//     }
-//     return responses;
-// }
 
 function createErrorImage(errorMessage: string): Blob {
     const canvas = document.createElement('canvas');

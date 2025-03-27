@@ -100,8 +100,8 @@ const Announcement = ({ message, onClose }: { message: string, onClose: () => vo
 
 // Parameter Debug Tab Component
 const ParameterDebugTab = () => {
-    const { state } = useChatContext();
-    const { selectedNode } = state;
+    const { state, dispatch } = useChatContext();
+    const { selectedNode, screenState } = state;
     const selectedNodes = selectedNode ? selectedNode : [];
     
     const ParameterDebugInterface = React.lazy(() => 
@@ -110,10 +110,20 @@ const ParameterDebugTab = () => {
       }))
     );
     
+    const handleCloseParameterDebug = () => {
+        // Clear selected nodes and screen state
+        dispatch({ type: 'SET_SELECTED_NODE', payload: null });
+        dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+    };
+    
     return (
         <div className="flex-1 flex flex-col overflow-y-auto">
             <React.Suspense fallback={<div>Loading...</div>}>
-                <ParameterDebugInterface selectedNodes={selectedNodes} visible={true} />
+                <ParameterDebugInterface 
+                    selectedNodes={selectedNodes} 
+                    visible={true} 
+                    onClose={handleCloseParameterDebug}
+                />
             </React.Suspense>
         </div>
     );

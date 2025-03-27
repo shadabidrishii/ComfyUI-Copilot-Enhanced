@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getOutputImageByPromptId, queuePrompt, WidgetParamConf, WidgetPair } from '../../utils/queuePrompt';
+import { getOutputImageByPromptId, queuePrompt, WidgetParamConf } from '../../utils/queuePrompt';
 import { app } from '../../utils/comfyapp';
 import { interruptProcessing, manageQueue } from '../../apis/comfyApiCustom';
+import { useChatContext } from '../../context/ChatContext';
 
 // Add CSS for the highlight pulse effect
 const highlightPulseStyle = `
@@ -43,11 +44,19 @@ interface GeneratedImage {
 interface ParameterDebugInterfaceProps {
   selectedNodes: any[];
   visible: boolean;
+  onClose?: () => void;
+}
+
+// Define WidgetPair interface here since it's not exported from queuePrompt
+interface WidgetPair {
+  paramName: string;
+  paramValue: string;
 }
 
 export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = ({
   selectedNodes,
-  visible
+  visible,
+  onClose
 }) => {
   const [currentScreen, setCurrentScreen] = useState(0);
   const [selectedParams, setSelectedParams] = useState<{[key: string]: boolean}>({
@@ -99,6 +108,53 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   // Add new state for modal
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState('');
+
+  // Get dispatch from context to update screen state
+  const { dispatch } = useChatContext();
+
+  // Add useEffect to initialize parameter test values when selectedNodes change
+  useEffect(() => {
+    if (!selectedNodes || selectedNodes.length === 0) return;
+    
+    // Initialize empty parameter test values for any newly selected nodes
+    const updatedParamTestValues = { ...paramTestValues };
+    
+    // Clean up any nodes that are no longer selected
+    const selectedNodeIds = selectedNodes.map((node: any) => node.id.toString());
+    const currentNodeIds = Object.keys(updatedParamTestValues);
+    
+    // Remove test values for nodes that are no longer selected
+    currentNodeIds.forEach(nodeId => {
+      if (!selectedNodeIds.includes(nodeId)) {
+        delete updatedParamTestValues[nodeId];
+      }
+    });
+    
+    // Add empty entries for newly selected nodes
+    selectedNodes.forEach((node: any) => {
+      const nodeId = node.id.toString();
+      if (!updatedParamTestValues[nodeId]) {
+        updatedParamTestValues[nodeId] = {};
+      }
+    });
+    
+    // Update state if changes were made
+    if (JSON.stringify(updatedParamTestValues) !== JSON.stringify(paramTestValues)) {
+      setParamTestValues(updatedParamTestValues);
+    }
+  }, [selectedNodes, paramTestValues]);
+
+  // Add useEffect to update screen state in context when screen changes
+  useEffect(() => {
+    dispatch({ 
+      type: 'SET_SCREEN_STATE', 
+      payload: {
+        currentScreen,
+        isProcessing,
+        isCompleted
+      } 
+    });
+  }, [currentScreen, isProcessing, isCompleted, dispatch]);
 
   // Add style to document head
   useEffect(() => {
@@ -160,7 +216,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }
     // 如果要从屏幕 1 进入屏幕 2，更新 totalCount
     if (currentScreen === 1) {
-      setTotalCount(calculateTotalRuns(paramTestValues));
+      const combinations = generateParameterCombinations();
+      setTotalCount(combinations.length);
     }
     // 清除错误消息
     setErrorMessage(null);
@@ -179,6 +236,23 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     if (isCompleted) {
       setIsCompleted(false);
     }
+    
+    // If going back from screen 1 to 0, clean up any paramTestValues for nodes that are no longer selected
+    if (currentScreen === 1) {
+      const selectedNodeIds = selectedNodes.map(node => node.id.toString());
+      const currentNodeIds = Object.keys(paramTestValues);
+      
+      // Remove test values for any nodes that are no longer selected
+      const updatedParamTestValues = { ...paramTestValues };
+      currentNodeIds.forEach(nodeId => {
+        if (!selectedNodeIds.includes(nodeId)) {
+          delete updatedParamTestValues[nodeId];
+        }
+      });
+      
+      setParamTestValues(updatedParamTestValues);
+    }
+    
     setCurrentScreen(prev => Math.max(prev - 1, 0));
   };
 
@@ -250,93 +324,94 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     return combinations.length;
   };
 
-  // Generate all parameter combinations for the selected parameters
-  const generateParameterCombinations = () => {
-    // First, we need to get all the different parameter combinations
-    const result: WidgetParamConf[] = [];
+// Generate all parameter combinations for the selected parameters
+const generateParameterCombinations = () => {
+  // First, we need to get all the different parameter combinations
+  const result: WidgetParamConf[][] = [];
+  
+  // Create a list of all parameter combinations for each node
+  const nodeParamCombinations: {[nodeId: string]: Array<WidgetParamConf[]>} = {};
+  
+  // For each node, generate all combinations of its parameters
+  Object.keys(paramTestValues).forEach(nodeIdStr => {
+    const nodeId = parseInt(nodeIdStr);
+    const nodeParams = paramTestValues[nodeIdStr] || {};
     
-    // Get all combinations of parameter values across all nodes and parameters
-    const createCombinations = () => {
-      // Store combinations of parameter values, organized by node
-      const nodeParamCombinations: {[nodeId: string]: Array<Array<{[paramName: string]: any}>>} = {};
+    // Get all parameter names that have values
+    const paramNames = Object.keys(nodeParams).filter(
+      paramName => nodeParams[paramName] && nodeParams[paramName].length > 0
+    );
+    
+    if (paramNames.length === 0) return;
+    
+    // Create all possible combinations of parameter values for this node
+    const combinations: WidgetParamConf[][] = [[]];
+    
+    // For each parameter, create combinations with all its values
+    paramNames.forEach(paramName => {
+      const values = nodeParams[paramName];
+      const newCombinations: WidgetParamConf[][] = [];
       
-      // Initialize the structure for each node
-      Object.keys(paramTestValues).forEach(nodeId => {
-        nodeParamCombinations[nodeId] = [];
-        
-        // For each parameter in this node, create an array of parameter-value pairs
-        Object.entries(paramTestValues[nodeId] || {}).forEach(([paramName, values]) => {
-          // Skip if no values selected
-          if (!values || values.length === 0) return;
-          
-          // Add value options for this parameter
-          const paramOptions: Array<{[key: string]: any}> = [];
-          values.forEach(value => {
-            const paramOption: {[key: string]: any} = {};
-            paramOption[paramName] = value;
-            paramOptions.push(paramOption);
-          });
-          
-          nodeParamCombinations[nodeId].push(paramOptions);
+      // For each existing combination
+      combinations.forEach(combo => {
+        // For each value of the current parameter
+        values.forEach(value => {
+          // Create a new combination by adding this parameter value
+          const newCombo = [...combo, {
+            nodeId,
+            paramName,
+            paramValue: String(value)
+          }];
+          newCombinations.push(newCombo);
         });
       });
       
-      // For each node, get all combinations of its parameters
-      Object.entries(nodeParamCombinations).forEach(([nodeId, paramOptions]) => {
-        if (paramOptions.length === 0) return;
-        
-        // Generate all combinations of parameters for this node
-        const nodeCombinations = getCombinations(paramOptions);
-        
-        // Create a WidgetParamConf entry for each combination
-        nodeCombinations.forEach(combo => {
-          const widgetParams: WidgetPair[] = [];
-          
-          // Convert the combination object to WidgetPair array
-          Object.entries(combo).forEach(([paramName, value]) => {
-            widgetParams.push({
-              paramName,
-              paramValue: String(value)
-            });
-          });
-          
-          result.push({
-            nodeId: parseInt(nodeId),
-            params: widgetParams
-          });
-        });
-      });
-    };
+      // Replace combinations with the new ones
+      combinations.length = 0;
+      combinations.push(...newCombinations);
+    });
     
-    // Helper function to generate all combinations of parameters
-    const getCombinations = (arrays: Array<Array<{[paramName: string]: any}>>): Array<{[paramName: string]: any}> => {
-      // Edge cases
-      if (arrays.length === 0) return [{}];
-      
-      // Start with first array
-      let result = arrays[0].map(item => ({...item}));
-      
-      // Combine with each additional array
-      for (let i = 1; i < arrays.length; i++) {
-        const temp: Array<{[paramName: string]: any}> = [];
-        
-        // For each existing result
-        for (const existing of result) {
-          // Combine with each option in the next array
-          for (const next of arrays[i]) {
-            temp.push({...existing, ...next});
-          }
-        }
-        
-        result = temp;
-      }
-      
-      return result;
-    };
-    
-    createCombinations();
+    // Store all combinations for this node
+    nodeParamCombinations[nodeIdStr] = combinations;
+  });
+  
+  // If no nodes have parameters, return empty result
+  if (Object.keys(nodeParamCombinations).length === 0) {
     return result;
-  };
+  }
+  
+  // If there's only one node, return its combinations directly
+  if (Object.keys(nodeParamCombinations).length === 1) {
+    const nodeId = Object.keys(nodeParamCombinations)[0];
+    return nodeParamCombinations[nodeId];
+  }
+  
+  // For multiple nodes, we need to create combinations across nodes
+  const nodeIds = Object.keys(nodeParamCombinations);
+  
+  // Start with combinations from the first node
+  let allCombinations = nodeParamCombinations[nodeIds[0]];
+  
+  // For each additional node, create combinations with all previous nodes
+  for (let i = 1; i < nodeIds.length; i++) {
+    const nodeCombinations = nodeParamCombinations[nodeIds[i]];
+    const newCombinations: WidgetParamConf[][] = [];
+    
+    // For each existing combination across previous nodes
+    allCombinations.forEach(existingCombo => {
+      // For each combination from the current node
+      nodeCombinations.forEach(nodeCombo => {
+        // Combine them
+        newCombinations.push([...existingCombo, ...nodeCombo]);
+      });
+    });
+    
+    // Update all combinations
+    allCombinations = newCombinations;
+  }
+  
+  return allCombinations;
+};
   
   // Toggle dropdown open status - 使用nodeId_paramName作为键
   const toggleDropdown = (nodeId: string, paramName: string, event: React.MouseEvent) => {
@@ -482,9 +557,6 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     // Initialize nodeParams structure
     dynamicParams.nodeParams = {};
     
-    // Keep track of how many values we've seen for each parameter
-    let combinationIndices: {[nodeId: string]: {[paramName: string]: number}} = {};
-    
     // Get all parameter combinations
     const allCombinations = generateParameterCombinations();
     
@@ -492,16 +564,22 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     if (index < allCombinations.length) {
       const selectedCombination = allCombinations[index];
       
-      // Add node parameters
-      dynamicParams.nodeParams[selectedCombination.nodeId] = {};
-      
-      // Extract parameter values from the combination
-      selectedCombination.params.forEach(param => {
+      // Process each parameter in the combination
+      selectedCombination.forEach(param => {
+        const nodeId = param.nodeId.toString();
+        const paramName = param.paramName;
+        const paramValue = param.paramValue;
+        
+        // Initialize node if needed
+        if (!dynamicParams.nodeParams![nodeId]) {
+          dynamicParams.nodeParams![nodeId] = {};
+        }
+        
         // Add to nodeParams structure
-        dynamicParams.nodeParams![selectedCombination.nodeId][param.paramName] = param.paramValue;
+        dynamicParams.nodeParams![nodeId][paramName] = paramValue;
         
         // Also add to flat structure for backwards compatibility and display
-        dynamicParams[param.paramName] = param.paramValue;
+        dynamicParams[paramName] = paramValue;
       });
     }
     
@@ -524,9 +602,14 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    // Get parameter combinations
+    const paramCombinations = generateParameterCombinations();
+    const totalCombinations = paramCombinations.length;
+    
     // Check if total runs exceed 20
-    if (totalCount > 20) {
-      setErrorMessage(`Cannot generate more than 20 images at once (currently: ${totalCount} images)`);
+    if (totalCombinations > 20) {
+      setErrorMessage(`Cannot generate more than 20 images at once (currently: ${totalCombinations} images)`);
       return;
     }
     
@@ -534,7 +617,6 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setIsProcessing(true);
     setCompletedCount(0);
     
-    const paramCombinations = generateParameterCombinations();
     console.log("Generated parameter combinations:", paramCombinations);
     
     // If we have no combinations, show error and return
@@ -547,8 +629,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     const prompt_ids: string[] = [];
     try {
       // Each combination represents all parameters for a single image generation
-      for (const paramConfig of paramCombinations) {
-        const response = await queuePrompt([paramConfig]); // We wrap in array because queuePrompt expects WidgetParamConf[]
+      for (const combination of paramCombinations) {
+        const response = await queuePrompt(combination);
         if(response.prompt_id) {
             prompt_ids.push(response.prompt_id);
         } else {
@@ -568,7 +650,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       
       // Track timeout
       const startTime = Date.now();
-      const timeoutDuration = 5 * 60 * 1000; // 2 minutes
+      const timeoutDuration = 5 * 60 * 1000; // 5 minutes
       
       // Function to poll for images
       const pollForImages = async () => {
@@ -617,7 +699,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           setIsCompleted(true);
           setCurrentPage(1);
         } else {
-          // Otherwise, poll again in 2 seconds
+          // Otherwise, poll again in 3 seconds
           setTimeout(pollForImages, 3000);
         }
       };
@@ -702,7 +784,52 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }
   };
 
+  // Modified handle close to implement different behaviors based on current screen
+  const handleClose = (event?: React.MouseEvent, nodeIndex?: number) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    // Screen 2: Close individual node card
+    if (currentScreen === 1 && nodeIndex !== undefined) {
+      // Remove the node at specified index
+      const newSelectedNodes = [...selectedNodes];
+      newSelectedNodes.splice(nodeIndex, 1);
+      
+      // If no nodes left, return to original screen
+      if (newSelectedNodes.length === 0) {
+        if (onClose) {
+          // Clear screen state from context when closing
+          dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+          // Call provided onClose to reset the interface
+          onClose();
+        }
+      } else {
+        // Update the context with the new selected nodes
+        dispatch({ type: 'SET_SELECTED_NODE', payload: newSelectedNodes });
+      }
+      return;
+    }
+    
+    // Screen 3, 4, 5 or original: Close the entire interface
+    if (onClose) {
+      // Clear screen state from context when closing
+      dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+      // Use the provided onClose callback
+      onClose();
+    } else {
+      // For users of this component without a callback
+      // Reset internal states
+      setCurrentScreen(0);
+      setIsCompleted(false);
+      setIsProcessing(false);
+      setErrorMessage(null);
+    }
+  };
+
   // Conditionally render based on whether nodes are selected
+  // Screen original - Only stop propagation, don't prevent default
   if (!visible || selectedNodes.length === 0) {
     return (
       <div 
@@ -749,7 +876,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     );
   }
 
-  // If we're in completed state, show the results gallery
+  // Screen 5: If we're in completed state, show the results gallery
   if (isCompleted) {
     // Calculate current page's image index range using generatedImages.length instead of totalCount
     const startIndex = (currentPage - 1) * imagesPerPage;
@@ -770,7 +897,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               <h3 className="text-base font-medium text-gray-800">Generation Complete</h3>
               <p className="text-xs text-gray-500">All {generatedImages.length} images have been generated.</p>
             </div>
-            <button className="text-gray-400 hover:text-gray-600">
+            <button 
+              className="text-gray-400 hover:text-gray-600"
+              onClick={handleClose}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -925,7 +1055,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     );
   }
 
-  // If processing, show the loading overlay
+  // Screen 4: If processing, show the loading overlay
   if (isProcessing) {
     return (
       <div 
@@ -971,7 +1101,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
                 In the selected parameter combinations, there are {totalCount} total runs. Each run will generate a separate image.
               </p>
             </div>
-            <button className="text-gray-400 hover:text-gray-600">
+            <button 
+              className="text-gray-400 hover:text-gray-600"
+              onClick={handleClose}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -1074,7 +1207,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               <h3 className="text-base font-medium text-gray-800">Select Parameters for Testing</h3>
               <p className="text-xs text-gray-500">Choose the parameters you want to include in your batch test</p>
             </div>
-            <button className="text-gray-400 hover:text-gray-600">
+            <button 
+              className="text-gray-400 hover:text-gray-600"
+              onClick={handleClose}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -1146,7 +1282,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             </div>
             <button 
               className="text-gray-400 hover:text-gray-600"
-              onClick={(e) => setCurrentScreen(0)}
+              onClick={handleClose}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1162,8 +1298,17 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               
               return (
                 <div key={nodeIndex} className="border rounded-md mb-4 overflow-hidden">
-                  <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 border-b">
-                    {node.type} (ID: {nodeId})
+                  <div className="bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 border-b flex justify-between items-center">
+                    <span>{node.type} (ID: {nodeId})</span>
+                    {/* Add close button for individual node card */}
+                    <button 
+                      className="text-gray-400 hover:text-gray-600"
+                      onClick={(e) => handleClose(e, nodeIndex)}
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
                   <div className="p-4 space-y-4">
                     {nodeWidgets.map((widget: any, widgetIndex: number) => {
@@ -1621,7 +1766,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           </div>
           <button 
             className="text-gray-400 hover:text-gray-600"
-            onClick={(e) => setCurrentScreen(0)}
+            onClick={handleClose}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
