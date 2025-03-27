@@ -389,6 +389,43 @@ export namespace WorkflowChatAPI {
       return '';
     }
   }
+
+  export async function generateSDPrompts(text: string): Promise<string[]> {
+    try {
+      const apiKey = getApiKey();
+      const browserLanguage = getBrowserLanguage();
+      
+      // Prepare headers
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'trace-id': generateUUID(),
+        'Accept-Language': browserLanguage,
+      };
+      
+      const response = await fetch(`${BASE_URL}/api/param_debug/generate_sd_prompts`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          text: text
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        const message = result.message || 'Failed to generate SD prompts';
+        alert(message);
+        throw new Error(message);
+      }
+
+      return result.data as string[];
+    } catch (error) {
+      console.error('Error generating SD prompts:', error);
+      alert(error instanceof Error ? error.message : 'Failed to generate SD prompts');
+      throw error;
+    }
+  }
 }
 
   

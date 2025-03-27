@@ -588,6 +588,17 @@
     --tw-prose-invert-th-borders: #525252;
     --tw-prose-invert-td-borders: #404040;
   }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
   .\!visible {
     visibility: visible !important;
   }
@@ -844,11 +855,17 @@
   .h-full {
     height: 100%;
   }
+  .max-h-24 {
+    max-height: 6rem;
+  }
   .max-h-60 {
     max-height: 15rem;
   }
   .max-h-\[400px\] {
     max-height: 400px;
+  }
+  .max-h-\[40vh\] {
+    max-height: 40vh;
   }
   .max-h-\[90vh\] {
     max-height: 90vh;
@@ -925,6 +942,9 @@
   .min-w-\[400px\] {
     min-width: 400px;
   }
+  .max-w-2xl {
+    max-width: 42rem;
+  }
   .max-w-4xl {
     max-width: 56rem;
   }
@@ -1000,6 +1020,9 @@
   .resize-none {
     resize: none;
   }
+  .resize-y {
+    resize: vertical;
+  }
   .resize {
     resize: both;
   }
@@ -1061,6 +1084,11 @@
     --tw-space-x-reverse: 0;
     margin-right: calc(0.75rem * var(--tw-space-x-reverse));
     margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+  .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
   }
   .space-y-3 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
@@ -1622,6 +1650,10 @@
     --tw-text-opacity: 1;
     color: rgb(126 34 206 / var(--tw-text-opacity, 1));
   }
+  .text-red-500 {
+    --tw-text-opacity: 1;
+    color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+  }
   .text-red-600 {
     --tw-text-opacity: 1;
     color: rgb(220 38 38 / var(--tw-text-opacity, 1));
@@ -1888,6 +1920,11 @@
 .hover\:text-gray-900:hover {
   --tw-text-opacity: 1;
   color: rgb(17 24 39 / var(--tw-text-opacity, 1));
+}
+
+.hover\:text-red-700:hover {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }
 
 .hover\:opacity-100:hover {

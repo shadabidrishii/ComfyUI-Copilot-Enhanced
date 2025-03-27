@@ -3,6 +3,7 @@ import { getOutputImageByPromptId, queuePrompt, WidgetParamConf } from '../../ut
 import { app } from '../../utils/comfyapp';
 import { interruptProcessing, manageQueue } from '../../apis/comfyApiCustom';
 import { useChatContext } from '../../context/ChatContext';
+import { WorkflowChatAPI } from '../../apis/workflowChatApi';
 
 // Add CSS for the highlight pulse effect
 const highlightPulseStyle = `
@@ -91,9 +92,6 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   // Add new state to store search terms
   const [searchTerms, setSearchTerms] = useState<{[key: string]: string}>({});
 
-  // Add state to store dropdown positions
-  const [dropdownPositions, setDropdownPositions] = useState<{[key: string]: {x: number, y: number}}>({});
-
   // Add state to track input values - 更新为使用nodeId_paramName作为键
   const [inputValues, setInputValues] = useState<{[nodeId_paramName: string]: {min?: string, max?: string, step?: string}}>({});
 
@@ -109,8 +107,153 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState('');
 
+  // Add state for text inputs and AI writing modal
+  const [textInputs, setTextInputs] = useState<{[nodeId_paramName: string]: string[]}>({});
+  const [aiWritingModalVisible, setAiWritingModalVisible] = useState(false);
+  const [aiWritingModalText, setAiWritingModalText] = useState('');
+  const [aiGeneratedTexts, setAiGeneratedTexts] = useState<string[]>([]);
+  const [aiWritingLoading, setAiWritingLoading] = useState(false);
+  const [aiWritingNodeId, setAiWritingNodeId] = useState<string>('');
+  const [aiWritingParamName, setAiWritingParamName] = useState<string>('');
+  const [aiWritingError, setAiWritingError] = useState<string | null>(null);
+  const [aiSelectedTexts, setAiSelectedTexts] = useState<{[key: string]: boolean}>({});
+
   // Get dispatch from context to update screen state
   const { dispatch } = useChatContext();
+
+  // Add function to handle AI text generation
+  const handleAiWriting = async () => {
+    if (!aiWritingModalText.trim()) {
+      setAiWritingError("Please enter some text to generate variations");
+      return;
+    }
+    
+    setAiWritingLoading(true);
+    setAiWritingError(null);
+    setAiGeneratedTexts([]);
+    setAiSelectedTexts({});
+    
+    try {
+      const generatedTexts = await WorkflowChatAPI.generateSDPrompts(aiWritingModalText);
+      setAiGeneratedTexts(generatedTexts);
+      
+      // Pre-select all generated texts
+      const newSelectedTexts: {[key: string]: boolean} = {};
+      generatedTexts.forEach((text, index) => {
+        newSelectedTexts[`text${index+1}`] = false;
+      });
+      setAiSelectedTexts(newSelectedTexts);
+    } catch (error) {
+      console.error("Error generating text:", error);
+      setAiWritingError("Failed to generate text variations. Please try again.");
+    } finally {
+      setAiWritingLoading(false);
+    }
+  };
+  
+  // Add function to handle text input changes
+  const handleTextInputChange = (nodeId: string, paramName: string, index: number, value: string) => {
+    const textKey = `${nodeId}_${paramName}`;
+    
+    setTextInputs(prev => {
+      const currentTexts = [...(prev[textKey] || [])];
+      currentTexts[index] = value;
+      return {
+        ...prev,
+        [textKey]: currentTexts
+      };
+    });
+    
+    // Also update paramTestValues
+    updateParamTestValues(nodeId, paramName, textInputs[textKey] || []);
+  };
+  
+  // Add function to add a new text input
+  const handleAddTextInput = (nodeId: string, paramName: string) => {
+    const textKey = `${nodeId}_${paramName}`;
+    
+    setTextInputs(prev => {
+      const currentTexts = [...(prev[textKey] || [])];
+      currentTexts.push('');
+      return {
+        ...prev,
+        [textKey]: currentTexts
+      };
+    });
+    
+    // Also update paramTestValues
+    const updatedTexts = [...(textInputs[textKey] || []), ''];
+    updateParamTestValues(nodeId, paramName, updatedTexts);
+  };
+  
+  // Add function to remove a text input
+  const handleRemoveTextInput = (nodeId: string, paramName: string, index: number) => {
+    const textKey = `${nodeId}_${paramName}`;
+    
+    setTextInputs(prev => {
+      const currentTexts = [...(prev[textKey] || [])];
+      currentTexts.splice(index, 1);
+      return {
+        ...prev,
+        [textKey]: currentTexts
+      };
+    });
+    
+    // Also update paramTestValues
+    const updatedTexts = [...(textInputs[textKey] || [])];
+    updatedTexts.splice(index, 1);
+    updateParamTestValues(nodeId, paramName, updatedTexts);
+  };
+  
+  // Add function to toggle text selection in AI writing modal
+  const toggleTextSelection = (textKey: string) => {
+    setAiSelectedTexts(prev => ({
+      ...prev,
+      [textKey]: !prev[textKey]
+    }));
+  };
+  
+  // Add function to add selected texts from AI modal
+  const addSelectedTexts = () => {
+    const textKey = `${aiWritingNodeId}_${aiWritingParamName}`;
+    const selectedTexts = Object.entries(aiSelectedTexts)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([key]) => {
+        const index = parseInt(key.replace('text', '')) - 1;
+        return aiGeneratedTexts[index];
+      });
+    
+    if (selectedTexts.length === 0) {
+      return;
+    }
+    
+    setTextInputs(prev => {
+      const currentTexts = [...(prev[textKey] || [])];
+      return {
+        ...prev,
+        [textKey]: [...currentTexts, ...selectedTexts]
+      };
+    });
+    
+    // Also update paramTestValues
+    const updatedTexts = [...(textInputs[textKey] || []), ...selectedTexts];
+    updateParamTestValues(aiWritingNodeId, aiWritingParamName, updatedTexts);
+    
+    // Close the modal
+    setAiWritingModalVisible(false);
+  };
+  
+  // Add function to open AI writing modal
+  const openAiWritingModal = (nodeId: string, paramName: string) => {
+    setAiWritingModalVisible(true);
+    setAiWritingNodeId(nodeId);
+    setAiWritingParamName(paramName);
+    setAiWritingModalText('');
+    setAiGeneratedTexts([]);
+    setAiSelectedTexts({});
+    setAiWritingLoading(false);
+    setAiWritingError(null);
+  };
 
   // Add useEffect to initialize parameter test values when selectedNodes change
   useEffect(() => {
@@ -315,13 +458,6 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }
     
     return values;
-  };
-
-  // Calculate total runs - updated to work with new structure
-  const calculateTotalRuns = (paramTestValues: {[nodeId: string]: {[paramName: string]: any[]}}) => {
-    // Get all parameter combinations
-    const combinations = generateParameterCombinations();
-    return combinations.length;
   };
 
 // Generate all parameter combinations for the selected parameters
@@ -584,16 +720,6 @@ const generateParameterCombinations = () => {
     }
     
     return dynamicParams;
-  };
-
-  // Add function to update generated image parameters
-  const updateGeneratedImageParams = () => {
-    // Create a new array of images with updated parameters
-    const newImages = Array(totalCount).fill(null).map((_, i) => ({
-      url: `https://source.unsplash.com/random/300x300?sig=${Math.random()}`,
-      params: generateDynamicParams(paramTestValues, i)
-    }));
-    return newImages;
   };
 
   // Handle start generation
@@ -969,7 +1095,7 @@ const generateParameterCombinations = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="p-2 text-xs text-gray-600 bg-white">
+                  <div className="p-2 text-xs text-gray-600 bg-white max-h-24 overflow-y-auto">
                     {Object.entries(image.params)
                       // Filter out nodeParams and other complex objects from display
                       .filter(([paramName, value]) => 
@@ -1290,6 +1416,118 @@ const generateParameterCombinations = () => {
             </button>
           </div>
           
+          {/* AI Writing Modal */}
+          {aiWritingModalVisible && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
+                <div className="p-4 border-b flex justify-between items-center">
+                  <h3 className="text-lg font-medium">AI Writing Assistant</h3>
+                  <button 
+                    className="text-gray-400 hover:text-gray-600"
+                    onClick={() => setAiWritingModalVisible(false)}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className="p-4">
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600 mb-2">Enter text and AI will generate variations</p>
+                    <textarea 
+                      className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                      rows={3}
+                      placeholder="Enter some text here..."
+                      value={aiWritingModalText}
+                      onChange={(e) => setAiWritingModalText(e.target.value)}
+                    />
+                    
+                    <button 
+                      className="mt-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-md text-sm flex items-center hover:bg-blue-200 transition-colors"
+                      onClick={handleAiWriting}
+                      disabled={aiWritingLoading}
+                    >
+                      {aiWritingLoading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Generating...
+                        </>
+                      ) : (
+                        <>Generate</>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {aiWritingError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+                      {aiWritingError}
+                    </div>
+                  )}
+                  
+                  {aiGeneratedTexts.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-sm font-medium mb-2">Generated variations (select items to add):</p>
+                      <div className="space-y-2 max-h-[40vh] overflow-y-auto p-2">
+                        {aiGeneratedTexts.map((text, idx) => (
+                          <div key={idx} className="flex items-start border border-gray-200 rounded-md p-2">
+                            <div className="mr-2 mt-1">
+                              <div className="relative">
+                                <input 
+                                  type="checkbox" 
+                                  id={`text${idx+1}`}
+                                  checked={!!aiSelectedTexts[`text${idx+1}`]}
+                                  onChange={() => toggleTextSelection(`text${idx+1}`)}
+                                  className="sr-only" /* Hide the actual checkbox but keep it functional */
+                                />
+                                <div 
+                                  className={`h-4 w-4 rounded border ${
+                                    aiSelectedTexts[`text${idx+1}`] 
+                                      ? 'bg-blue-600 border-blue-600' 
+                                      : 'bg-white border-gray-300'
+                                  } flex items-center justify-center`}
+                                  onClick={() => toggleTextSelection(`text${idx+1}`)}
+                                >
+                                  {aiSelectedTexts[`text${idx+1}`] && (
+                                    <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <label htmlFor={`text${idx+1}`} className="text-sm text-gray-700 cursor-pointer flex-1">
+                              {text}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="p-4 border-t flex justify-end">
+                  <button 
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm mr-2 hover:bg-gray-200 transition-colors"
+                    onClick={() => setAiWritingModalVisible(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md text-sm hover:bg-blue-600 transition-colors"
+                    onClick={addSelectedTexts}
+                    disabled={Object.values(aiSelectedTexts).every(v => !v)}
+                  >
+                    Add Selected
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {selectedNodes.length > 0 ? (
             selectedNodes.map((node, nodeIndex) => {
               const widgets = node.widgets || {};
@@ -1321,6 +1559,74 @@ const generateParameterCombinations = () => {
 
                       // 为每个输入字段创建唯一的键值
                       const inputKey = `${nodeId}_${paramName}`;
+                      
+                      // Handle text parameter type
+                      if (widget.type === "customtext" || widget.type.toLowerCase().includes("text")) {
+                        // Initialize text inputs if not already set
+                        if (!textInputs[inputKey]) {
+                          setTextInputs(prev => ({
+                            ...prev,
+                            [inputKey]: ['']
+                          }));
+                          
+                          // Initialize parameter test values
+                          if (!paramTestValues[nodeId] || !paramTestValues[nodeId][paramName]) {
+                            updateParamTestValues(nodeId, paramName, ['']);
+                          }
+                        }
+                        
+                        const currentTexts = textInputs[inputKey] || [''];
+                        
+                        return (
+                          <div key={widgetIndex} className="border-b pb-3">
+                            <div className="flex justify-between items-center mb-2">
+                              <label className="text-xs font-medium text-gray-700">{paramName}:</label>
+                              <button
+                                className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs flex items-center hover:bg-blue-200 transition-colors"
+                                onClick={() => openAiWritingModal(nodeId, paramName)}
+                              >
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                AI Writing
+                              </button>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              {currentTexts.map((text, textIndex) => (
+                                <div key={textIndex} className="flex items-start">
+                                  <textarea
+                                    className="flex-1 border border-gray-300 rounded p-2 text-xs resize-y"
+                                    rows={2}
+                                    placeholder="Enter text..."
+                                    value={text}
+                                    onChange={(e) => handleTextInputChange(nodeId, paramName, textIndex, e.target.value)}
+                                  />
+                                  <button
+                                    className="ml-2 text-red-500 hover:text-red-700"
+                                    onClick={() => handleRemoveTextInput(nodeId, paramName, textIndex)}
+                                    title="Remove"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                            
+                            <button
+                              className="mt-2 px-2 py-1 border border-dashed border-gray-300 rounded text-xs text-gray-600 hover:bg-gray-50 flex items-center"
+                              onClick={() => handleAddTextInput(nodeId, paramName)}
+                            >
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Add Text
+                            </button>
+                          </div>
+                        );
+                      }
                       
                       if (widget.type === "number") {
                         const min = widget.options?.min || 0;
