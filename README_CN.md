@@ -120,7 +120,7 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 
 微信服务群：
 <div align="center">
-<img src='https://github.com/AIDC-AI/ComfyUI-Copilot/blob/main/assets/qrcode.png' width='300'>
+<img src='https://github.com/AIDC-AI/ComfyUI-Copilot/blob/main/assets/qrcode.jpg' width='300'>
 </div>
 
 ## 📚 许可证
