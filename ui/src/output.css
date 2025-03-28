@@ -855,8 +855,8 @@
   .h-full {
     height: 100%;
   }
-  .max-h-24 {
-    max-height: 6rem;
+  .max-h-16 {
+    max-height: 4rem;
   }
   .max-h-60 {
     max-height: 15rem;

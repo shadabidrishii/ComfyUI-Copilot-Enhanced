@@ -1099,7 +1099,7 @@ const generateParameterCombinations = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="p-2 text-xs text-gray-600 bg-white max-h-24 overflow-y-auto">
+                  <div className="p-2 text-xs text-gray-600 bg-white max-h-16 overflow-y-auto">
                     {Object.entries(image.params)
                       // Filter out nodeParams and other complex objects from display
                       .filter(([paramName, value]) => 
