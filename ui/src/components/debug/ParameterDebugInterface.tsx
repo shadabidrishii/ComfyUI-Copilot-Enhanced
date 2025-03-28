@@ -164,8 +164,11 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       };
     });
     
-    // Also update paramTestValues
-    updateParamTestValues(nodeId, paramName, textInputs[textKey] || []);
+    // Also update paramTestValues with the new value directly instead of using textInputs state
+    // (which hasn't been updated yet)
+    const currentTexts = [...(textInputs[textKey] || [])];
+    currentTexts[index] = value;
+    updateParamTestValues(nodeId, paramName, currentTexts);
   };
   
   // Add function to add a new text input
