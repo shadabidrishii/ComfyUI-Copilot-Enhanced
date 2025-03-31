@@ -181,37 +181,41 @@ export async function getOutputImagesByPromptId(promptId: string): Promise<{[nod
     }
   }
 
+// Define node interface for type safety
+interface ComfyNode {
+  id: number;
+  type: string;
+  [key: string]: any;
+}
 
-  export function getOnlyOneImageNode() {
-    const nodes = Object.values(app.graph._nodes_by_id);
-    const saveNodeIds = [];
-    const previewNodeIds = [];
-    
-    for(const node of nodes) {
-      if(node.type === "SaveImage") {
-        saveNodeIds.push(node.id);
-      } else if(node.type === "PreviewImage") {
-        previewNodeIds.push(node.id);
-      }
-    }
-    console.log("saveNodeIds:", saveNodeIds);
-    console.log("previewNodeIds:", previewNodeIds);
-    if(saveNodeIds.length === 0 && previewNodeIds.length === 0) {
-      throw new Error("No SaveImage or PreviewImage node found, please add one to the graph");
-    }
-    if(saveNodeIds.length === 1) {
-      return saveNodeIds[0];
-    } else if(saveNodeIds.length == 0 && previewNodeIds.length === 1) {
-      return previewNodeIds[0];
-    } else {
-      const nodeIds = [...saveNodeIds, ...previewNodeIds];
-      const nodeId = prompt(`Multiple SaveImage and PreviewImage nodes detected with IDs ${nodeIds.join(",")}. Please enter the ID to use as the result`)
-      console.log("prompt input nodeId:", nodeId);
-      return Number(nodeId);
+export function getOnlyOneImageNode() {
+  const nodes = Object.values(app.graph._nodes_by_id) as ComfyNode[];
+  const saveNodeIds = [];
+  const previewNodeIds = [];
+  
+  for(const node of nodes) {
+    if(node.type === "SaveImage") {
+      saveNodeIds.push(node.id);
+    } else if(node.type === "PreviewImage") {
+      previewNodeIds.push(node.id);
     }
   }
+  console.log("saveNodeIds:", saveNodeIds);
+  console.log("previewNodeIds:", previewNodeIds);
+  if(saveNodeIds.length === 0 && previewNodeIds.length === 0) {
+    throw new Error("No SaveImage or PreviewImage node found, please add one to the graph");
+  }
+  if(saveNodeIds.length === 1) {
+    return saveNodeIds[0];
+  } else if(saveNodeIds.length == 0 && previewNodeIds.length === 1) {
+    return previewNodeIds[0];
+  } else {
+    // Return all node IDs as an array so the UI can handle selection
+    return null;
+  }
+}
 
-  export async function getOutputImageByPromptId(promptId: string, nodeId: Number): Promise<string | null> {
+export async function getOutputImageByPromptId(promptId: string, nodeId: Number): Promise<string | null> {
     const outputImages = await getOutputImagesByPromptId(promptId);
     // If no images were found, return an empty array
     if (Object.keys(outputImages).length === 0) {

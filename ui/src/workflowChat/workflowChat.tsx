@@ -105,7 +105,7 @@ const ParameterDebugTab = () => {
     const selectedNodes = selectedNode ? selectedNode : [];
     
     const ParameterDebugInterface = React.lazy(() => 
-      import("../components/debug/ParameterDebugInterface").then(module => ({
+      import("../components/debug/ParameterDebugInterfaceNew").then(module => ({
           default: module.ParameterDebugInterface
       }))
     );
