@@ -10,8 +10,11 @@
 // Licensed under the MIT License.
 
 import { api } from "../utils/comfyapp";
+import type { ComfyApi } from "@comfyorg/comfyui-frontend-types";
 
-export async function getObjectInfo(): Promise<Record<string, any>> {
+type ObjectInfo = ReturnType<ComfyApi["getNodeDefs"]>;
+
+export async function getObjectInfo(): Promise<ObjectInfo> {
   try {
     const response = await api.fetchApi("/object_info", { method: "GET" });
     return await response.json();
@@ -21,7 +24,7 @@ export async function getObjectInfo(): Promise<Record<string, any>> {
   }
 }
 
-export async function getInstalledNodes(): Promise<string[]> {
+export async function getInstalledNodes() {
   const objectInfos = await getObjectInfo();
   return Object.keys(objectInfos);
 }
