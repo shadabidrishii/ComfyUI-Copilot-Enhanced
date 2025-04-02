@@ -166,7 +166,8 @@ export async function getOutputImagesByPromptId(promptId: string): Promise<{[nod
                 // Construct the image URL using the ComfyUI view endpoint
                 // const imageUrl = `${window.location.origin}/view?filename=${encodeURIComponent(img.filename)}&type=${encodeURIComponent(img.type)}${img.subfolder ? '&subfolder=' + encodeURIComponent(img.subfolder) : ''}`;
                 //app.graph._nodes_by_id[3].imgs[0].currentSrc
-                outputImages[nodeId].push(app.graph._nodes_by_id[nodeId].imgs[0].currentSrc);
+                const urlBase = app.graph._nodes_by_id[nodeId].imgs[0].currentSrc.split("?")[0];
+                outputImages[nodeId].push(urlBase + "?filename=" + encodeURIComponent(img.filename) + "&type=" + encodeURIComponent(img.type) + (img.subfolder ? "&subfolder=" + encodeURIComponent(img.subfolder) : ""));
               }
             }
             

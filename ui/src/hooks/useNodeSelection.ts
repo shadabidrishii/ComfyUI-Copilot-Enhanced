@@ -12,9 +12,10 @@ export function useNodeSelection(enabled: boolean = true) {
     const handleNodeSelection = (event: MouseEvent) => {
       // and only when in parameter-debug tab
       const isParameterDebugTab = activeTab === 'parameter-debug';
-      const isAllowedScreen = !screenState || screenState.currentScreen === 0;
+      const isChatTab = activeTab === 'chat';
+      const isAllowedScreenParameterDebug = !screenState || screenState.currentScreen === 0;
       
-      if (isAllowedScreen) {
+      if ((isChatTab) || (isAllowedScreenParameterDebug && isParameterDebugTab)) {
         const selectedNodes = app.canvas.selected_nodes;
         if (Object.keys(selectedNodes ?? {}).length) {
           const nodeInfo = Object.values(selectedNodes);
