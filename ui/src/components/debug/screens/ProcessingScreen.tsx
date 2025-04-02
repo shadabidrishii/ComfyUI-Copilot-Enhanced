@@ -11,6 +11,7 @@ interface ProcessingScreenProps {
   handleClose: (event?: React.MouseEvent) => void;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentScreen: React.Dispatch<React.SetStateAction<number>>;
+  cleanupPolling?: () => void;
 }
 
 export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
@@ -22,7 +23,8 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   errorMessage,
   handleClose,
   setIsProcessing,
-  setCurrentScreen
+  setCurrentScreen,
+  cleanupPolling
 }) => {
   // 处理取消生成
   const handleCancel = (e: React.MouseEvent) => {
@@ -30,6 +32,9 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     e.stopPropagation();
     manageQueue({clear: true});
     interruptProcessing();
+    if (cleanupPolling) {
+      cleanupPolling();
+    }
     setIsProcessing(false);
     setCurrentScreen(2);
   };

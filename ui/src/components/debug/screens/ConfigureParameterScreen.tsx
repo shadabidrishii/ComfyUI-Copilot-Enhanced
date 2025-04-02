@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface ConfigureParameterScreenProps {
   selectedNodes: any[];
@@ -64,35 +64,77 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
     // Generate values based on the actual step
     const values = [];
     let current = min;
-    if (count <= 10){
-      while (current <= max && values.length <= 10) {
-        // Apply precision based on the parameter
-        const factor = Math.pow(10, precision);
-        const roundedValue = Math.round(current * factor) / factor;
-        
-        values.push(roundedValue);
-        current += step;
-      }
-    }
-    else{
-      // For large ranges, generate evenly distributed values
-      const range = max - min;
-      const step = range / 9; // 9 steps to get 10 values
+    
+    // Generate all values between min and max using step
+    while (current <= max) {
+      // Apply precision based on the parameter
+      const factor = Math.pow(10, precision);
+      const roundedValue = Math.round(current * factor) / factor;
       
-      for (let i = 0; i <= 9; i++) {
-        // Calculate the value at this position
-        const value = min + (step * i);
-        
-        // Apply precision
-        const factor = Math.pow(10, precision);
-        const roundedValue = Math.round(value * factor) / factor;
-        
-        values.push(roundedValue);
-      }
+      values.push(roundedValue);
+      current += step;
     }
     
     return values;
   };
+  
+  // Initialize default values for numeric parameters when component mounts
+  useEffect(() => {
+    if (!selectedNodes || selectedNodes.length === 0) return;
+    
+    // For each selected node
+    selectedNodes.forEach(node => {
+      const nodeId = node.id.toString();
+      const widgets = node.widgets || {};
+      const nodeWidgets = Object.values(widgets);
+      
+      // For each widget in the node
+      nodeWidgets.forEach((widget: any) => {
+        const paramName = widget.name;
+        
+        // Only process selected parameters
+        if (!selectedParams[paramName]) return;
+        
+        // Check if we already have values for this parameter
+        const hasValues = paramTestValues[nodeId]?.[paramName]?.length > 0;
+        
+        // If no values exist yet and it's a numeric parameter
+        if (!hasValues && widget.type === "number") {
+          const min = widget.options?.min || 0;
+          const max = widget.options?.max || 100;
+          const step = (widget.options?.step || 10) / 10;
+          const precision = widget.options?.precision || 0;
+          
+          // Generate default values
+          const defaultValues = generateNumericTestValues(min, max, step, precision);
+          
+          // Store these values in the state
+          if (defaultValues.length > 0) {
+            updateParamTestValues(nodeId, paramName, defaultValues);
+            
+            // Also update the input values state
+            const inputKey = `${nodeId}_${paramName}`;
+            setInputValues(prev => ({
+              ...prev,
+              [inputKey]: {
+                min: min.toString(),
+                max: max.toString(),
+                step: step.toString()
+              }
+            }));
+          }
+        }
+        
+        // Initialize text inputs if they're empty
+        if (!hasValues && (widget.type === "customtext" || widget.type.toLowerCase().includes("text"))) {
+          const inputKey = `${nodeId}_${paramName}`;
+          if (!textInputs[inputKey] || textInputs[inputKey].length === 0) {
+            updateParamTestValues(nodeId, paramName, ['']);
+          }
+        }
+      });
+    });
+  }, [selectedNodes, selectedParams, paramTestValues, textInputs, updateParamTestValues, setInputValues, generateNumericTestValues]);
   
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -322,25 +364,77 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                         <div className="mt-1">
                           <label className="text-xs text-gray-600">Test values</label>
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {(paramTestValues[nodeId]?.[paramName] || defaultValues).map((value, idx) => (
-                              <div 
-                                key={idx}
-                                className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs cursor-pointer hover:bg-blue-200"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleTestValueSelect(nodeId, paramName, value, e);
-                                }}
-                              >
-                                <span>{value}</span>
-                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </div>
-                            ))}
+                            {(() => {
+                              const values = paramTestValues[nodeId]?.[paramName] || defaultValues;
+                              
+                              // If 10 values or less, show all of them
+                              if (values.length <= 10) {
+                                return values.map((value, idx) => (
+                                  <div 
+                                    key={idx}
+                                    className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs cursor-pointer hover:bg-blue-200"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleTestValueSelect(nodeId, paramName, value, e);
+                                    }}
+                                  >
+                                    <span>{value}</span>
+                                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </div>
+                                ));
+                              } else {
+                                // Show first 5, ellipsis, and last 5
+                                const firstFive = values.slice(0, 5);
+                                const lastFive = values.slice(values.length - 5);
+                                
+                                return (
+                                  <>
+                                    {firstFive.map((value, idx) => (
+                                      <div 
+                                        key={`first-${idx}`}
+                                        className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs cursor-pointer hover:bg-blue-200"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleTestValueSelect(nodeId, paramName, value, e);
+                                        }}
+                                      >
+                                        <span>{value}</span>
+                                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                      </div>
+                                    ))}
+                                    
+                                    {/* Ellipsis indicator */}
+                                    <div className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md flex items-center text-xs">
+                                      ...
+                                    </div>
+                                    
+                                    {lastFive.map((value, idx) => (
+                                      <div 
+                                        key={`last-${idx}`}
+                                        className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs cursor-pointer hover:bg-blue-200"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleTestValueSelect(nodeId, paramName, value, e);
+                                        }}
+                                      >
+                                        <span>{value}</span>
+                                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                      </div>
+                                    ))}
+                                  </>
+                                );
+                              }
+                            })()}
                           </div>
                         </div>
                         <div className="mt-1">
-                          <p className="text-xs text-gray-500">Values are distributed evenly between Min and Max (max 10 values)</p>
+                          <p className="text-xs text-gray-500">Values are distributed evenly between Min and Max</p>
                         </div>
                       </div>
                     );

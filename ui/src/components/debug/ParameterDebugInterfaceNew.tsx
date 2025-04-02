@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getOnlyOneImageNode, getOutputImageByPromptId, queuePrompt } from '../../utils/queuePrompt';
 import { app } from '../../utils/comfyapp';
 import { interruptProcessing, manageQueue } from '../../apis/comfyApiCustom';
@@ -124,6 +124,11 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
 
   // Get dispatch from context to update screen state
   const { dispatch } = useChatContext();
+
+  // Add a ref to store the polling timeout
+  const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Add a ref to track the current polling session ID
+  const pollingSessionIdRef = useRef<string | null>(null);
 
   // Add function to handle AI text generation
   const handleAiWriting = async () => {
@@ -352,11 +357,35 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    // When moving from screen 0 to screen 1, clean up paramTestValues for unselected parameters
+    if (currentScreen === 0) {
+      // Make a copy of the current paramTestValues
+      const updatedParamTestValues = { ...paramTestValues };
+      
+      // For each node
+      Object.keys(updatedParamTestValues).forEach(nodeId => {
+        const nodeParams = updatedParamTestValues[nodeId];
+        
+        // For each parameter in this node
+        Object.keys(nodeParams).forEach(paramName => {
+          // If this parameter is no longer selected, remove it
+          if (!selectedParams[paramName]) {
+            delete nodeParams[paramName];
+          }
+        });
+      });
+      
+      // Update the state with cleaned up values
+      setParamTestValues(updatedParamTestValues);
+    }
+    
     // 如果要从屏幕 1 进入屏幕 2，更新 totalCount
     if (currentScreen === 1) {
       const combinations = generateParameterCombinations(paramTestValues);
       setTotalCount(combinations.length);
     }
+    
     // 清除错误消息
     setErrorMessage(null);
     setCurrentScreen(prev => Math.min(prev + 1, 2));
@@ -400,10 +429,31 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    const isCurrentlySelected = selectedParams[param];
+    
+    // Update the selected params state
     setSelectedParams(prev => ({
       ...prev,
-      [param]: !prev[param]
+      [param]: !isCurrentlySelected
     }));
+    
+    // If we're deselecting a parameter, remove its values from paramTestValues
+    if (isCurrentlySelected) {
+      // Make a copy of the current paramTestValues
+      const updatedParamTestValues = { ...paramTestValues };
+      
+      // For each node
+      Object.keys(updatedParamTestValues).forEach(nodeId => {
+        // If this parameter exists in this node, remove it
+        if (updatedParamTestValues[nodeId][param]) {
+          delete updatedParamTestValues[nodeId][param];
+        }
+      });
+      
+      // Update the state with cleaned up values
+      setParamTestValues(updatedParamTestValues);
+    }
   };
   
   // Toggle dropdown open status - 使用nodeId_paramName作为键
@@ -548,12 +598,31 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setCurrentPage(Math.max(1, Math.min(newPage, Math.ceil(generatedImages.length / imagesPerPage))));
   };
 
-  // Handle start generation
+  // Handle polling cleanup function
+  const cleanupPolling = () => {
+    if (pollingTimeoutRef.current) {
+      clearTimeout(pollingTimeoutRef.current);
+      pollingTimeoutRef.current = null;
+    }
+    pollingSessionIdRef.current = null;
+  };
+
+  // Add useEffect cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupPolling();
+    };
+  }, []);
+
+  // Handle start generation - modified to clean up before starting
   const handleStartGeneration = async (event?: React.MouseEvent, selectedNodeId?: number) => {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
+    
+    // Clean up any existing polling
+    cleanupPolling();
     
     // Get parameter combinations
     const paramCombinations = generateParameterCombinations(paramTestValues);
@@ -598,6 +667,10 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     
     const prompt_ids: string[] = [];
     try {
+      // Generate a unique session ID
+      const sessionId = Date.now().toString();
+      pollingSessionIdRef.current = sessionId;
+      
       // Each combination represents all parameters for a single image generation
       for (const combination of paramCombinations) {
         const response = await queuePrompt(combination);
@@ -624,19 +697,26 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       
       // Function to poll for images
       const pollForImages = async () => {
+        // Check if this polling session is still active
+        if (pollingSessionIdRef.current !== sessionId) {
+          console.log("Another polling session has started, stopping this one");
+          return;
+        }
+        
         // Check if timeout has been reached
         if (Date.now() - startTime > timeoutDuration) {
           console.log("Timeout reached while waiting for images");
-          setIsProcessing(false);
-          setIsCompleted(true);
-          setCurrentPage(1);
+          if (pollingSessionIdRef.current === sessionId) {
+            setIsProcessing(false);
+            setIsCompleted(true);
+            setCurrentPage(1);
+          }
           return;
         }
         
         let completedImagesCount = 0;
         
         // Check each prompt id to see if images are ready
-        
         for (let i = 0; i < prompt_ids.length; i++) {
           const promptId = prompt_ids[i];
           if (!promptId) continue;
@@ -658,20 +738,24 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           }
         }
         
-        // Update the images in state
-        setGeneratedImages([...newImages]);
-        
-        // Update the completed count
-        setCompletedCount(completedImagesCount);
-        
-        // If all images are ready or timeout occurred, we're done
-        if (completedImagesCount === prompt_ids.length || Date.now() - startTime > timeoutDuration) {
-          setIsProcessing(false);
-          setIsCompleted(true);
-          setCurrentPage(1);
-        } else {
-          // Otherwise, poll again in 3 seconds
-          setTimeout(pollForImages, 3000);
+        // Only update state if this polling session is still active
+        if (pollingSessionIdRef.current === sessionId) {
+          // Update the images in state
+          setGeneratedImages([...newImages]);
+          
+          // Update the completed count
+          setCompletedCount(completedImagesCount);
+          
+          // If all images are ready or timeout occurred, we're done
+          if (completedImagesCount === prompt_ids.length) {
+            console.log("All images ready, completing session");
+            setIsProcessing(false);
+            setIsCompleted(true);
+            setCurrentPage(1);
+          } else {
+            // Otherwise, poll again in 3 seconds
+            pollingTimeoutRef.current = setTimeout(pollForImages, 3000);
+          }
         }
       };
       
@@ -780,13 +864,26 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     if (currentScreen === 1 && nodeIndex !== undefined) {
       // Remove the node at specified index
       const newSelectedNodes = [...selectedNodes];
+      const removedNode = newSelectedNodes[nodeIndex];
       newSelectedNodes.splice(nodeIndex, 1);
+      
+      // Also remove the parameter test values for the removed node
+      if (removedNode) {
+        const removedNodeId = removedNode.id.toString();
+        setParamTestValues(prev => {
+          const updated = { ...prev };
+          delete updated[removedNodeId];
+          return updated;
+        });
+      }
       
       // If no nodes left, return to original screen
       if (newSelectedNodes.length === 0) {
         if (onClose) {
           // Clear screen state from context when closing
           dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+          // Clear all state variables
+          resetAllStates();
           // Call provided onClose to reset the interface
           onClose();
         }
@@ -801,16 +898,59 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     if (onClose) {
       // Clear screen state from context when closing
       dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+      // Clear all state variables
+      resetAllStates();
       // Use the provided onClose callback
       onClose();
     } else {
       // For users of this component without a callback
-      // Reset internal states
-      setCurrentScreen(0);
-      setIsCompleted(false);
-      setIsProcessing(false);
-      setErrorMessage(null);
+      // Reset all states
+      resetAllStates();
     }
+  };
+
+  // Helper function to reset all state variables
+  const resetAllStates = () => {
+    setCurrentScreen(0);
+    setSelectedParams({
+      Steps: true,
+      CFG: true,
+      sampler_name: true,
+      threshold: false,
+      prompt: false
+    });
+    cleanupPolling(); // Add cleanup call
+    setIsProcessing(false);
+    setIsCompleted(false);
+    setCompletedCount(0);
+    setTotalCount(12);
+    setSelectedImageIndex(null);
+    setGeneratedImages(Array(12).fill(null).map((_, i) => ({
+      url: `https://source.unsplash.com/random/300x300?sig=${Math.random()}`,
+      params: {
+        step: i % 3 === 0 ? 5 : i % 3 === 1 ? 10 : 15,
+        sampler_name: 'euler',
+        cfg: 1
+      }
+    })));
+    setParamTestValues({});
+    setOpenDropdowns({});
+    setSearchTerms({});
+    setInputValues({});
+    setCurrentPage(1);
+    setErrorMessage(null);
+    setNotificationVisible(false);
+    setModalVisible(false);
+    setModalImageUrl('');
+    setTextInputs({});
+    setAiWritingModalVisible(false);
+    setAiWritingModalText('');
+    setAiGeneratedTexts([]);
+    setAiWritingLoading(false);
+    setAiWritingNodeId('');
+    setAiWritingParamName('');
+    setAiWritingError(null);
+    setAiSelectedTexts({});
   };
 
   // Conditionally render based on whether nodes are selected
@@ -905,6 +1045,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           handleClose={handleClose}
           setIsProcessing={setIsProcessing}
           setCurrentScreen={setCurrentScreen}
+          cleanupPolling={cleanupPolling}
         />
       </div>
     );
