@@ -170,6 +170,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     // 使用自定义 hooks，只在visible为true且activeTab为chat时启用
     useMousePosition(visible && activeTab === 'chat');
     useNodeSelection(visible);
+
+    // 使用自定义 hooks
     const { 
         isResizing: resizableIsResizing, 
         setIsResizing: resizableSetIsResizing, 

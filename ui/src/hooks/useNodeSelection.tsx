@@ -33,9 +33,6 @@ export function useNodeSelection(enabled: boolean = true) {
       // };
       
       dispatch({ type: 'SET_SELECTED_NODE', payload: Object.values(app.canvas.selected_nodes) });
-      
-      // Automatically switch to parameter-debug tab when a node is selected
-      dispatch({ type: 'SET_ACTIVE_TAB', payload: 'parameter-debug' });
     };
 
     // Listen for selection events
