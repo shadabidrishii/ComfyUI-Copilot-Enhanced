@@ -2,7 +2,7 @@
  * @Author: ai-business-hql ai.bussiness.hql@gmail.com
  * @Date: 2025-02-17 20:53:45
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-03-28 14:28:51
+ * @LastEditTime: 2025-04-02 11:06:22
  * @FilePath: /comfyui_copilot/ui/src/apis/comfyApiCustom.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -103,30 +103,6 @@ export async function interruptProcessing(): Promise<Response> {
   }
 }
 
-
-
-export async function getImage(filename: string, subfolder: string, folderType: string): Promise<Blob> {
-  try {
-    const params = new URLSearchParams({
-      filename,
-      subfolder,
-      type: folderType
-    });
-    
-    const response = await api.fetchApi(`/view?${params.toString()}`, { 
-      method: "GET" 
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.blob();
-  } catch (error) {
-    console.error("Error fetching image:", error);
-    throw error;
-  }
-}
 
 export async function getHistory(promptId: string): Promise<any> {
   try {
