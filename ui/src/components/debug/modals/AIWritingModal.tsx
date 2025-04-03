@@ -31,7 +31,7 @@ export const AIWritingModal: React.FC<AIWritingModalProps> = ({
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="p-4 border-b flex justify-between items-center">
           <h3 className="text-lg font-medium">AI Writing Assistant</h3>
           <button 
@@ -44,7 +44,7 @@ export const AIWritingModal: React.FC<AIWritingModalProps> = ({
           </button>
         </div>
         
-        <div className="p-4">
+        <div className="p-4 overflow-y-auto flex-1">
           <div className="mb-4">
             <p className="text-sm text-gray-600 mb-2">Enter text and AI will generate variations</p>
             <textarea 
@@ -121,7 +121,7 @@ export const AIWritingModal: React.FC<AIWritingModalProps> = ({
           )}
         </div>
         
-        <div className="p-4 border-t flex justify-end">
+        <div className="p-4 border-t flex justify-end flex-shrink-0">
           <button 
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm mr-2 hover:bg-gray-200 transition-colors"
             onClick={onClose}
