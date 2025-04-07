@@ -27,6 +27,25 @@ export interface UploadedImage {
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
+const models_conf = [
+    {
+        "name": "gpt-4o",
+        "image_enable": true
+    },
+    {
+        "name": "gpt-4o-mini",
+        "image_enable": true
+    },
+    {
+        "name": "qwen-plus",
+        "image_enable": false
+    },
+    {
+        "name": "DeepSeek-V3",
+        "image_enable": false
+    }
+]
+
 export function ChatInput({ 
     input, 
     loading, 
@@ -140,20 +159,20 @@ export function ChatInput({
                              focus:border-transparent hover:bg-gray-50
                              transition-colors border-0"
                 >
-                    
-                    <option value="gpt-4o-mini">gpt-4o-mini</option>
-                    <option value="gpt-4o">gpt-4o</option>
-                    <option value="qwen-plus">qwen-plus</option>
-                    <option value="DeepSeek-V3">DeepSeek-V3</option>
+                    {models_conf.map((model) => (
+                        <option value={model.name} key={model.name}>{model.name}</option>
+                    ))}
                 </select>
 
                 {/* Upload image button */}
                 <button
                     type="button"
                     onClick={() => setShowUploadModal(true)}
-                    className="p-1.5 text-gray-500 bg-white border-none
+                    disabled={!models_conf.find(model => model.name === selectedModel)?.image_enable}
+                    className={`p-1.5 text-gray-500 bg-white border-none
                              hover:bg-gray-100 hover:text-gray-600 
-                             transition-all duration-200 outline-none">
+                             transition-all duration-200 outline-none
+                             ${!models_conf.find(model => model.name === selectedModel)?.image_enable ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <ImageIcon className="h-4 w-4" />
                 </button>
             </div>
