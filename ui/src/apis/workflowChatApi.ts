@@ -415,14 +415,14 @@ export namespace WorkflowChatAPI {
       const result = await response.json();
       if (!result.success) {
         const message = result.message || 'Failed to generate SD prompts';
-        alert(message);
+        // alert(message);
         throw new Error(message);
       }
 
       return result.data as string[];
     } catch (error) {
       console.error('Error generating SD prompts:', error);
-      alert(error instanceof Error ? error.message : 'Failed to generate SD prompts');
+      // alert(error instanceof Error ? error.message : 'Failed to generate SD prompts');
       throw error;
     }
   }
