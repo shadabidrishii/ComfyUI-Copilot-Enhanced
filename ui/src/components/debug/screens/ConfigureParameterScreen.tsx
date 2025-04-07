@@ -125,11 +125,15 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
           }
         }
         
-        // Initialize text inputs if they're empty
-        if (!hasValues && (widget.type === "customtext" || widget.type.toLowerCase().includes("text"))) {
+        // Handle text inputs - Always ensure paramTestValues are in sync with textInputs
+        if ((widget.type === "customtext" || widget.type.toLowerCase().includes("text"))) {
           const inputKey = `${nodeId}_${paramName}`;
-          if (!textInputs[inputKey] || textInputs[inputKey].length === 0) {
-            updateParamTestValues(nodeId, paramName, ['']);
+          const currentTexts = textInputs[inputKey] || [''];
+          
+          // Always update paramTestValues with current textInputs to ensure they're in sync
+          // This ensures text values are maintained throughout the workflow
+          if (JSON.stringify(currentTexts) !== JSON.stringify(paramTestValues[nodeId]?.[paramName] || [''])) {
+            updateParamTestValues(nodeId, paramName, currentTexts);
           }
         }
       });

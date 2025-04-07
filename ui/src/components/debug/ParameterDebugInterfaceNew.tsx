@@ -380,9 +380,34 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       setParamTestValues(updatedParamTestValues);
     }
     
-    // 如果要从屏幕 1 进入屏幕 2，更新 totalCount
+    // When moving to the confirmation screen, ensure all text values are properly synchronized
     if (currentScreen === 1) {
-      const combinations = generateParameterCombinations(paramTestValues);
+      // Ensure textInputs are synced to paramTestValues for all selected nodes
+      const updatedParamTestValues = { ...paramTestValues };
+      selectedNodes.forEach(node => {
+        const nodeId = node.id.toString();
+        const widgets = node.widgets || {};
+        
+        Object.values(widgets).forEach((widget: any) => {
+          const paramName = widget.name;
+          
+          // Only process selected text parameters
+          if (selectedParams[paramName] && (widget.type === "customtext" || widget.type.toLowerCase().includes("text"))) {
+            const inputKey = `${nodeId}_${paramName}`;
+            const currentTexts = textInputs[inputKey] || [''];
+            
+            // Update paramTestValues with the current text values
+            updatedParamTestValues[nodeId] = updatedParamTestValues[nodeId] || {};
+            updatedParamTestValues[nodeId][paramName] = currentTexts;
+          }
+        });
+      });
+      
+      // Update the state with synchronized values
+      setParamTestValues(updatedParamTestValues);
+      
+      // Update totalCount with parameter combinations
+      const combinations = generateParameterCombinations(updatedParamTestValues);
       setTotalCount(combinations.length);
     }
     
@@ -414,6 +439,32 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       currentNodeIds.forEach(nodeId => {
         if (!selectedNodeIds.includes(nodeId)) {
           delete updatedParamTestValues[nodeId];
+        }
+      });
+      
+      setParamTestValues(updatedParamTestValues);
+    }
+    
+    // If returning from the result gallery or confirmation screen, ensure text values are maintained
+    if (currentScreen === 2 || isCompleted) {
+      // Ensure paramTestValues are correctly synchronized with textInputs
+      const updatedParamTestValues = { ...paramTestValues };
+      
+      // For each text input value, ensure it's properly synced to paramTestValues
+      Object.entries(textInputs).forEach(([key, texts]) => {
+        if (!texts || texts.length === 0) return;
+        
+        const [nodeId, paramName] = key.split('_');
+        
+        // Skip if node doesn't exist in selected nodes
+        if (!selectedNodes.some(node => node.id.toString() === nodeId)) return;
+        
+        // Ensure the node and parameter exist in paramTestValues
+        updatedParamTestValues[nodeId] = updatedParamTestValues[nodeId] || {};
+        
+        // Only update if the values are different to avoid unnecessary state updates
+        if (JSON.stringify(updatedParamTestValues[nodeId][paramName]) !== JSON.stringify(texts)) {
+          updatedParamTestValues[nodeId][paramName] = texts;
         }
       });
       
@@ -942,6 +993,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setNotificationVisible(false);
     setModalVisible(false);
     setModalImageUrl('');
+    // Completely reset text inputs to ensure clean state on next run
     setTextInputs({});
     setAiWritingModalVisible(false);
     setAiWritingModalText('');
