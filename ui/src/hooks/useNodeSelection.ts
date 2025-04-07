@@ -3,18 +3,26 @@ import { app } from '../utils/comfyapp';
 import { useChatContext } from '../context/ChatContext';
 
 export function useNodeSelection(enabled: boolean = true) {
-  const { dispatch } = useChatContext();
+  const { state, dispatch } = useChatContext();
+  const { activeTab, screenState } = state;
 
   useEffect(() => {
     if (!enabled) return;
 
-    const handleNodeSelection = () => {
-      const selectedNodes = app.canvas.selected_nodes;
-      if (Object.keys(selectedNodes ?? {}).length) {
-        const nodeInfo = Object.values(selectedNodes)[0];
-        dispatch({ type: 'SET_SELECTED_NODE', payload: nodeInfo });
-      } else {
-        dispatch({ type: 'SET_SELECTED_NODE', payload: null });
+    const handleNodeSelection = (event: MouseEvent) => {
+      // and only when in parameter-debug tab
+      const isParameterDebugTab = activeTab === 'parameter-debug';
+      const isChatTab = activeTab === 'chat';
+      const isAllowedScreenParameterDebug = !screenState || screenState.currentScreen === 0;
+      
+      if ((isChatTab) || (isAllowedScreenParameterDebug && isParameterDebugTab)) {
+        const selectedNodes = app.canvas.selected_nodes;
+        if (Object.keys(selectedNodes ?? {}).length) {
+          const nodeInfo = Object.values(selectedNodes);
+          dispatch({ type: 'SET_SELECTED_NODE', payload: nodeInfo });
+        } else {
+          dispatch({ type: 'SET_SELECTED_NODE', payload: null });
+        }
       }
     };
 
@@ -22,5 +30,5 @@ export function useNodeSelection(enabled: boolean = true) {
     return () => {
       document.removeEventListener("click", handleNodeSelection);
     };
-  }, [dispatch, enabled]);
+  }, [dispatch, enabled, activeTab, screenState]);
 } 

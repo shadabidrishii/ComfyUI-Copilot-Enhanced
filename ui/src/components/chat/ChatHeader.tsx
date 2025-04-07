@@ -19,9 +19,16 @@ interface ChatHeaderProps {
     onClear?: () => void;
     hasMessages: boolean;
     onHeightResize?: (deltaY: number) => void;
+    title?: string;
 }
 
-export function ChatHeader({ onClose, onClear, hasMessages, onHeightResize }: ChatHeaderProps) {
+export function ChatHeader({ 
+    onClose, 
+    onClear, 
+    hasMessages, 
+    onHeightResize,
+    title = "ComfyUI-Copilot"
+}: ChatHeaderProps) {
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
     
@@ -76,9 +83,9 @@ export function ChatHeader({ onClose, onClear, hasMessages, onHeightResize }: Ch
                     <img 
                         src={logoImage}
                         alt="ComfyUI-Copilot Logo" 
-                        className="h-12 w-12 -ml-2"
+                        className="h-10 w-10 -ml-1" 
                     />
-                    <h3 className="text-[16px] font-medium text-gray-800">ComfyUI-Copilot</h3>
+                    <h3 className="text-[16px] font-medium text-gray-800">{title}</h3>
                     <button
                         onClick={handleApiKeyClick}
                         className="p-1 bg-white border-none hover:bg-gray-100 rounded text-gray-500"
@@ -88,8 +95,8 @@ export function ChatHeader({ onClose, onClear, hasMessages, onHeightResize }: Ch
                 </div>
                 <div className="flex items-center gap-1">
                     <button
-                        className="inline-flex bg-white border-none items-center justify-center rounded-md p-2 
-                                 text-gray-500 hover:bg-gray-100"
+                        className={`inline-flex bg-white border-none items-center justify-center rounded-md p-2 
+                                 ${hasMessages ? 'text-gray-500 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'}`}
                         disabled={!hasMessages}
                         onClick={onClear}>
                         <TrashIcon className="h-5 w-5" />
