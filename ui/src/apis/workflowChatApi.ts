@@ -391,40 +391,57 @@ export namespace WorkflowChatAPI {
   }
 
   export async function generateSDPrompts(text: string): Promise<string[]> {
-    try {
-      const apiKey = getApiKey();
-      const browserLanguage = getBrowserLanguage();
-      
-      // Prepare headers
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'trace-id': generateUUID(),
-        'Accept-Language': browserLanguage,
-      };
-      
-      const response = await fetch(`${BASE_URL}/api/param_debug/generate_sd_prompts`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          text: text
-        }),
-      });
+    const maxRetries = 3;
+    let retryCount = 0;
+    let lastError: any;
 
-      const result = await response.json();
-      if (!result.success) {
-        const message = result.message || 'Failed to generate SD prompts';
-        // alert(message);
-        throw new Error(message);
+    while (retryCount < maxRetries) {
+      try {
+        const apiKey = getApiKey();
+        const browserLanguage = getBrowserLanguage();
+        
+        // Prepare headers
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          'accept': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'trace-id': generateUUID(),
+          'Accept-Language': browserLanguage,
+        };
+        
+        const response = await fetch(`${BASE_URL}/api/param_debug/generate_sd_prompts`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            text: text
+          }),
+        });
+
+        const result = await response.json();
+        if (!result.success) {
+          const message = result.message || 'Failed to generate SD prompts';
+          throw new Error(message);
+        }
+
+        return result.data as string[];
+      } catch (error) {
+        lastError = error;
+        retryCount++;
+        
+        if (retryCount >= maxRetries) {
+          console.error(`Error generating SD prompts after ${maxRetries} attempts:`, error);
+          throw error;
+        }
+        
+        console.warn(`Attempt ${retryCount} failed, retrying... Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        
+        // Wait with exponential backoff before retrying (500ms, 1000ms, 2000ms)
+        await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, retryCount - 1)));
       }
-
-      return result.data as string[];
-    } catch (error) {
-      console.error('Error generating SD prompts:', error);
-      // alert(error instanceof Error ? error.message : 'Failed to generate SD prompts');
-      throw error;
     }
+
+    // This should never be reached due to the throw in the loop, but TypeScript needs it
+    throw lastError;
   }
 }
 
