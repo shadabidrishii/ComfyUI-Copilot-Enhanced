@@ -1107,7 +1107,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   if (currentScreen === 0) {
     return (
       <div 
-        className="flex-1 overflow-y-auto bg-gray-50 p-4"
+        className="flex-1 overflow-y-auto bg-gray-50 p-4 flex flex-col h-full max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <InitialScreen 
@@ -1125,7 +1125,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   if (currentScreen === 1) {
     return (
       <div 
-        className="flex-1 overflow-y-auto bg-gray-50 p-4"
+        className="flex-1 overflow-y-auto bg-gray-50 p-4 flex flex-col h-full max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <ConfigureParameterScreen 
@@ -1172,7 +1172,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   // Screen 3: Final configuration
   return (
     <div 
-      className="flex-1 overflow-y-auto bg-gray-50 p-4"
+      className="flex-1 overflow-y-auto bg-gray-50 p-4 flex flex-col h-full max-h-[80vh]"
       onClick={(e) => e.stopPropagation()}
     >
       <ConfirmConfigurationScreen 
