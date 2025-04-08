@@ -47,7 +47,32 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 
 ---
 
-## ✨ Updates
+## 🚀  Updates
+### 2025.04.08 Release
+#### ✨ New Features
+
+##### 1. 🎉 GenLab Launch
+We are excited to announce that GenLab is now officially live, bringing two powerful new features:
+
+###### a. 🔍 Parameter Exploration
+- Now you can optimize parameters for executable workflows
+- How to use:
+  - Click on the node you wish to explore
+  - Select the parameters to explore
+  - Set the parameter value ranges
+  - The system will automatically batch execute different parameter combinations
+  - Generated results support visual comparison, helping you quickly find the optimal parameter configuration
+    
+https://github.com/user-attachments/assets/8069744a-411e-4a25-b1a5-4503a303bc6c
+
+###### b. ✏️ Prompt Rewriting Assistant
+- New feature helps users generate rich, high-quality "spells"
+- Optimize your prompts to enhance the quality and diversity of generated content
+  
+https://github.com/user-attachments/assets/85decdbf-9ae5-4c78-818b-8db444ed4e7b
+
+#### 🛠️ Bug Fixes
+- 🐛 Fixed multiple known issues, improving system stability
 
 ### 2025.02.27 Release
 
