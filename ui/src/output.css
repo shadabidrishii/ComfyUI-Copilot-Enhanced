@@ -867,6 +867,9 @@
   .max-h-\[40vh\] {
     max-height: 40vh;
   }
+  .max-h-\[80vh\] {
+    max-height: 80vh;
+  }
   .max-h-\[90vh\] {
     max-height: 90vh;
   }
