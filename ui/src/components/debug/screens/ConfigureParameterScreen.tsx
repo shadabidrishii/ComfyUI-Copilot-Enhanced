@@ -446,6 +446,13 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                     const values = widget.options?.values || [];
                     const dropdownKey = `${nodeId}_${paramName}`;
                     
+                    // Helper function to get display value, handling both string and object
+                    const getDisplayValue = (value: any): string => {
+                      if (typeof value === 'string') return value;
+                      if (value && typeof value === 'object' && 'name' in value) return value.name;
+                      return String(value);
+                    };
+                    
                     return (
                       <div key={widgetIndex} className="border-b pb-3">
                         <div className="flex justify-between items-center">
@@ -511,9 +518,9 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    const filteredValues = values.filter((value: string) => 
+                                    const filteredValues = values.filter((value: any) => 
                                       !searchTerms[dropdownKey] || 
-                                      value.toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
+                                      getDisplayValue(value).toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
                                     );
                                     handleSelectAll(nodeId, paramName, filteredValues);
                                   }}
@@ -543,11 +550,11 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                 {/* Scrollable option list */}
                                 <div className="max-h-60 overflow-y-auto">
                                   {values
-                                    .filter((value: string) => 
+                                    .filter((value: any) => 
                                       !searchTerms[dropdownKey] || 
-                                      value.toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
+                                      getDisplayValue(value).toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
                                     )
-                                    .map((value: string, i: number) => (
+                                    .map((value: any, i: number) => (
                                       <div 
                                         key={i} 
                                         className="px-3 py-1.5 hover:bg-gray-100 cursor-pointer text-xs flex items-center text-gray-700"
@@ -564,14 +571,14 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                             </svg>
                                           )}
                                         </div>
-                                        <span className="whitespace-normal overflow-hidden text-ellipsis">{value}</span>
+                                        <span className="whitespace-normal overflow-hidden text-ellipsis">{getDisplayValue(value)}</span>
                                       </div>
                                     ))}
                                   
                                   {/* No search results message */}
-                                  {values.filter((value: string) => 
+                                  {values.filter((value: any) => 
                                     !searchTerms[dropdownKey] || 
-                                    value.toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
+                                    getDisplayValue(value).toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
                                   ).length === 0 && (
                                     <div className="px-3 py-4 text-sm text-gray-500 text-center">
                                       No matching options
@@ -585,12 +592,12 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                         <div className="mt-2">
                           <label className="text-xs text-gray-600">Test values</label>
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {(paramTestValues[nodeId]?.[paramName] || []).map((value: string, idx: number) => (
+                            {(paramTestValues[nodeId]?.[paramName] || []).map((value: any, idx: number) => (
                               <div 
                                 key={idx}
                                 className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs"
                               >
-                                <span>{value}</span>
+                                <span>{getDisplayValue(value)}</span>
                                 <svg 
                                   className="w-4 h-4 ml-1 cursor-pointer hover:text-blue-600" 
                                   fill="none" 
