@@ -453,6 +453,14 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                       return String(value);
                     };
                     
+                    // Helper function to get actual value to store
+                    const getValueToStore = (value: any): any => {
+                      if (typeof value === 'object' && value !== null && 'name' in value) {
+                        return value.name;
+                      }
+                      return value;
+                    };
+                    
                     return (
                       <div key={widgetIndex} className="border-b pb-3">
                         <div className="flex justify-between items-center">
@@ -522,7 +530,9 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                       !searchTerms[dropdownKey] || 
                                       getDisplayValue(value).toLowerCase().includes((searchTerms[dropdownKey] || '').toLowerCase())
                                     );
-                                    handleSelectAll(nodeId, paramName, filteredValues);
+                                    // Map values to use name property when available
+                                    const valuesToStore = filteredValues.map(getValueToStore);
+                                    handleSelectAll(nodeId, paramName, valuesToStore);
                                   }}
                                 >
                                   <div className={`w-4 h-4 mr-2 border rounded-sm flex items-center justify-center ${
@@ -561,11 +571,11 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
-                                          handleTestValueSelect(nodeId, paramName, value, e);
+                                          handleTestValueSelect(nodeId, paramName, getValueToStore(value), e);
                                         }}
                                       >
-                                        <div className={`w-4 h-4 mr-2 border rounded-sm flex items-center justify-center ${(paramTestValues[nodeId]?.[paramName] || []).includes(value) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
-                                          {(paramTestValues[nodeId]?.[paramName] || []).includes(value) && (
+                                        <div className={`w-4 h-4 mr-2 border rounded-sm flex items-center justify-center ${(paramTestValues[nodeId]?.[paramName] || []).includes(getValueToStore(value)) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
+                                          {(paramTestValues[nodeId]?.[paramName] || []).includes(getValueToStore(value)) && (
                                             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
@@ -597,7 +607,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                 key={idx}
                                 className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md flex items-center text-xs"
                               >
-                                <span>{getDisplayValue(value)}</span>
+                                <span>{value}</span>
                                 <svg 
                                   className="w-4 h-4 ml-1 cursor-pointer hover:text-blue-600" 
                                   fill="none" 
