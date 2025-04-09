@@ -858,9 +858,9 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       // Calculate total parameter combinations
       if (paramTestValues) {
         for (const nodeId in paramTestValues) {
-          if (paramTestValues[nodeId] && paramTestValues[nodeId].values) {
-            for (const paramName in paramTestValues[nodeId].values) {
-              const paramOptions = paramTestValues[nodeId].values[paramName];
+          if (paramTestValues[nodeId]) {
+            for (const paramName in paramTestValues[nodeId]) {
+              const paramOptions = paramTestValues[nodeId][paramName];
               if (paramOptions) {
                 let optionsCount = 1;
                 if (Array.isArray(paramOptions)) {
