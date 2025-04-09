@@ -861,8 +861,15 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           if (paramTestValues[nodeId] && paramTestValues[nodeId].values) {
             for (const paramName in paramTestValues[nodeId].values) {
               const paramOptions = paramTestValues[nodeId].values[paramName];
-              if (Array.isArray(paramOptions) && paramOptions.length > 0) {
-                count_temp = count_temp * paramOptions.length;
+              if (paramOptions) {
+                let optionsCount = 1;
+                if (Array.isArray(paramOptions)) {
+                  optionsCount = paramOptions.length > 0 ? paramOptions.length : 1;
+                } else if (typeof paramOptions === 'object' && paramOptions !== null) {
+                  // Handle both numeric and string keys in objects
+                  optionsCount = Object.keys(paramOptions).length > 0 ? Object.keys(paramOptions).length : 1;
+                }
+                count_temp = count_temp * optionsCount;
               }
             }
           }
