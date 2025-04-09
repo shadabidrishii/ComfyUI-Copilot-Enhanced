@@ -42,7 +42,7 @@ const getBrowserLanguage = () => {
 
 // Add this helper function after getOpenAiConfig()
 const checkAndSaveApiKey = (response: Response) => {
-  const apiKeyFromHeader = response.headers.get('api-key');
+  const apiKeyFromHeader = response.headers.get('User-Api-Key');
   if (apiKeyFromHeader && !localStorage.getItem('chatApiKey')) {
     localStorage.setItem('chatApiKey', apiKeyFromHeader);
   }
