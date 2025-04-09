@@ -854,6 +854,28 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       console.log(`Applied image ${selectedImageIndex + 1} with parameters:`, generatedImages[selectedImageIndex].params);
 
       // 发送埋点事件
+      let count_temp = 1;
+      // Calculate total parameter combinations
+      if (paramTestValues) {
+        for (const nodeId in paramTestValues) {
+          if (paramTestValues[nodeId]) {
+            for (const paramName in paramTestValues[nodeId]) {
+              const paramOptions = paramTestValues[nodeId][paramName];
+              if (paramOptions) {
+                let optionsCount = 1;
+                if (Array.isArray(paramOptions)) {
+                  optionsCount = paramOptions.length > 0 ? paramOptions.length : 1;
+                } else if (typeof paramOptions === 'object' && paramOptions !== null) {
+                  // Handle both numeric and string keys in objects
+                  optionsCount = Object.keys(paramOptions).length > 0 ? Object.keys(paramOptions).length : 1;
+                }
+                count_temp = count_temp * optionsCount;
+              }
+            }
+          }
+        }
+      }
+
       WorkflowChatAPI.trackEvent({
           event_type: 'parameter_debug_apply',
           message_type: 'parameter_debug',
@@ -862,7 +884,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
               workflow: (await app.graphToPrompt()).output,
               selected_params: generatedImages[selectedImageIndex].params,
               all_params: paramTestValues,
-              count: Object.keys(paramTestValues).length
+              count: count_temp
           }
       });
 

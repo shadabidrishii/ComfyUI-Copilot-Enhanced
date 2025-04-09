@@ -1,3 +1,11 @@
+/*
+ * @Author: ai-business-hql ai.bussiness.hql@gmail.com
+ * @Date: 2025-03-31 18:29:53
+ * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
+ * @LastEditTime: 2025-04-09 11:39:45
+ * @FilePath: /comfyui_copilot/ui/src/components/debug/screens/InitialScreen.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import React from 'react';
 
 interface InitialScreenProps {
@@ -15,6 +23,14 @@ export const InitialScreen: React.FC<InitialScreenProps> = ({
   handleNext,
   handleClose
 }) => {
+  // 获取所有当前节点中实际存在的参数名称
+  const availableParams: string[] = selectedNodes.flatMap(node => 
+    (node.widgets || []).map((widget: any) => widget.name)
+  );
+  
+  // 检查当前显示的节点参数中是否有被选中的
+  const anyParamSelected = availableParams.some(param => selectedParams[param] === true);
+  
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
@@ -72,7 +88,12 @@ export const InitialScreen: React.FC<InitialScreenProps> = ({
       <div className="mt-6 flex justify-center">
         <button
           onClick={(e) => handleNext(e)}
-          className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
+          disabled={!anyParamSelected}
+          className={`px-3 py-1.5 text-xs ${
+            anyParamSelected 
+              ? "bg-pink-200 text-pink-700 hover:bg-pink-300" 
+              : "bg-gray-200 text-gray-500 cursor-not-allowed"
+          } rounded-md transition-colors`}
         >
           Next
         </button>
