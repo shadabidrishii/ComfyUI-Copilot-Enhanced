@@ -18,6 +18,10 @@ const getApiKey = () => {
     return apiKey;
 };
 
+const setApiKey = (apiKey: string) => {
+    localStorage.setItem('chatApiKey', apiKey);
+};
+
 // Get OpenAI configuration from localStorage
 const getOpenAiConfig = () => {
     const openaiApiKey = localStorage.getItem('openaiApiKey');
@@ -34,6 +38,14 @@ const getOpenAiConfig = () => {
 // Get browser language
 const getBrowserLanguage = () => {
     return navigator.language || 'zh-CN'; // Default to Chinese if language is not available
+};
+
+// Add this helper function after getOpenAiConfig()
+const checkAndSaveApiKey = (response: Response) => {
+  const apiKeyFromHeader = response.headers.get('api-key');
+  if (apiKeyFromHeader && !localStorage.getItem('chatApiKey')) {
+    localStorage.setItem('chatApiKey', apiKeyFromHeader);
+  }
 };
 
 export namespace WorkflowChatAPI {
@@ -144,7 +156,9 @@ export namespace WorkflowChatAPI {
           }))
         }),
       });
-
+      
+      checkAndSaveApiKey(response);
+      
       const reader = response.body!.getReader();
       let buffer = '';
 
@@ -217,7 +231,9 @@ export namespace WorkflowChatAPI {
           prompt: prompt
         } as OptimizedWorkflowRequest),
       });
-
+      
+      checkAndSaveApiKey(response);
+      
       const result = await response.json();
       if (!result.success) {
         const message = result.message || 'Failed to get optimized workflow';
@@ -264,6 +280,9 @@ export namespace WorkflowChatAPI {
         node_types: nodeTypes
       }),
     });
+    
+    checkAndSaveApiKey(response);
+    
     const result = await response.json();
     if (!result.success) {
       const message = result.message || 'Failed to get node info by types';
@@ -309,7 +328,9 @@ export namespace WorkflowChatAPI {
         method: 'GET',
         headers,
       });
-
+      
+      checkAndSaveApiKey(response);
+      
       const result = await response.json();
       if (!result.success) {
         const message = result.message || 'Failed to fetch messages';
@@ -375,7 +396,9 @@ export namespace WorkflowChatAPI {
         method: 'GET',
         headers,
       });
-
+      
+      checkAndSaveApiKey(response);
+      
       const result = await response.json();
       if (!result.success) {
         const message = result.message || 'Failed to fetch announcement';
@@ -416,7 +439,9 @@ export namespace WorkflowChatAPI {
             text: text
           }),
         });
-
+        
+        checkAndSaveApiKey(response);
+        
         const result = await response.json();
         if (!result.success) {
           const message = result.message || 'Failed to generate SD prompts';
