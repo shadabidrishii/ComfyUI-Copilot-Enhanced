@@ -212,11 +212,12 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                           {currentTexts.map((text, textIndex) => (
                             <div key={textIndex} className="flex items-start">
                               <textarea
-                                className="flex-1 border border-gray-300 rounded p-2 text-xs resize-y"
+                                className={`flex-1 border ${!text ? 'border-red-500' : 'border-gray-300'} rounded p-2 text-xs resize-y`}
                                 rows={2}
                                 placeholder="Enter text..."
                                 value={text}
                                 onChange={(e) => handleTextInputChange(nodeId, paramName, textIndex, e.target.value)}
+                                required
                               />
                               <button
                                 className="ml-2 text-red-500 hover:text-red-700"
@@ -270,6 +271,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                             type="text" 
                             className="w-12 h-6 border border-gray-300 rounded text-xs px-2" 
                             value={currentInputs.min}
+                            required
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -307,6 +309,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                               e.preventDefault();
                               e.stopPropagation();
                             }}
+                            required
                             onChange={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -336,6 +339,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                             type="text" 
                             className="w-12 h-6 border border-gray-300 rounded text-xs px-2" 
                             value={currentInputs.step}
+                            required
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -467,7 +471,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                           <label className="text-xs font-medium text-gray-700">{paramName}</label>
                           <div className="relative dropdown-container">
                             <button 
-                              className="appearance-none border border-gray-300 rounded px-2 py-0.5 pr-6 text-xs flex items-center bg-white text-gray-700"
+                              className={`appearance-none border ${(paramTestValues[nodeId]?.[paramName] || []).length === 0 ? 'border-red-500' : 'border-gray-300'} rounded px-2 py-0.5 pr-6 text-xs flex items-center bg-white text-gray-700`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -601,6 +605,9 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                         </div>
                         <div className="mt-2">
                           <label className="text-xs text-gray-600">Test values</label>
+                          {(paramTestValues[nodeId]?.[paramName] || []).length === 0 && (
+                            <div className="text-xs text-red-500 mt-1">Please select at least one value</div>
+                          )}
                           <div className="mt-1 flex flex-wrap gap-1">
                             {(paramTestValues[nodeId]?.[paramName] || []).map((value: any, idx: number) => (
                               <div 
