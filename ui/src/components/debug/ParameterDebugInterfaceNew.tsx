@@ -71,6 +71,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     threshold: false,
     prompt: false
   });
+  const [task_id, setTask_id] = useState(generateUUID());
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
@@ -145,6 +146,16 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     try {
       const generatedTexts = await WorkflowChatAPI.generateSDPrompts(aiWritingModalText);
       setAiGeneratedTexts(generatedTexts);
+      // 发送埋点事件
+      WorkflowChatAPI.trackEvent({
+        event_type: 'prompt_generate',
+        message_type: 'parameter_debug',
+        message_id: task_id,
+        data: {
+          input_text: aiWritingModalText,
+          generated_texts: generatedTexts
+        }
+      });
       
       // Pre-select all generated texts
       const newSelectedTexts: {[key: string]: boolean} = {};
@@ -245,6 +256,18 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         ...prev,
         [textKey]: [...currentTexts, ...selectedTexts]
       };
+    });
+
+    // 发送埋点事件
+    WorkflowChatAPI.trackEvent({
+      event_type: 'prompt_apply',
+      message_type: 'parameter_debug',
+      message_id: task_id,
+      data: {
+        input_text: aiWritingModalText,
+        generated_texts: aiGeneratedTexts,
+        selected_texts: selectedTexts
+      }
     });
     
     // Also update paramTestValues
@@ -350,6 +373,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [openDropdowns]);
+
+  // Add useEffect to reset task_id when visible changes from false to true
+  useEffect(() => {
+    if (visible) {
+      setTask_id(generateUUID());
+    }
+  }, [visible]);
 
   // Navigate to next screen
   const handleNext = (event?: React.MouseEvent) => {
@@ -690,6 +720,18 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setCompletedCount(0);
     
     console.log("Generated parameter combinations:", paramCombinations);
+
+    // 发送埋点事件
+    WorkflowChatAPI.trackEvent({
+      event_type: 'start_generation',
+      message_type: 'parameter_debug',
+      message_id: task_id,
+      data: {
+        workflow: (await app.graphToPrompt()).output,
+        all_params: paramTestValues,
+        count: totalCombinations
+      }
+    });
     
     // If we have no combinations, show error and return
     if (paramCombinations.length === 0) {
@@ -879,7 +921,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       WorkflowChatAPI.trackEvent({
           event_type: 'parameter_debug_apply',
           message_type: 'parameter_debug',
-          message_id: generateUUID(),
+          message_id: task_id,
           data: {
               workflow: (await app.graphToPrompt()).output,
               selected_params: generatedImages[selectedImageIndex].params,
@@ -992,6 +1034,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       threshold: false,
       prompt: false
     });
+    // Reset task_id
+    setTask_id(generateUUID());
     cleanupPolling(); // Add cleanup call
     setIsProcessing(false);
     setIsCompleted(false);
