@@ -2,7 +2,7 @@
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2024-12-26 17:16:51
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-02-26 14:14:07
+ * @LastEditTime: 2025-04-11 15:31:59
  * @FilePath: /comfyui_copilot/ui/src/components/chat/messages/NodeInstallGuide.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -22,7 +22,7 @@ export function NodeInstallGuide({ content, onLoadSubgraph }: NodeInstallGuidePr
 
     return (
         <div>
-            <p>在加载graph到画布前，以下节点有待安装，请跳转到对应的github安装节点：</p>
+            <p>Before loading the graph to canvas, the following nodes need to be installed. Please visit the corresponding GitHub repositories to install them:</p>
             <div className="grid grid-cols-2 gap-3">
                 {nodeInfos.map((node: any, index: number) => (
                     <div 
@@ -69,14 +69,14 @@ export function NodeInstallGuide({ content, onLoadSubgraph }: NodeInstallGuidePr
                 ))}
             </div>
             <p className="mt-4"></p>
-            <p>安装完成后，请点击继续加载graph按钮，将graph加载到画布中：</p>
+            <p>After installation, please click the continue loading graph button to load the graph to the canvas:</p>
             <div className="mt-4">
                 <button
                     className="px-3 py-2 bg-blue-500 text-white rounded-md 
                              hover:bg-blue-600 transition-colors text-xs block mx-auto"
                     onClick={onLoadSubgraph}
                 >
-                    继续加载graph
+                    Loading graph directly
                 </button>
             </div>
         </div>
