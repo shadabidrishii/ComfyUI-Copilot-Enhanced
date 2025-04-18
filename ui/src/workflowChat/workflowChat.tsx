@@ -12,7 +12,6 @@
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Message } from "../types/types";
 import { WorkflowChatAPI } from "../apis/workflowChatApi";
-import { app } from "../utils/comfyapp";
 import { ChatHeader } from "../components/chat/ChatHeader";
 import { ChatInput } from "../components/chat/ChatInput";
 import { SelectedNodeInfo } from "../components/chat/SelectedNodeInfo";
@@ -24,7 +23,6 @@ import React from "react";
 import { debounce } from "lodash";
 import { useChatContext } from '../context/ChatContext';
 import { useMousePosition } from '../hooks/useMousePosition';
-import { useResizable } from '../hooks/useResizable';
 import { useNodeSelection } from '../hooks/useNodeSelection';
 import { MemoizedReactMarkdown } from "../components/markdown";
 import remarkGfm from 'remark-gfm';
@@ -172,17 +170,6 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     useNodeSelection(visible);
 
     // 使用自定义 hooks
-    const { 
-        isResizing: resizableIsResizing, 
-        setIsResizing: resizableSetIsResizing, 
-        dimensions, 
-        handleHeightResize 
-    } = useResizable({
-        minWidth: 300,
-        maxWidth: window.innerWidth * 0.8,
-        minHeight: 300,
-        maxHeight: window.innerHeight
-    }, visible);
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -579,22 +566,17 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         <ParameterDebugTab />
     ), []);
 
+    if (!visible) return null;
+
     return (
         <div 
-            className="fixed right-0 shadow-lg bg-white duration-200 ease-out"
+            className="flex flex-col h-full w-full bg-white"
             style={{ 
                 display: visible ? 'block' : 'none',
-                width: `${dimensions.width}px`,
-                height: `${dimensions.height}px`,
-                top: `${dimensions.top}px`
             }}
         >
             <div
                 className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300"
-                onMouseDown={(e) => {
-                    resizableSetIsResizing(true);
-                    e.preventDefault();
-                }}
             />
             
             <div className="flex h-full flex-col">
@@ -602,7 +584,6 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     onClose={onClose}
                     onClear={handleClearMessages}
                     hasMessages={messages.length > 0}
-                    onHeightResize={handleHeightResize}
                     title={`ComfyUI-Copilot`}
                 />
                 

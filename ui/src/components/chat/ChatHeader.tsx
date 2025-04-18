@@ -69,14 +69,6 @@ export function ChatHeader({
 
     return (
         <>
-            <div 
-                className="absolute top-0 left-0 right-0 h-2 bg-gray-100 hover:bg-gray-300 
-                          transition-colors duration-200 cursor-ns-resize z-20"
-                onMouseDown={handleMouseDown}
-                style={{ 
-                    borderBottom: '1px solid #e5e7eb',
-                }}
-            />
             <div className="flex items-center justify-between border-b px-4 py-3 
                         bg-white border-gray-200 sticky top-2 z-10">
                 <div className="flex items-center space-x-2">

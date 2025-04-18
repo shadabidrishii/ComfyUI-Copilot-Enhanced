@@ -9,7 +9,7 @@
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { waitForApp } from "./utils/comfyapp.ts";
 import "./scoped-tailwind.css";
@@ -35,13 +35,23 @@ function waitForDocumentBody() {
 waitForDocumentBody()
   .then(() => waitForApp())
   .then(() => {
-    // todo： 创建一个web component
-    const topbar = document.createElement("div");
-    topbar.id = "comfyui-copilot-plugin";
-    document.body.append(topbar);
-    ReactDOM.createRoot(topbar).render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-    );
+    app.extensionManager.registerSidebarTab({
+      id: "comfyui-copilot",
+      icon: "mdi mdi-robot-excited-outline",
+      title: "ComfyUI Copilot",
+      tooltip: "ComfyUI Copilot",
+      type: "custom",
+      render: (el: HTMLElement) => {
+        const container = document.createElement("div");
+        container.id = "comfyui-copilot-plugin";
+        el.appendChild(container);
+        ReactDOM.createRoot(container).render(
+          <React.StrictMode>
+            <Suspense fallback={<div>Loading...</div>}>
+              <App />
+            </Suspense>
+          </React.StrictMode>,
+        );
+      },
+    });
   });
