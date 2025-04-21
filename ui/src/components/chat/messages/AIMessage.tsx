@@ -105,10 +105,10 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
             return <h4 className="text-xs font-semibold !my-1">{children}</h4>
           },
           table: ({ children }) => (
-            <table className="border-solid border border-[#979797] w-[100%] text-xs">{children}</table>
+            <table className="border-solid border w-[100%] text-xs">{children}</table>
           ),
           th: ({ children }) => (
-            <th className="border-solid bg-[#E5E7ED] dark:bg-[#FFFFFF] dark:text-[#000000] border border-[#979797] text-center pt-2 text-xs">{children}</th>
+            <th className="border-solid border text-center pt-2 text-xs">{children}</th>
           ),
           td: ({ children }) => {
             if (Array.isArray(children) && children?.length > 0) {
@@ -142,7 +142,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
             
             return (
               <span className="relative group inline-flex items-center">
-                <code className="text-xs bg-gray-100 text-gray-800 rounded px-1">{children}</code>
+                <code className="text-xs bg-gray-100 text-gray-900 rounded px-1">{children}</code>
                 <button 
                   onClick={handleCopy}
                   className="absolute top-0 right-0 bg-gray-200 rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-300 z-10"
