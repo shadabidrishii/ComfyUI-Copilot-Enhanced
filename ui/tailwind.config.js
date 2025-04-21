@@ -18,6 +18,21 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        white: 'var(--p-panel-background)',
+        gray: {
+          50: 'color-mix(in srgb, var(--p-text-color) 5%, transparent)',
+          100: 'color-mix(in srgb, var(--p-text-color) 10%, transparent)',
+          200: 'color-mix(in srgb, var(--p-text-color) 20%, transparent)',
+          300: 'color-mix(in srgb, var(--p-text-color) 30%, transparent)',
+          400: 'color-mix(in srgb, var(--p-text-color) 40%, transparent)',
+          500: 'color-mix(in srgb, var(--p-text-color) 50%, transparent)',
+          600: 'color-mix(in srgb, var(--p-text-color) 60%, transparent)',
+          700: 'color-mix(in srgb, var(--p-text-color) 70%, transparent)',
+          800: 'color-mix(in srgb, var(--p-text-color) 80%, transparent)',
+          900: 'color-mix(in srgb, var(--p-text-color) 90%, transparent)',
+        }
+      },
       animation: {
         // bounce: 'bounce 1s infinite',
       },
