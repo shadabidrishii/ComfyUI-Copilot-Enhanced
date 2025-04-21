@@ -44,14 +44,20 @@ waitForDocumentBody()
       render: (el: HTMLElement) => {
         const container = document.createElement("div");
         container.id = "comfyui-copilot-plugin";
+        container.className = "h-full w-full flex flex-col";
+        el.style.height = "100%";
         el.appendChild(container);
         ReactDOM.createRoot(container).render(
           <React.StrictMode>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="h-full w-full flex items-center justify-center">Loading...</div>}>
               <App />
             </Suspense>
           </React.StrictMode>,
         );
       },
     });
-  });
+  })
+  // .then(() => {
+  //   app.extensionManager.setting.set('Comfy.Sidebar.Location', 'right');
+  // })
+  ;

@@ -2,7 +2,7 @@
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2024-12-26 17:16:51
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-04-11 15:31:59
+ * @LastEditTime: 2025-04-21 16:32:10
  * @FilePath: /comfyui_copilot/ui/src/components/chat/messages/NodeInstallGuide.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -34,7 +34,7 @@ export function NodeInstallGuide({ content, onLoadSubgraph }: NodeInstallGuidePr
                 {uniqueNodeInfos.map((node: any, index: number) => (
                     <div 
                         key={index}
-                        className="w-full p-3 bg-white rounded-lg border border-gray-200 
+                        className="w-full p-3 rounded-lg border border-gray-200 
                                  hover:shadow-sm transition-all duration-200"
                     >
                         <div className="flex flex-col">
@@ -47,7 +47,7 @@ export function NodeInstallGuide({ content, onLoadSubgraph }: NodeInstallGuidePr
                                         href={node.repository_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-2 py-1 bg-white text-gray-900 rounded-md 
+                                        className="px-2 py-1 text-gray-900 rounded-md 
                                                  border border-gray-900 hover:bg-gray-100 
                                                  transition-colors text-[10px] flex items-center gap-1"
                                     >

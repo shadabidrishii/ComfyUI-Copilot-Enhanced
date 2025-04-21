@@ -2,6 +2,9 @@
   @tailwind base;
   @tailwind components;
   @tailwind utilities;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Specifically reset basic elements within our scope to counter preflight:false */

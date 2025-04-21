@@ -572,7 +572,8 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         <div 
             className="flex flex-col h-full w-full bg-white"
             style={{ 
-                display: visible ? 'block' : 'none',
+                display: visible ? 'flex' : 'none',
+                height: '100%'
             }}
         >
             <div
@@ -613,7 +614,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 
                 {/* Tab content - Both tabs are mounted but only the active one is displayed */}
                 <div 
-                    className="flex-1 overflow-y-auto p-4 scroll-smooth"
+                    className="flex-1 overflow-y-auto p-4 scroll-smooth h-0"
                     style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
                     ref={messageDivRef}
                 >
@@ -656,7 +657,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
                 {/* ParameterDebugTab - Always mounted but conditionally displayed */}
                 <div 
-                    className="flex-1 flex flex-col"
+                    className="flex-1 flex flex-col h-0"
                     style={{ display: activeTab === 'parameter-debug' ? 'flex' : 'none' }}
                 >
                     {parameterDebugTabComponent}

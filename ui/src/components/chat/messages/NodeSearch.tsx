@@ -48,7 +48,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                         {installedNodesList.map((node: Node) => (
                             <div
                                 key={node.name}
-                                className="w-full p-3 bg-white rounded-lg border border-gray-200 
+                                className="w-full p-3 rounded-lg border border-gray-200 
                                          hover:shadow-sm transition-all duration-200 relative group"
                                 onMouseEnter={() => setHoveredNode(node.name)}
                                 onMouseLeave={() => setHoveredNode(null)}
@@ -113,7 +113,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                         {uninstalledNodesList.map((node: Node) => (
                             <div
                                 key={node.name}
-                                className="w-full p-3 bg-white rounded-lg border border-gray-200 
+                                className="w-full p-3 rounded-lg border border-gray-200 
                                          hover:shadow-sm transition-all duration-200 relative group"
                                 onMouseEnter={() => setHoveredNode(node.name)}
                                 onMouseLeave={() => setHoveredNode(null)}
@@ -132,7 +132,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                         href={node.github_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-2 py-1 bg-white text-gray-900 rounded-md 
+                                        className="px-2 py-1 text-gray-900 rounded-md 
                                                  border border-gray-900 hover:bg-gray-100 
                                                  transition-colors text-[10px] flex items-center gap-1"
                                         onClick={() => {

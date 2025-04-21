@@ -1079,7 +1079,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="max-w-lg p-8 bg-white rounded-lg shadow-sm border border-blue-100 relative">
+        <div className="max-w-lg p-8 rounded-lg shadow-sm border border-blue-100 relative">
           <div className="mb-6 text-center">
             <h3 className="text-base font-bold text-blue-800 mb-2">GenLab</h3>
             <div className="h-1 w-16 bg-blue-500 mx-auto rounded-full mb-4"></div>

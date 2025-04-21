@@ -31,7 +31,7 @@ export const AIWritingModal: React.FC<AIWritingModalProps> = ({
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div className="rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="p-4 border-b flex justify-between items-center">
           <h3 className="text-lg font-medium">AI Writing Assistant</h3>
           <button 
@@ -99,7 +99,7 @@ export const AIWritingModal: React.FC<AIWritingModalProps> = ({
                           className={`h-4 w-4 rounded border ${
                             aiSelectedTexts[`text${idx+1}`] 
                               ? 'bg-blue-600 border-blue-600' 
-                              : 'bg-white border-gray-300'
+                              : 'border-gray-300'
                           } flex items-center justify-center`}
                           onClick={() => toggleTextSelection(`text${idx+1}`)}
                         >
