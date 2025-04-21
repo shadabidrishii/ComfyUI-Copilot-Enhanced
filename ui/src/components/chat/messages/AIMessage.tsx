@@ -72,7 +72,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
           rehypeKatex
         ]}
         remarkPlugins={[remarkGfm, remarkMath]}
-        className={`prose prose-xs prose-neutral prose-a:text-accent-foreground/50 break-words [&>*]:!my-1 leading-relaxed text-xs
+        className={`prose prose-xs prose-neutral prose-a:text-accent-foreground/50 break-words [&>*]:!my-1 leading-relaxed text-xs text-gray-800
                   prose-headings:font-semibold
                   prose-h1:text-base
                   prose-h2:text-sm
@@ -88,6 +88,9 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
         components={{
           p: ({ children }) => {
             return <p className="!my-0.5 leading-relaxed text-xs">{children}</p>
+          },
+          strong: ({ children }) => {
+            return <strong className="text-gray-900">{children}</strong>
           },
           h1: ({ children }) => {
             return <h1 className="text-base font-semibold !my-1">{children}</h1>
@@ -278,7 +281,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
 
   return (
     <BaseMessage name={name}>
-      <div className="w-full rounded-lg bg-gray-50 p-4 text-gray-700 text-sm break-words overflow-hidden">
+      <div className="w-full rounded-lg bg-gray-50 p-4 text-gray-900 text-sm break-words overflow-hidden">
         {renderContent()}
       </div>
     </BaseMessage>
