@@ -18,8 +18,7 @@ export function useNodeSelection(enabled: boolean = true) {
       if ((isChatTab) || (isAllowedScreenParameterDebug && isParameterDebugTab)) {
         const selectedNodes = app.canvas.selected_nodes;
         if (Object.keys(selectedNodes ?? {}).length) {
-          const nodeInfo = Object.values(selectedNodes);
-          dispatch({ type: 'SET_SELECTED_NODE', payload: nodeInfo });
+          dispatch({ type: 'SET_SELECTED_NODE', payload: Object.values(selectedNodes) });
         } else {
           dispatch({ type: 'SET_SELECTED_NODE', payload: null });
         }

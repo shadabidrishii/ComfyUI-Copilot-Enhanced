@@ -1565,12 +1565,21 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  .dark\:border-blue-500 {
+    --tw-border-opacity: 1;
+    border-color: rgb(59 130 246 / var(--tw-border-opacity, 1));
+  }
+
   .dark\:border-gray-600 {
     border-color: color-mix(in srgb, var(--p-text-color) 60%, transparent);
   }
 
   .dark\:border-gray-700 {
     border-color: color-mix(in srgb, var(--p-text-color) 70%, transparent);
+  }
+
+  .dark\:border-red-800\/20 {
+    border-color: rgb(153 27 27 / 0.2);
   }
 
   .dark\:bg-blue-500 {

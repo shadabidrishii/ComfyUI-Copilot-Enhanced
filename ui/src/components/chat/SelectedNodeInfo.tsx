@@ -2,7 +2,7 @@
  * @Author: 晴知 qingli.hql@alibaba-inc.com
  * @Date: 2025-02-17 20:53:45
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-03-20 18:55:32
+ * @LastEditTime: 2025-04-22 16:43:57
  * @FilePath: /comfyui_copilot/ui/src/components/chat/SelectedNodeInfo.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -19,8 +19,8 @@ interface SelectedNodeInfoProps {
 }
 
 
-function getDownstreamSubgraphExt() {
-    const selectedNode = Object.values(app.canvas.selected_nodes)[0];
+function getDownstreamSubgraphExt(nodeInfo: any[]) {
+    const selectedNode = nodeInfo[0];
     const nodeTypeSet = new Set<string>();
     
     function findUpstreamNodes(node: any, depth: number) {
@@ -50,6 +50,7 @@ function getDownstreamSubgraphExt() {
 }
 
 export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading, onSendWithContent }: SelectedNodeInfoProps) {
+    console.log('SelectedNodeInfo nodeInfo:', nodeInfo[0]);
     return (
         <div className="mb-3 p-3 rounded-md bg-gray-50 border border-gray-200">
             <div className="text-sm text-gray-700">
@@ -72,7 +73,7 @@ export function SelectedNodeInfo({ nodeInfo, onSendWithIntent, loading, onSendWi
                     <button
                         className="px-3 py-1 text-xs rounded-md bg-purple-100 
                                  text-purple-700 hover:bg-purple-200"
-                        onClick={() => onSendWithIntent('downstream_subgraph_search', getDownstreamSubgraphExt())}
+                        onClick={() => onSendWithIntent('downstream_subgraph_search', getDownstreamSubgraphExt(nodeInfo))}
                         disabled={loading}>
                         Downstream Nodes
                     </button>

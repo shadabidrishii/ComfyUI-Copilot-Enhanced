@@ -18,6 +18,7 @@ interface NodeSearchProps {
 export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes }: NodeSearchProps) {
     const response = JSON.parse(content) as ChatResponse;
     const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+    const [hoveredNodeData, setHoveredNodeData] = useState<Node | null>(null);
 
     const nodes = response.ext?.find(item => item.type === 'node')?.data || [];
     
@@ -39,8 +40,18 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
         return num.toString();
     };
 
+    const handleMouseEnter = (node: Node) => {
+        setHoveredNode(node.name);
+        setHoveredNodeData(node);
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredNode(null);
+        setHoveredNodeData(null);
+    };
+
     return (
-        <div className="rounded-lg bg-green-50 p-3 text-gray-700 text-xs break-words overflow-visible">
+        <div className="rounded-lg bg-gray-50 p-3 text-gray-700 text-xs break-words overflow-visible">
             {installedNodesList.length > 0 && (
                 <div className="space-y-3">
                     <p className="text-xs font-medium">Installed nodes:</p>
@@ -50,8 +61,8 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                 key={node.name}
                                 className="w-full p-3 rounded-lg border border-gray-200 
                                          hover:shadow-sm transition-all duration-200 relative group"
-                                onMouseEnter={() => setHoveredNode(node.name)}
-                                onMouseLeave={() => setHoveredNode(null)}
+                                onMouseEnter={() => handleMouseEnter(node)}
+                                onMouseLeave={handleMouseLeave}
                             >
                                 <h3 className="text-[12px] font-medium text-gray-800 mb-4">
                                     {node.name}
@@ -87,19 +98,6 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                         Add to Canvas
                                     </button>
                                 </div>
-                                {hoveredNode === node.name && node.description && (
-                                    <div className="fixed -translate-y-full z-[9999] w-64 p-2 
-                                                bg-gray-800 text-white text-xs rounded-md shadow-lg mb-2"
-                                        style={{
-                                            left: 'calc(var(--mouse-x, 0) + 16px)',
-                                            top: 'calc(var(--mouse-y, 0) - 8px)'
-                                        }}
-                                    >
-                                        {node.description}
-                                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 
-                                                    border-4 border-transparent border-t-gray-800"/>
-                                    </div>
-                                )}
                             </div>
                         ))}
                     </div>
@@ -115,8 +113,8 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                 key={node.name}
                                 className="w-full p-3 rounded-lg border border-gray-200 
                                          hover:shadow-sm transition-all duration-200 relative group"
-                                onMouseEnter={() => setHoveredNode(node.name)}
-                                onMouseLeave={() => setHoveredNode(null)}
+                                onMouseEnter={() => handleMouseEnter(node)}
+                                onMouseLeave={handleMouseLeave}
                             >
                                 <h3 className="text-[12px] font-medium text-gray-800 mb-4">
                                     {node.name}
@@ -153,22 +151,24 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                                         Download
                                     </a>
                                 </div>
-                                {hoveredNode === node.name && node.description && (
-                                    <div className="fixed -translate-y-full z-[9999] w-64 p-2 
-                                                bg-gray-800 text-white text-xs rounded-md shadow-lg mb-2"
-                                        style={{
-                                            left: 'calc(var(--mouse-x, 0) + 16px)',
-                                            top: 'calc(var(--mouse-y, 0) - 8px)'
-                                        }}
-                                    >
-                                        {node.description}
-                                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 
-                                                    border-4 border-transparent border-t-gray-800"/>
-                                    </div>
-                                )}
                             </div>
                         ))}
                     </div>
+                </div>
+            )}
+
+            {/* 全局悬浮描述框 */}
+            {hoveredNode && hoveredNodeData?.description && (
+                <div className="fixed -translate-y-full z-[9999] w-64 p-2 
+                            bg-gray-800 text-white text-xs rounded-md shadow-lg mb-2"
+                    style={{
+                        left: 'calc(var(--mouse-x, 0) + 16px)',
+                        top: 'calc(var(--mouse-y, 0) - 8px)'
+                    }}
+                >
+                    {hoveredNodeData.description}
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 
+                                border-4 border-transparent border-t-gray-800"/>
                 </div>
             )}
         </div>

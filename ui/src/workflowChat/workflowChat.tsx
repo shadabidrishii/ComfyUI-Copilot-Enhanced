@@ -2,7 +2,7 @@
  * @Author: ai-business-hql ai.bussiness.hql@gmail.com
  * @Date: 2025-03-20 15:15:20
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-03-26 15:48:39
+ * @LastEditTime: 2025-04-22 17:48:28
  * @FilePath: /comfyui_copilot/ui/src/workflowChat/workflowChat.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -411,11 +411,13 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         if (!sessionId || !selectedNode) return;
         dispatch({ type: 'SET_LOADING', payload: true });
 
+        const nodeName = selectedNode[0].comfyClass || selectedNode[0].type;
+
         const traceId = generateUUID();
         const userMessage: Message = {
             id: generateUUID(),
             role: "user",
-            content: selectedNode.comfyClass || selectedNode.type,
+            content: nodeName,
             trace_id: traceId,
         };
 
@@ -427,7 +429,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
-                selectedNode.comfyClass || selectedNode.type,
+                nodeName,
                 [], 
                 intent, 
                 ext,
