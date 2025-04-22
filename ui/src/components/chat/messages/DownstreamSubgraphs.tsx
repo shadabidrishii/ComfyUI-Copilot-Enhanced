@@ -56,7 +56,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
             arrows: {
                 to: { enabled: true, scaleFactor: 1.2 }
             },
-            color: '#FFFFFF',
+            color: '#000000',
             width: 2
         }));
 
@@ -99,7 +99,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
             },
             edges: {
                 arrows: 'to',
-                color: '#FFFFFF',
+                color: '#000000',
                 width: 2,
                 smooth: {
                     enabled: true,
