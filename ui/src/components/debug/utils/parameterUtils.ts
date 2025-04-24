@@ -10,6 +10,11 @@ export const generateNumericTestValues = (
   max = isNaN(max) ? 100 : max;
   step = isNaN(step) || step <= 0 ? 1 : step;
   
+  // Add minimum step check
+  if (step < 0.1) {
+    step = 0.1;
+  }
+  
   // Ensure max >= min
   if (max < min) {
     max = min;

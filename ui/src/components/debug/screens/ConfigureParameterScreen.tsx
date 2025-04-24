@@ -102,7 +102,11 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
         if (!hasValues && widget.type === "number") {
           const min = widget.options?.min || 0;
           const max = widget.options?.max || 100;
-          const step = (widget.options?.step || 10) / 10;
+          let step = (widget.options?.step || 10) / 10;
+          // 添加最小step值检查
+          if (step < 0.1) {
+            step = 0.1;
+          }
           const precision = widget.options?.precision || 0;
           
           // Generate default values
@@ -362,7 +366,10 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                               if (value === '' || (!isNaN(parseFloat(value)) && parseFloat(value) > 0)) {
                                 const newMin = parseFloat(currentInputs.min || min.toString());
                                 const newMax = parseFloat(currentInputs.max || max.toString());
-                                const newStep = value === '' ? 1 : parseFloat(value);
+                                let newStep = value === '' ? 1 : parseFloat(value);
+                                if (newStep < 0.1) {
+                                  newStep = 0.1;
+                                }
                                 const newValues = generateNumericTestValues(newMin, newMax, newStep, precision);
                                 updateParamTestValues(nodeId, paramName, newValues);
                               }

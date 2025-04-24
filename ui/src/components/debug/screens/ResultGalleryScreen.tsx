@@ -94,7 +94,7 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
               <img 
                 src={modalImageUrl} 
                 alt="Enlarged image" 
-                className="max-w-full h-auto"
+                className="max-w-full object-contain w-auto h-auto"
               />
             </div>
           </div>

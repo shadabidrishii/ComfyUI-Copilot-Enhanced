@@ -15,6 +15,9 @@ import { generateDynamicParams, generateParameterCombinations } from './utils/pa
 import { WidgetParamConf } from './utils/parameterUtils';
 import { generateUUID } from '../../utils/uuid';
 
+// Add constant for localStorage key - used to persist interface state between sessions
+const PARAM_DEBUG_STORAGE_KEY = 'parameter_debug_state';
+
 // Add CSS for the highlight pulse effect
 const highlightPulseStyle = `
   @keyframes highlight-pulse {
@@ -46,7 +49,6 @@ const highlightPulseStyle = `
   }
 `;
 
-// 添加一个新的接口来定义图像类型
 interface GeneratedImage {
   url: string;
   params: { [key: string]: any };
@@ -89,7 +91,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }));
   });
 
-  // 修改参数测试值结构，使用嵌套对象，按节点ID进行分组
+  // Modify parameter test values structure, use nested objects, group by node ID
   const [paramTestValues, setParamTestValues] = useState<{[nodeId: string]: {[paramName: string]: any[]}}>({}); 
   // Add a state to store dropdown open status
   const [openDropdowns, setOpenDropdowns] = useState<{[key: string]: boolean | {isOpen: boolean, x: number, y: number}}>({});
@@ -97,7 +99,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   // Add new state to store search terms
   const [searchTerms, setSearchTerms] = useState<{[key: string]: string}>({});
 
-  // Add state to track input values - 更新为使用nodeId_paramName作为键
+  // Add state to track input values - Update to use nodeId_paramName as key
   const [inputValues, setInputValues] = useState<{[nodeId_paramName: string]: {min?: string, max?: string, step?: string}}>({});
 
   // Add a state to store current page
@@ -130,6 +132,18 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Add a ref to track the current polling session ID
   const pollingSessionIdRef = useRef<string | null>(null);
+  
+  // Add loading state after other state declarations
+  const [isLoading, setIsLoading] = useState(() => visible); // Initialize loading based on visibility
+
+  // Function to save state to localStorage
+  const saveStateToLocalStorage = (state: any) => {
+    try {
+      localStorage.setItem(PARAM_DEBUG_STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Error saving parameter debug state:', error);
+    }
+  };
 
   // Add function to handle AI text generation
   const handleAiWriting = async () => {
@@ -146,7 +160,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     try {
       const generatedTexts = await WorkflowChatAPI.generateSDPrompts(aiWritingModalText);
       setAiGeneratedTexts(generatedTexts);
-      // 发送埋点事件
+      // Send tracking event
       WorkflowChatAPI.trackEvent({
         event_type: 'prompt_generate',
         message_type: 'parameter_debug',
@@ -258,7 +272,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       };
     });
 
-    // 发送埋点事件
+    // Send tracking event
     WorkflowChatAPI.trackEvent({
       event_type: 'prompt_apply',
       message_type: 'parameter_debug',
@@ -374,12 +388,143 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     };
   }, [openDropdowns]);
 
-  // Add useEffect to reset task_id when visible changes from false to true
+  // Modify useEffect for the task_id to use localStorage
   useEffect(() => {
     if (visible) {
-      setTask_id(generateUUID());
+      // Only generate a new task_id if we don't have one in localStorage
+      const savedState = JSON.parse(localStorage.getItem(PARAM_DEBUG_STORAGE_KEY) || '{}');
+      if (!savedState.task_id) {
+        setTask_id(generateUUID());
+      }
     }
   }, [visible]);
+
+  // Modify the useEffect that loads state to handle loading state
+  useEffect(() => {
+    // Load state from localStorage when component becomes visible
+    if (visible) {
+      setIsLoading(true); // Set loading to true while we load state
+      
+      try {
+        const savedState = localStorage.getItem(PARAM_DEBUG_STORAGE_KEY);
+        if (savedState) {
+          const parsedState = JSON.parse(savedState);
+          
+          // Only restore state if we have selected nodes
+          if (!selectedNodes || selectedNodes.length === 0) {
+            console.log("Not restoring parameter debug state: no nodes selected");
+            setIsLoading(false);
+            return;
+          }
+          
+          // Restore all states
+          if (parsedState.currentScreen !== undefined) setCurrentScreen(parsedState.currentScreen);
+          if (parsedState.selectedParams) setSelectedParams(parsedState.selectedParams);
+          if (parsedState.task_id) setTask_id(parsedState.task_id);
+          
+          // Don't restore processing state if it was interrupted (e.g., by page refresh)
+          // Only restore isCompleted if we have generated images
+          const hasImages = parsedState.generatedImages && parsedState.generatedImages.length > 0;
+          if (parsedState.isProcessing !== undefined && !parsedState.isProcessing) {
+            setIsProcessing(false);
+          }
+          if (parsedState.isCompleted !== undefined && hasImages) {
+            setIsCompleted(parsedState.isCompleted);
+          }
+          
+          if (parsedState.completedCount !== undefined) setCompletedCount(parsedState.completedCount);
+          if (parsedState.totalCount !== undefined) setTotalCount(parsedState.totalCount);
+          if (parsedState.selectedImageIndex !== undefined) setSelectedImageIndex(parsedState.selectedImageIndex);
+          if (parsedState.generatedImages) setGeneratedImages(parsedState.generatedImages);
+          if (parsedState.paramTestValues) setParamTestValues(parsedState.paramTestValues);
+          if (parsedState.searchTerms) setSearchTerms(parsedState.searchTerms);
+          if (parsedState.inputValues) setInputValues(parsedState.inputValues);
+          if (parsedState.currentPage !== undefined) setCurrentPage(parsedState.currentPage);
+          if (parsedState.textInputs) setTextInputs(parsedState.textInputs);
+        }
+      } catch (error) {
+        console.error('Error loading parameter debug state:', error);
+      } finally {
+        // Set loading to false after loading (with a small delay to ensure all state is updated)
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 50);
+      }
+    } else {
+      // Reset loading state when component becomes invisible
+      setIsLoading(true);
+    }
+    
+    // Save current state when component becomes invisible but don't clear it
+    return () => {
+      if (!visible) return; // Don't do anything if already invisible
+      
+      const stateToSave = {
+        currentScreen,
+        selectedParams,
+        task_id,
+        isProcessing,
+        isCompleted,
+        completedCount,
+        totalCount,
+        selectedImageIndex,
+        generatedImages,
+        paramTestValues,
+        searchTerms,
+        inputValues,
+        currentPage,
+        textInputs
+      };
+      
+      saveStateToLocalStorage(stateToSave);
+    };
+  }, [visible]);
+
+  // Add useEffect to save state when relevant states change
+  useEffect(() => {
+    if (!visible) return;
+    
+    // Use a timeout to debounce saves (only save after 500ms of no changes)
+    const saveTimeout = setTimeout(() => {
+      const stateToSave = {
+        currentScreen,
+        selectedParams,
+        task_id,
+        isProcessing,
+        isCompleted,
+        completedCount,
+        totalCount,
+        selectedImageIndex,
+        generatedImages,
+        paramTestValues,
+        searchTerms,
+        inputValues,
+        currentPage,
+        textInputs
+      };
+      
+      saveStateToLocalStorage(stateToSave);
+    }, 500);
+    
+    // Clear timeout if state changes again before it fires
+    return () => clearTimeout(saveTimeout);
+  }, [
+    visible,
+    currentScreen,
+    selectedParams,
+    task_id,
+    isProcessing,
+    isCompleted,
+    completedCount,
+    totalCount,
+    selectedImageIndex,
+    generatedImages,
+    paramTestValues,
+    searchTerms,
+    inputValues,
+    currentPage,
+    textInputs
+  ]);
 
   // Navigate to next screen
   const handleNext = (event?: React.MouseEvent) => {
@@ -441,7 +586,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       setTotalCount(combinations.length);
     }
     
-    // 清除错误消息
+    // Clear error message
     setErrorMessage(null);
     setCurrentScreen(prev => Math.min(prev + 1, 2));
   };
@@ -452,7 +597,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       event.preventDefault();
       event.stopPropagation();
     }
-    // 清除错误消息
+    // Clear error message
     setErrorMessage(null);
     // Reset completed state when going back
     if (isCompleted) {
@@ -537,7 +682,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }
   };
   
-  // Toggle dropdown open status - 使用nodeId_paramName作为键
+  // Toggle dropdown open status - Use nodeId_paramName as key
   const toggleDropdown = (nodeId: string, paramName: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
@@ -556,30 +701,30 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           [dropdownKey]: false
         };
       } else {
-        // 确定下拉框的位置
+        // Determine dropdown position
         let x = 0;
         let y = 0;
         
-        // 尝试从事件目标获取位置
+        // Try to get position from event target
         if (event.currentTarget) {
           const rect = event.currentTarget.getBoundingClientRect();
           x = rect.left;
           y = rect.bottom;
         } else {
-          // 如果无法获取元素位置，使用鼠标点击位置
+          // If unable to get element position, use mouse click position
           x = event.clientX;
-          y = event.clientY + 20; // 在鼠标位置下方20px显示
+          y = event.clientY + 20; // Display 20px below mouse position
         }
         
-        // 确保下拉框不会超出窗口边界
+        // Ensure dropdown doesn't go out of window bounds
         const windowWidth = window.innerWidth;
-        const dropdownWidth = 250; // 估计的下拉框宽度
+        const dropdownWidth = 250; // Estimated dropdown width
         
         if (x + dropdownWidth > windowWidth) {
-          x = windowWidth - dropdownWidth - 10; // 确保距离右边界至少10px
+          x = windowWidth - dropdownWidth - 10; // Ensure distance from right edge at least 10px
         }
         
-        if (x < 0) x = 10; // 确保距离左边界至少10px
+        if (x < 0) x = 10; // Ensure distance from left edge at least 10px
         
         return {
           ...prev,
@@ -593,24 +738,24 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     });
   };
   
-  // Update parameter test values - 修改为支持新的参数结构
+  // Update parameter test values - Modify to support new parameter structure
   const updateParamTestValues = (nodeId: string, paramName: string, values: any[]) => {
     setParamTestValues(prev => {
       const updatedValues = { ...prev };
       
-      // 确保节点ID存在
+      // Ensure nodeID exists
       if (!updatedValues[nodeId]) {
         updatedValues[nodeId] = {};
       }
       
-      // 更新特定节点和参数的值
+      // Update specific node and parameter values
       updatedValues[nodeId][paramName] = values;
       
       return updatedValues;
     });
   };
   
-  // Handle selecting specific test values - 修改为支持新的参数结构
+  // Handle selecting specific test values - Modify to support new parameter structure
   const handleTestValueSelect = (nodeId: string, paramName: string, value: any, event?: React.MouseEvent) => {
     if (event) {
       event.preventDefault();
@@ -620,12 +765,12 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setParamTestValues(prev => {
       const updatedValues = { ...prev };
       
-      // 确保节点ID存在
+      // Ensure nodeID exists
       if (!updatedValues[nodeId]) {
         updatedValues[nodeId] = {};
       }
       
-      // 确保参数名存在
+      // Ensure parameter name exists
       if (!updatedValues[nodeId][paramName]) {
         updatedValues[nodeId][paramName] = [];
       }
@@ -642,7 +787,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     });
   };
 
-  // Add processing search - 使用nodeId_paramName作为键
+  // Add processing search - Use nodeId_paramName as key
   const handleSearch = (nodeId: string, paramName: string, term: string) => {
     const searchKey = `${nodeId}_${paramName}`;
     setSearchTerms(prev => ({
@@ -651,18 +796,18 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }));
   };
 
-  // Add select all - 修改为支持新的参数结构
+  // Add select all - Modify to support new parameter structure
   const handleSelectAll = (nodeId: string, paramName: string, values: any[]) => {
-    // 确保节点ID存在
+    // Ensure nodeID exists
     if (!paramTestValues[nodeId]) {
       updateParamTestValues(nodeId, paramName, values);
       return;
     }
     
-    // 获取当前值
+    // Get current values
     const currentValues = paramTestValues[nodeId][paramName] || [];
     
-    // 如果所有值都已选择，则取消选择所有，否则选择所有
+    // If all values are selected, cancel selecting all, otherwise select all
     if (values.length === currentValues.length) {
       updateParamTestValues(nodeId, paramName, []);
     } else {
@@ -695,7 +840,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     };
   }, []);
 
-  // Handle start generation - modified to clean up before starting
+  // Handle start generation - Modified to clean up before starting
   const handleStartGeneration = async (event?: React.MouseEvent, selectedNodeId?: number) => {
     if (event) {
       event.preventDefault();
@@ -721,7 +866,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     
     console.log("Generated parameter combinations:", paramCombinations);
 
-    // 发送埋点事件
+    // Send tracking event
     WorkflowChatAPI.trackEvent({
       event_type: 'start_generation',
       message_type: 'parameter_debug',
@@ -740,7 +885,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
       return;
     }
     
-    // Get node ID to use for showing images - use provided selectedNodeId if available
+    // Get node ID to use for showing images - Use provided selectedNodeId if available
     let showNodeId: number | null = selectedNodeId || null;
     
     // If no selectedNodeId provided, try to get one automatically
@@ -895,7 +1040,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     if (selectedImageIndex !== null) {
       console.log(`Applied image ${selectedImageIndex + 1} with parameters:`, generatedImages[selectedImageIndex].params);
 
-      // 发送埋点事件
+      // Send tracking event
       let count_temp = 1;
       // Calculate total parameter combinations
       if (paramTestValues) {
@@ -930,23 +1075,23 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           }
       });
 
-      // 把选中图片的参数应用到画布上
+      // Apply selected image parameters to canvas
       const selectedParams = generatedImages[selectedImageIndex].params;
       
-      // 使用结构化的参数格式
+      // Use structured parameter format
       if (selectedParams.nodeParams) {
-        // 遍历所有节点参数
+        // Iterate over all node parameters
         Object.entries(selectedParams.nodeParams).forEach(([nodeId, nodeParams]) => {
-          // 获取节点
+          // Get node
           const node = app.graph._nodes_by_id[nodeId];
           if (!node || !node.widgets) return;
           
-          // 遍历节点的参数
+          // Iterate over node parameters
           Object.entries(nodeParams as Record<string, any>).forEach(([paramName, value]) => {
-            // 在节点的widgets中查找对应名称的widget
+            // Find corresponding widget in node widgets
             for (const widget of node.widgets) {
               if (widget.name === paramName) {
-                // 设置widget的值
+                // Set widget value
                 widget.value = value;
                 break;
               }
@@ -954,13 +1099,13 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           });
         });
         
-        // 标记画布为脏，触发重新渲染
+        // Mark canvas as dirty, trigger re-render
         app.graph.setDirtyCanvas(false, true);
         
-        // 显示通知消息
+        // Show notification message
         setNotificationVisible(true);
         
-        // 3秒后隐藏通知
+        // Hide notification after 3 seconds
         setTimeout(() => {
           setNotificationVisible(false);
         }, 3000);
@@ -997,8 +1142,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         if (onClose) {
           // Clear screen state from context when closing
           dispatch({ type: 'SET_SCREEN_STATE', payload: null });
-          // Clear all state variables
-          resetAllStates();
+          // Clear all state variables and localStorage
+          resetAllStates(true); // Pass true to clear localStorage
           // Call provided onClose to reset the interface
           onClose();
         }
@@ -1013,19 +1158,19 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     if (onClose) {
       // Clear screen state from context when closing
       dispatch({ type: 'SET_SCREEN_STATE', payload: null });
-      // Clear all state variables
-      resetAllStates();
+      // Clear all state variables and localStorage
+      resetAllStates(true); // Pass true to clear localStorage
       // Use the provided onClose callback
       onClose();
     } else {
       // For users of this component without a callback
       // Reset all states
-      resetAllStates();
+      // resetAllStates();
     }
   };
 
   // Helper function to reset all state variables
-  const resetAllStates = () => {
+  const resetAllStates = (clearStorage = false) => {
     setCurrentScreen(0);
     setSelectedParams({
       Steps: true,
@@ -1069,9 +1214,29 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     setAiWritingParamName('');
     setAiWritingError(null);
     setAiSelectedTexts({});
+    
+    // Clear localStorage if requested (only when explicitly closing the interface)
+    if (clearStorage) {
+      localStorage.removeItem(PARAM_DEBUG_STORAGE_KEY);
+    }
   };
 
   // Conditionally render based on whether nodes are selected
+  // First check if loading
+  if (isLoading && visible && selectedNodes.length > 0) {
+    return (
+      <div 
+        className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-8 rounded-lg shadow-sm relative flex flex-col items-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="mt-4 text-gray-600 text-sm">Loading interface...</div>
+        </div>
+      </div>
+    );
+  }
+
   // Screen original - Only stop propagation, don't prevent default
   if (!visible || selectedNodes.length === 0) {
     return (

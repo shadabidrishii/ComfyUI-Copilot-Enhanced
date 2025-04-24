@@ -112,6 +112,8 @@ const ParameterDebugTab = () => {
         // Clear selected nodes and screen state
         dispatch({ type: 'SET_SELECTED_NODE', payload: null });
         dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+        // 同时清除localStorage中保存的状态
+        localStorage.removeItem("screenState");
     };
     
     return (
@@ -212,6 +214,33 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             localStorage.setItem("sessionId", sid);
         }
     }, [activeTab]);
+
+    // 添加保存和恢复activeTab的逻辑
+    useEffect(() => {
+        // 从localStorage恢复activeTab状态
+        const savedTab = localStorage.getItem("activeTab") as TabType;
+        if (savedTab) {
+            dispatch({ type: 'SET_ACTIVE_TAB', payload: savedTab });
+        }
+        
+        // 从localStorage恢复screenState状态（如果存在）
+        const savedScreenState = localStorage.getItem("screenState");
+        if (savedScreenState) {
+            dispatch({ type: 'SET_SCREEN_STATE', payload: JSON.parse(savedScreenState) });
+        }
+    }, []);
+    
+    // 当activeTab变化时保存到localStorage
+    useEffect(() => {
+        localStorage.setItem("activeTab", activeTab);
+    }, [activeTab]);
+    
+    // 当screenState变化时保存到localStorage
+    useEffect(() => {
+        if (state.screenState) {
+            localStorage.setItem("screenState", JSON.stringify(state.screenState));
+        }
+    }, [state.screenState]);
 
     // 使用防抖处理宽度调整
     const handleMouseMoveForResize = React.useCallback((e: MouseEvent) => {

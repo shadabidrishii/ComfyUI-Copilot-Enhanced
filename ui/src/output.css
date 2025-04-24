@@ -158,6 +158,9 @@
   .visible {
     visibility: visible;
   }
+  .invisible {
+    visibility: hidden;
+  }
   .collapse {
     visibility: collapse;
   }
@@ -489,6 +492,9 @@
   .w-\[calc\(50\%-0\.25rem\)\] {
     width: calc(50% - 0.25rem);
   }
+  .w-auto {
+    width: auto;
+  }
   .w-full {
     width: 100%;
   }
@@ -806,6 +812,9 @@
   .border-t-gray-800 {
     border-top-color: color-mix(in srgb, var(--p-text-color) 80%, transparent);
   }
+  .border-t-transparent {
+    border-top-color: transparent;
+  }
   .bg-black {
     --tw-bg-opacity: 1;
     background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
@@ -924,6 +933,10 @@
   }
   .fill-current {
     fill: currentColor;
+  }
+  .object-contain {
+    -o-object-fit: contain;
+       object-fit: contain;
   }
   .object-cover {
     -o-object-fit: cover;
