@@ -13,6 +13,7 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { waitForApp } from "./utils/comfyapp.ts";
 import "./scoped-tailwind.css";
+import "./fonts.css";
 
 const App = React.lazy(() =>
   import("./App.tsx").then(({ default: App }) => ({
@@ -37,7 +38,7 @@ waitForDocumentBody()
   .then(() => {
     app.extensionManager.registerSidebarTab({
       id: "comfyui-copilot",
-      icon: "mdi mdi-robot-excited-outline",
+      icon: "cc-icon-logo",
       title: "ComfyUI Copilot",
       tooltip: "ComfyUI Copilot",
       type: "custom",
