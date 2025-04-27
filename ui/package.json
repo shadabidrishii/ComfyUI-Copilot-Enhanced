@@ -60,6 +60,7 @@
   "overrides": {
     "cross-spawn": ">=7.0.5",
     "rollup": ">=4.22.4",
-    "pagefinder": ">=1.1.1"
+    "pagefinder": ">=1.1.1",
+    "terser": ">=5.16.1"
   }
 }
