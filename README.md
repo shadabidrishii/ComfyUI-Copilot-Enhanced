@@ -48,6 +48,11 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 ---
 
 ## 🚀  Updates
+### 2025.04.28 Release
+- Our frontend UI is embedded within the ComfyUI interface. Simply click on the ComfyUI-Copilot icon in the left sidebar to launch our service.
+- The UI automatically adapts to ComfyUI's black/light theme, switching background colors accordingly.
+<img src="assets/comfyui_ui_icon.png"/>
+
 ### 2025.04.08 Release
 #### ✨ New Features
 
