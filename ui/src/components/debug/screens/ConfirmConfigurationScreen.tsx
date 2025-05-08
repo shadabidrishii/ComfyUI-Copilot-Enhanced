@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React, { useState, useEffect } from 'react';
 import { app } from '../../../utils/comfyapp';
 import { useChatContext } from '../../../context/ChatContext';

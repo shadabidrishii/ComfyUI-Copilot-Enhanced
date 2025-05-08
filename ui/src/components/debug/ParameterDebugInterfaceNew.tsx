@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React, { useState, useEffect, useRef } from 'react';
 import { getOnlyOneImageNode, getOutputImageByPromptId, queuePrompt } from '../../utils/queuePrompt';
 import { app } from '../../utils/comfyapp';
