@@ -1,3 +1,5 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
 export const markdownComponents = {
   p: ({ children }) => {
     return <p className="!my-0.5 leading-relaxed text-xs">{children}</p>

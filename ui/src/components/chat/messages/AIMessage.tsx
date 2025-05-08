@@ -1,5 +1,7 @@
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
+// Copyright (C) 2025 ComfyUI-Copilot Authors
+// Licensed under the MIT License.
 
 import { MemoizedReactMarkdown } from "../../markdown";
 import remarkGfm from 'remark-gfm';
