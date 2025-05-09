@@ -101,8 +101,6 @@ https://github.com/user-attachments/assets/85decdbf-9ae5-4c78-818b-8db444ed4e7b
 <img src="assets/comfycopilot_nodes_search.gif"/>
 
 - 💎 **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
-<img src="assets/工作流检索.png"/>
-
 - 💎 **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
 - 💎 **Up-and-Coming Features**:
   

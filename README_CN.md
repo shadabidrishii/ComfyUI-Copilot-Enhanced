@@ -89,8 +89,6 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 <img src="assets/comfycopilot_nodes_search.gif"/>
 
 - 💎 **智能工作流助手**：自动识别开发者需求，推荐并构建合适的工作流框架，减少手动设置时间。
-<img src="assets/工作流检索.png"/>
-
 - 💎 **模型查询**：根据需求提示 Copilot 查找基础模型和 'lora'。
 - 💎 **即将推出的功能**：
   
