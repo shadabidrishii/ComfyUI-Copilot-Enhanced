@@ -798,7 +798,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             <button 
               className="text-blue-500 hover:text-blue-700 mr-2"
               onClick={toggleHistoryScreen}
-              title="Show history"
+              title="Show History"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
@@ -819,33 +819,26 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="bg-blue-100 p-1.5 rounded-full text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-800">Parameter Lab</h4>
-                <p className="text-xs text-gray-600">Batch‑test parameters & find the optimal combo in one click</p>
-              </div>
+            <div className="text-left mb-4">
+              <h3 className="text-sm font-medium text-gray-800 mb-3">Batch-test parameters & find the best combo in one click.</h3>
+              <div className="h-px w-full bg-gray-200 my-4"></div>
             </div>
 
-            <div className="flex items-start space-x-3">
-              <div className="bg-indigo-100 p-1.5 rounded-full text-indigo-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
+            <div className="text-left">
+              <h4 className="text-base font-medium text-gray-800 mb-4">How to use</h4>
+              
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">1 - </span>Click any node(hold Shift to select multiple nodes)
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">2 - </span>Set parameter ranges and start batch generation.
+                </p>
               </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-800">How To Use</h4>
-                <p className="text-xs text-gray-600">1. Click any node (hold Shift to select multiple nodes).</p>
-                <p className="text-xs text-gray-600">2. Set parameter ranges and start batch generation.</p>
-              </div>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <p className="text-xs text-blue-800 mb-3">Let’s select a node to begin!</p>
+              
+              <div className="h-px w-full bg-gray-200 my-4"></div>
+              
+              <p className="text-sm text-blue-600 mt-6">Let's select a node to begin!</p>
             </div>
           </div>
         </div>

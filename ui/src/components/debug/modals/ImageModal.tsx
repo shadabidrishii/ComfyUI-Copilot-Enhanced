@@ -24,7 +24,10 @@ export const ImageModal: React.FC<ImageModalProps> = ({
     
     const nodeElements = Object.entries(params.nodeParams).map(([nodeId, nodeParams]) => {
       // 获取节点名称 (如果存在)
-      const nodeName = params.nodeNames?.[nodeId] || `Node ${nodeId}`;
+      const nodeName = params.nodeNames?.[nodeId] || // 首先尝试从 nodeNames 中获取
+                     (params.selectedNodeInfoMap && params.selectedNodeInfoMap[nodeId]) || // 然后尝试从 selectedNodeInfoMap 获取
+                     (nodeId.includes('text') ? 'Text Node' : // 针对特殊节点类型提供更友好名称
+                     `Node ${nodeId}`); // 最后使用默认名称
       
       // 渲染每个参数
       const paramElements = Object.entries(nodeParams as Record<string, any>)
@@ -90,7 +93,7 @@ export const ImageModal: React.FC<ImageModalProps> = ({
         {/* 右侧参数信息 */}
         <div className="w-[35%] h-full overflow-hidden flex flex-col">
           <div className="p-4 flex-1 overflow-y-auto">
-            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">parameters</h3>
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">Parameters</h3>
             
             {/* 显示常规参数 */}
             {params && !params.nodeParams && Object.entries(params)

@@ -12,6 +12,7 @@ export const MAX_HISTORY_ITEMS = 30;
 export interface HistoryItem {
   id: string;
   timestamp: number;
+  title: string;
   nodeName: string;
   params: {[key: string]: any};
   generatedImages: GeneratedImage[];
@@ -37,8 +38,15 @@ export const saveHistoryItem = async (
     const newItem: HistoryItem = {
       id: generateUUID(),
       timestamp: Date.now(),
+      title: formatNodeNameWithParams(nodeName, params),
       nodeName,
-      params,
+      params: {
+        ...params,
+        nodeNames: { 
+          ...(params.nodeNames || {}),
+          [nodeName.split('<')[0]]: nodeName.split('<')[0]
+        }
+      },
       generatedImages,
       totalCount,
       workflow

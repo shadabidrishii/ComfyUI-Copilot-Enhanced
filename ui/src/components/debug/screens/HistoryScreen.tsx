@@ -2,7 +2,7 @@
  * @Author: ai-business-hql qingli.hql@alibaba-inc.com
  * @Date: 2025-05-15 15:30:33
  * @LastEditors: ai-business-hql qingli.hql@alibaba-inc.com
- * @LastEditTime: 2025-05-15 16:13:38
+ * @LastEditTime: 2025-05-15 18:42:45
  * @FilePath: /comfyui_copilot/ui/src/components/debug/screens/HistoryScreen.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -27,8 +27,8 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col h-full">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-medium text-gray-800">Generation History</h3>
-          <p className="text-xs text-gray-500">Last {historyItems.length} generation runs</p>
+          <h3 className="text-base font-medium text-gray-800">Experiments History</h3>
+          <p className="text-xs text-gray-500">Last {historyItems.length} experiments</p>
         </div>
         <button 
           className="text-gray-400 hover:text-gray-600"

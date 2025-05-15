@@ -4,7 +4,7 @@
 import React from 'react';
 import { ImageModal } from '../modals/ImageModal';
 import { GeneratedImage } from '../types/parameterDebugTypes';
-import { HistoryItem, formatDate } from '../utils/historyUtils';
+import { HistoryItem, formatDate, formatNodeNameWithParams } from '../utils/historyUtils';
 
 interface HistoryItemScreenProps {
   historyItem: HistoryItem;
@@ -35,7 +35,7 @@ export const HistoryItemScreen: React.FC<HistoryItemScreenProps> = ({
   openImageModal,
   closeImageModal
 }) => {
-  const { timestamp, nodeName, generatedImages } = historyItem;
+  const { timestamp, nodeName, generatedImages, params } = historyItem;
   
   // Calculate total pages
   const actualTotalPages = Math.ceil(generatedImages.length / imagesPerPage);
@@ -47,13 +47,13 @@ export const HistoryItemScreen: React.FC<HistoryItemScreenProps> = ({
   
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <div className="mb-4 border-b pb-2 flex justify-between items-center">
+      <div className="mb-4 border-b pb-2 flex justify-between items-start">
         <div>
-          <h3 className="text-base font-medium text-gray-800">{nodeName}</h3>
+          <h3 className="text-base font-medium text-gray-800">{formatNodeNameWithParams(nodeName, params)}</h3>
           <p className="text-xs text-gray-500">{formatDate(timestamp)} • {generatedImages.length} images</p>
         </div>
         <button 
-          className="text-gray-400 hover:text-gray-600"
+          className="text-gray-400 hover:text-gray-600 mt-0"
           onClick={handleClose}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,10 @@ export const HistoryItemScreen: React.FC<HistoryItemScreenProps> = ({
       <ImageModal
         visible={modalVisible}
         imageUrl={modalImageUrl}
-        params={modalImageParams || {}}
+        params={{
+          ...params,
+          nodeNames: { [historyItem.nodeName.split('<')[0]]: historyItem.nodeName.split('<')[0] }
+        }}
         onClose={closeImageModal}
       />
       
