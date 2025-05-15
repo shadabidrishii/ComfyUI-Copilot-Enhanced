@@ -151,7 +151,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-medium text-gray-800">Parameter Options</h3>
+          <h3 className="text-base font-medium text-gray-800">Set test values</h3>
           <p className="text-xs text-gray-500">Configure the test values for each parameter</p>
         </div>
         <button 

@@ -2,25 +2,18 @@
 // Licensed under the MIT License.
 
 import React from 'react';
-import { app } from '../../../utils/comfyapp';
 import { ImageModal } from '../modals/ImageModal';
+import { GeneratedImage } from '../types/parameterDebugTypes';
+import { HistoryItem, formatDate } from '../utils/historyUtils';
 
-interface GeneratedImage {
-  url: string;
-  params: { [key: string]: any };
-}
-
-interface ResultGalleryScreenProps {
-  generatedImages: GeneratedImage[];
+interface HistoryItemScreenProps {
+  historyItem: HistoryItem;
   selectedImageIndex: number | null;
   handleSelectImage: (index: number, event?: React.MouseEvent) => void;
-  handleApplySelected: (event?: React.MouseEvent) => void;
-  handlePrevious: (event?: React.MouseEvent) => void;
   handleClose: (event?: React.MouseEvent) => void;
   currentPage: number;
   handlePageChange: (newPage: number, event?: React.MouseEvent) => void;
   imagesPerPage: number;
-  notificationVisible: boolean;
   modalVisible: boolean;
   modalImageUrl: string;
   modalImageParams: { [key: string]: any } | null;
@@ -28,23 +21,22 @@ interface ResultGalleryScreenProps {
   closeImageModal: (event?: React.MouseEvent) => void;
 }
 
-export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
-  generatedImages,
+export const HistoryItemScreen: React.FC<HistoryItemScreenProps> = ({
+  historyItem,
   selectedImageIndex,
   handleSelectImage,
-  handleApplySelected,
-  handlePrevious,
   handleClose,
   currentPage,
   handlePageChange,
   imagesPerPage,
-  notificationVisible,
   modalVisible,
   modalImageUrl,
   modalImageParams,
   openImageModal,
   closeImageModal
 }) => {
+  const { timestamp, nodeName, generatedImages } = historyItem;
+  
   // Calculate total pages
   const actualTotalPages = Math.ceil(generatedImages.length / imagesPerPage);
   
@@ -57,8 +49,8 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-medium text-gray-800">Generation Complete</h3>
-          <p className="text-xs text-gray-500">All {generatedImages.length} images have been generated.</p>
+          <h3 className="text-base font-medium text-gray-800">{nodeName}</h3>
+          <p className="text-xs text-gray-500">{formatDate(timestamp)} • {generatedImages.length} images</p>
         </div>
         <button 
           className="text-gray-400 hover:text-gray-600"
@@ -69,20 +61,6 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
           </svg>
         </button>
       </div>
-      
-      {/* Notification toast */}
-      {notificationVisible && (
-        <div className="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-3 shadow-md rounded animate-fade-in-out z-50">
-          <div className="flex items-center">
-            <div className="py-1">
-              <svg className="h-4 w-4 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className="text-xs">Parameters has been applied.</p>
-          </div>
-        </div>
-      )}
       
       {/* Image Modal */}
       <ImageModal
@@ -170,16 +148,6 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
           </button>
         </div>
       )}
-      
-      <div className="mt-6 flex justify-end">
-        <button
-          onClick={(e) => handleApplySelected(e)}
-          className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"
-          disabled={selectedImageIndex === null}
-        >
-          Apply Selected
-        </button>
-      </div>
     </div>
   );
 }; 

@@ -69,36 +69,30 @@ export function ChatHeader({
 
     return (
         <>
-            <div className="flex items-center justify-between border-b px-4 py-3 
+            <div className="flex items-center justify-between border-b px-3 py-2 
                         bg-white border-gray-200 sticky top-2 z-10">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1">
                     <img 
                         src={logoImage}
                         alt="ComfyUI-Copilot Logo" 
-                        className="h-10 w-10 -ml-1" 
+                        className="h-7 w-7 -ml-1" 
                     />
-                    <h3 className="text-[16px] font-medium text-gray-800">{title}</h3>
+                    <h3 className="text-[14px] font-medium text-gray-800">{title}</h3>
                     <button
                         onClick={handleApiKeyClick}
                         className="p-1 bg-white border-none hover:bg-gray-100 rounded text-gray-500"
                     >
-                        <CogIcon className="h-5 w-5" />
+                        <CogIcon className="h-4 w-4" />
                     </button>
                 </div>
                 <div className="flex items-center gap-1">
                     <button
-                        className={`inline-flex bg-white border-none items-center justify-center rounded-md p-2 
+                        className={`inline-flex bg-white border-none items-center justify-center rounded-md p-1.5 
                                  ${hasMessages ? 'text-gray-500 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'}`}
                         disabled={!hasMessages}
                         onClick={onClear}>
-                        <TrashIcon className="h-5 w-5" />
+                        <TrashIcon className="h-4 w-4" />
                     </button>
-                    {/* <button
-                        className="inline-flex bg-white border-none items-center justify-center rounded-md p-2 
-                                 text-gray-500 hover:bg-gray-100"
-                        onClick={onClose}>
-                        <XIcon className="h-5 w-5" />
-                    </button> */}
                 </div>
             </div>
 

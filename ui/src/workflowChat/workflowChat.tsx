@@ -1,8 +1,8 @@
 /*
  * @Author: ai-business-hql ai.bussiness.hql@gmail.com
  * @Date: 2025-03-20 15:15:20
- * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-04-22 17:48:28
+ * @LastEditors: ai-business-hql qingli.hql@alibaba-inc.com
+ * @LastEditTime: 2025-05-14 20:48:24
  * @FilePath: /comfyui_copilot/ui/src/workflowChat/workflowChat.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -103,7 +103,7 @@ const ParameterDebugTab = () => {
     const selectedNodes = selectedNode ? selectedNode : [];
     
     const ParameterDebugInterface = React.lazy(() => 
-      import("../components/debug/ParameterDebugInterfaceNew").then(module => ({
+      import("../components/debug/ParameterDebugInterfaceV2").then(module => ({
           default: module.ParameterDebugInterface
       }))
     );
@@ -141,7 +141,7 @@ const TabButton = ({
 }) => (
     <button
         onClick={onClick}
-        className={`px-4 py-2 font-medium text-sm transition-colors duration-200 ${
+        className={`px-4 py-2 font-medium text-xs transition-colors duration-200 ${
             active 
                 ? "text-blue-600 border-b-2 border-blue-600" 
                 : "text-gray-600 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"

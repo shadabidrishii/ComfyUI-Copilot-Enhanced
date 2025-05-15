@@ -1,8 +1,8 @@
 /*
  * @Author: ai-business-hql ai.bussiness.hql@gmail.com
  * @Date: 2025-03-31 18:29:53
- * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-04-09 11:39:45
+ * @LastEditors: ai-business-hql qingli.hql@alibaba-inc.com
+ * @LastEditTime: 2025-05-15 16:18:09
  * @FilePath: /comfyui_copilot/ui/src/components/debug/screens/InitialScreen.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -38,8 +38,8 @@ export const InitialScreen: React.FC<InitialScreenProps> = ({
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-medium text-gray-800">Select Parameters for Testing</h3>
-          <p className="text-xs text-gray-500">Choose the parameters you want to include in your batch test</p>
+          <h3 className="text-base font-medium text-gray-800">Select parameters</h3>
+          <p className="text-xs text-gray-500">multiple selections supported</p>
         </div>
         <button 
           className="text-gray-400 hover:text-gray-600"

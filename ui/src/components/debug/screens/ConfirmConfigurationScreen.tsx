@@ -125,7 +125,7 @@ export const ConfirmConfigurationScreen: React.FC<ConfirmConfigurationScreenProp
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-medium text-gray-800">Confirm Test Configuration</h3>
+          <h3 className="text-base font-medium text-gray-800">Conform combinations</h3>
           <p className="text-xs text-gray-500">
             In the selected parameter combinations, there are {totalCount} total runs. Each run will generate a separate image.
           </p>
@@ -238,7 +238,7 @@ export const ConfirmConfigurationScreen: React.FC<ConfirmConfigurationScreenProp
           }`}
           disabled={imageNodeIds.length > 1 && !selectedImageNodeId}
         >
-          Start Generation
+          Generate & Compare
         </button>
       </div>
     </div>
