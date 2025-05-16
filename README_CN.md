@@ -45,6 +45,22 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 
 ---
 ## 🚀 Updates
+### 2025.05.16 发布
+#### ✨ 新功能
+- GenLab历史：支持参数探索后历史结果的查询。
+- 个性化工作流程生成：用户可以输入自己的需求，大语言模型为他们生成定制的工作流程。
+
+<div align="center">
+<img src="assets/GenLabHistory.png" width=50% />
+</div>
+
+
+### 2025.04.28 发布
+#### ✨ 新功能
+- 我们的前端用户界面嵌入在ComfyUI界面中。只需点击左侧栏中的ComfyUI-Copilot图标即可启动我们的服务。
+- 界面会自动适应ComfyUI的黑/白主题，背景颜色会相应切换。
+
+<img src="assets/comfyui_ui_icon.png"/>
 
 ### 2025.04.08 发布
 
