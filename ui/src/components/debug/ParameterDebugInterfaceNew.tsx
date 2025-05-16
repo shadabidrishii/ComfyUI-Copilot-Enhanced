@@ -814,7 +814,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
             </button>
           </div>
           <div className="mb-6 text-center">
-            <h3 className="text-base font-bold text-blue-800 mb-2">GenLab</h3>
+            <h3 className="text-base font-bold text-blue-600 mb-2">GenLab</h3>
             <div className="h-1 w-16 bg-blue-500 mx-auto rounded-full mb-4"></div>
           </div>
           
