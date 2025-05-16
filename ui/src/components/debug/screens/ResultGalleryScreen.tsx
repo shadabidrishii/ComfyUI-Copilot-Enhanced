@@ -1,5 +1,9 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React from 'react';
 import { app } from '../../../utils/comfyapp';
+import { ImageModal } from '../modals/ImageModal';
 
 interface GeneratedImage {
   url: string;
@@ -19,7 +23,8 @@ interface ResultGalleryScreenProps {
   notificationVisible: boolean;
   modalVisible: boolean;
   modalImageUrl: string;
-  openImageModal: (imageUrl: string, event: React.MouseEvent) => void;
+  modalImageParams: { [key: string]: any } | null;
+  openImageModal: (imageUrl: string, params: { [key: string]: any }, event: React.MouseEvent) => void;
   closeImageModal: (event?: React.MouseEvent) => void;
 }
 
@@ -36,6 +41,7 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
   notificationVisible,
   modalVisible,
   modalImageUrl,
+  modalImageParams,
   openImageModal,
   closeImageModal
 }) => {
@@ -79,27 +85,12 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
       )}
       
       {/* Image Modal */}
-      {modalVisible && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeImageModal}>
-          <div className="bg-white rounded-lg p-2 max-w-4xl max-h-[90vh] relative" onClick={(e) => e.stopPropagation()}>
-            <button 
-              className="absolute top-2 right-2 text-gray-700 hover:text-gray-900 rounded-full hover:bg-gray-200 p-1"
-              onClick={closeImageModal}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="overflow-auto max-h-[calc(90vh-4rem)]">
-              <img 
-                src={modalImageUrl} 
-                alt="Enlarged image" 
-                className="max-w-full h-auto"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <ImageModal
+        visible={modalVisible}
+        imageUrl={modalImageUrl}
+        params={modalImageParams || {}}
+        onClose={closeImageModal}
+      />
       
       <div className="grid grid-cols-3 gap-4 mb-6">
         {currentImages.map((image, indexOnPage) => {
@@ -113,7 +104,7 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
               {/* Zoom icon */}
               <button 
                 className="absolute top-2 right-2 bg-white bg-opacity-75 rounded-full p-0.5 text-gray-600 hover:text-gray-900 shadow-sm z-10"
-                onClick={(e) => openImageModal(image.url, e)}
+                onClick={(e) => openImageModal(image.url, image.params, e)}
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
@@ -125,18 +116,6 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
                   alt={`Generated image ${actualIndex+1}`} 
                   className="w-full h-full object-cover"
                 />
-              </div>
-              <div className="p-2 text-xs text-gray-600 bg-white max-h-16 overflow-y-auto">
-                {Object.entries(image.params)
-                  // Filter out nodeParams and other complex objects from display
-                  .filter(([paramName, value]) => 
-                    paramName !== 'nodeParams' && 
-                    typeof value !== 'object'
-                  )
-                  .map(([paramName, value]) => (
-                    <div key={paramName}>{paramName}: {String(value)}</div>
-                  ))
-                }
               </div>
             </div>
           );
@@ -192,13 +171,7 @@ export const ResultGalleryScreen: React.FC<ResultGalleryScreenProps> = ({
         </div>
       )}
       
-      <div className="mt-6 flex justify-between">
-        <button
-          onClick={(e) => handlePrevious(e)}
-          className="px-3 py-1.5 text-xs bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
-        >
-          Previous
-        </button>
+      <div className="mt-6 flex justify-end">
         <button
           onClick={(e) => handleApplySelected(e)}
           className="px-3 py-1.5 text-xs bg-pink-200 text-pink-700 rounded-md hover:bg-pink-300 transition-colors"

@@ -72,8 +72,14 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
             if (optimizedResult.workflow) {
                 // 检查是否需要安装节点
                 const nodeTypes = new Set<string>();
-                for (const node of optimizedResult.workflow.nodes) {
-                    nodeTypes.add(node.type);
+                if(optimizedResult.workflow.nodes) {
+                    for (const node of optimizedResult.workflow.nodes) {
+                        nodeTypes.add(node.type);
+                    }
+                } else {
+                    for (const node of Object.values(optimizedResult.workflow)) {
+                        nodeTypes.add(node.class_type);
+                    }
                 }
                 
                 const missingNodeTypes = Array.from(nodeTypes).filter(
@@ -141,8 +147,12 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
     };
 
     const loadWorkflow = (workflow: any, optimizedParams: any[]) => {
-        app.loadGraphData(workflow);
-        
+        if(workflow.nodes) {
+            app.loadGraphData(workflow);
+        } else {
+            app.loadApiJson(workflow);
+        }
+
         // 应用优化后的参数 [节点id，节点名称，参数id，参数名称，参数默认值]
         for (const [nodeId, nodeName, paramIndex, paramName, value] of optimizedParams) {
             const widgets = app.graph._nodes_by_id[nodeId].widgets;

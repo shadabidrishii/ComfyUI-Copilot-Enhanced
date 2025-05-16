@@ -1,5 +1,7 @@
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
+// Copyright (C) 2025 ComfyUI-Copilot Authors
+// Licensed under the MIT License.
 
 import { MemoizedReactMarkdown } from "../../markdown";
 import remarkGfm from 'remark-gfm';
@@ -72,7 +74,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
           rehypeKatex
         ]}
         remarkPlugins={[remarkGfm, remarkMath]}
-        className={`prose prose-xs prose-neutral prose-a:text-accent-foreground/50 break-words [&>*]:!my-1 leading-relaxed text-xs
+        className={`prose prose-xs prose-neutral prose-a:text-accent-foreground/50 break-words [&>*]:!my-1 leading-relaxed text-xs text-gray-800
                   prose-headings:font-semibold
                   prose-h1:text-base
                   prose-h2:text-sm
@@ -89,6 +91,9 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
           p: ({ children }) => {
             return <p className="!my-0.5 leading-relaxed text-xs">{children}</p>
           },
+          strong: ({ children }) => {
+            return <strong className="text-gray-900">{children}</strong>
+          },
           h1: ({ children }) => {
             return <h1 className="text-base font-semibold !my-1">{children}</h1>
           },
@@ -102,10 +107,10 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
             return <h4 className="text-xs font-semibold !my-1">{children}</h4>
           },
           table: ({ children }) => (
-            <table className="border-solid border border-[#979797] w-[100%] text-xs">{children}</table>
+            <table className="border-solid border w-[100%] text-xs">{children}</table>
           ),
           th: ({ children }) => (
-            <th className="border-solid bg-[#E5E7ED] dark:bg-[#FFFFFF] dark:text-[#000000] border border-[#979797] text-center pt-2 text-xs">{children}</th>
+            <th className="border-solid border text-center pt-2 text-xs">{children}</th>
           ),
           td: ({ children }) => {
             if (Array.isArray(children) && children?.length > 0) {
@@ -139,7 +144,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
             
             return (
               <span className="relative group inline-flex items-center">
-                <code className="text-xs bg-gray-100 text-gray-800 rounded px-1">{children}</code>
+                <code className="text-xs bg-gray-100 text-gray-900 rounded px-1">{children}</code>
                 <button 
                   onClick={handleCopy}
                   className="absolute top-0 right-0 bg-gray-200 rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-300 z-10"
@@ -259,7 +264,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
               {guides.map((guide: string, index: number) => (
                 <button
                   key={index}
-                  className="px-3 py-1.5 bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-[12px] w-[calc(50%-0.25rem)]"
+                  className="px-3 py-1.5 text-gray-700 rounded-md hover:bg-gray-50 transition-colors text-[12px] w-[calc(50%-0.25rem)]"
                   onClick={() => onOptionClick?.(guide)}
                 >
                   {guide}
@@ -278,7 +283,7 @@ export function AIMessage({ content, name = 'Assistant', avatar, format, onOptio
 
   return (
     <BaseMessage name={name}>
-      <div className="w-full rounded-lg bg-gray-50 p-4 text-gray-700 text-sm break-words overflow-hidden">
+      <div className="w-full rounded-lg bg-gray-50 p-4 text-gray-900 text-sm break-words overflow-hidden">
         {renderContent()}
       </div>
     </BaseMessage>

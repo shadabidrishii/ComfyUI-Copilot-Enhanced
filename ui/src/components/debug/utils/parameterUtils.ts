@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 // 生成数值类型的测试参数
 export const generateNumericTestValues = (
   min: number, 
@@ -9,6 +12,11 @@ export const generateNumericTestValues = (
   min = isNaN(min) ? 0 : min;
   max = isNaN(max) ? 100 : max;
   step = isNaN(step) || step <= 0 ? 1 : step;
+  
+  // Add minimum step check
+  if (step < 0.1) {
+    step = 0.1;
+  }
   
   // Ensure max >= min
   if (max < min) {

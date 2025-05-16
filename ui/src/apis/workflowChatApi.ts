@@ -141,6 +141,10 @@ export namespace WorkflowChatAPI {
         }
       }
       
+      // Set timeout to 2 minutes (120000ms)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
+      
       const response = await fetch(`${BASE_URL}/api/chat/invoke`, {
         method: 'POST',
         headers,
@@ -155,7 +159,11 @@ export namespace WorkflowChatAPI {
             data: base64
           }))
         }),
+        signal: controller.signal
       });
+      
+      // Clear the timeout since we got a response
+      clearTimeout(timeoutId);
       
       checkAndSaveApiKey(response);
       
@@ -188,7 +196,11 @@ export namespace WorkflowChatAPI {
       }
     } catch (error) {
       console.error('Error in streamInvokeServer:', error);
-      alert(error instanceof Error ? error.message : 'An error occurred while streaming, please refresh the page and try again.');
+      if (error.name === 'AbortError') {
+        alert('Request timed out after 2 minutes. Please try again.');
+      } else {
+        alert(error instanceof Error ? error.message : 'An error occurred while streaming, please refresh the page and try again.');
+      }
       throw error;
     }
   }

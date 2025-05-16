@@ -56,7 +56,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
             arrows: {
                 to: { enabled: true, scaleFactor: 1.2 }
             },
-            color: '#FFFFFF',
+            color: '#000000',
             width: 2
         }));
 
@@ -99,7 +99,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
             },
             edges: {
                 arrows: 'to',
-                color: '#FFFFFF',
+                color: '#000000',
                 width: 2,
                 smooth: {
                     enabled: true,
@@ -261,8 +261,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
         const handleNodeSelection = () => {
             const selectedNodes = app.canvas.selected_nodes;
             if (Object.keys(selectedNodes ?? {}).length) {
-                const nodeInfo = Object.values(selectedNodes)[0];
-                dispatch({ type: 'SET_SELECTED_NODE', payload: nodeInfo });
+                dispatch({ type: 'SET_SELECTED_NODE', payload: Object.values(selectedNodes) });
             } else {
                 dispatch({ type: 'SET_SELECTED_NODE', payload: null });
             }
@@ -275,7 +274,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
     }, []);
 
     return (
-        <div className="rounded-lg bg-green-50 p-3 text-gray-700 text-xs break-words overflow-visible">
+        <div className="rounded-lg bg-gray-500 p-3 text-gray-700 text-xs break-words overflow-visible">
             {nodes.length > 0 && (
                 <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
@@ -290,7 +289,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
                                 >
                                     {node.name}
                                 </button>
-                                <p className="text-xs ml-3 text-gray-500">
+                                <p className="text-xs ml-3 text-white">
                                     [{node.tags.join(', ')}]
                                 </p>
                                 {hoveredNode === node.name && (

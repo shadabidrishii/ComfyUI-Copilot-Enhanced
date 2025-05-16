@@ -48,6 +48,24 @@ Whether it's generating text, images, or audio, ComfyUI-Copilot offers intuitive
 ---
 
 ## 🚀  Updates
+### 2025.05.16 Release
+#### ✨ New Features
+- GenLab History: Support querying historical results after parameter exploration.
+- Personalized workflow generation: Users can input their own requirements, and a large language model generates a tailored workflow for them.
+
+<div align="center">
+<img src="assets/GenLabHistory.png" width=50% />
+</div>
+
+
+### 2025.04.28 Release
+#### ✨ New Features
+- Our frontend UI is embedded within the ComfyUI interface. Simply click on the ComfyUI-Copilot icon in the left sidebar to launch our service.
+- The UI automatically adapts to ComfyUI's black/light theme, switching background colors accordingly.
+
+<img src="assets/comfyui_ui_icon.png"/>
+
+
 ### 2025.04.08 Release
 #### ✨ New Features
 
@@ -96,8 +114,6 @@ https://github.com/user-attachments/assets/85decdbf-9ae5-4c78-818b-8db444ed4e7b
 <img src="assets/comfycopilot_nodes_search.gif"/>
 
 - 💎 **Smart Workflow Assistance**: Automatically discern developer needs to recommend and build fitting workflow frameworks, minimizing manual setup time.
-<img src="assets/工作流检索.png"/>
-
 - 💎 **Model Querying**: Prompt Copilot to seek foundational models and 'lora' based on requirements.
 - 💎 **Up-and-Coming Features**:
   

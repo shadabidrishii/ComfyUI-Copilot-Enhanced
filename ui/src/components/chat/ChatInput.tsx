@@ -132,7 +132,9 @@ export function ChatInput({
                             return;
                         }
                         e.preventDefault();
-                        onSend();
+                        if (input.trim() !== '') {
+                            onSend();
+                        }
                     }
                     onKeyPress(e);
                 }}
@@ -181,7 +183,7 @@ export function ChatInput({
             <button
                 type="submit"
                 onClick={onSend}
-                disabled={loading}
+                disabled={loading || input.trim() === ''}
                 className="absolute bottom-3 right-3 p-2 rounded-md text-gray-500 bg-white border-none 
                          hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50 
                          transition-all duration-200 active:scale-95">
