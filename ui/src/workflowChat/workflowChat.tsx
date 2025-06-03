@@ -4,7 +4,7 @@
  * @LastEditors: Shadab Idrishi <official.shadabidrishi@gmail.com>
  * @LastEditTime: 2025-05-14 20:48:24
  * @FilePath: /comfyui_copilot/ui/src/workflowChat/workflowChat.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: Workflow chat component for ComfyUI Copilot
  */
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
@@ -38,7 +38,7 @@ interface WorkflowChatProps {
     onUsageTriggered?: () => void;
 }
 
-// 优化公告组件样式 - 更加美观和专业，支持Markdown
+// Enhanced announcement component with better styling and Markdown support
 const Announcement = ({ message, onClose }: { message: string, onClose: () => void }) => {
     if (!message) return null;
     
@@ -112,7 +112,7 @@ const ParameterDebugTab = () => {
         // Clear selected nodes and screen state
         dispatch({ type: 'SET_SELECTED_NODE', payload: null });
         dispatch({ type: 'SET_SCREEN_STATE', payload: null });
-        // 同时清除localStorage中保存的状态
+        // Also clear the state saved in localStorage
         localStorage.removeItem("screenState");
     };
     
@@ -163,15 +163,15 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     const [selectedModel, setSelectedModel] = useState<string>("gpt-4o-mini");
     const [height, setHeight] = useState<number>(window.innerHeight);
     const [topPosition, setTopPosition] = useState<number>(0);
-    // 添加公告状态
+    // Add announcement state
     const [announcement, setAnnouncement] = useState<string>('');
     const [showAnnouncement, setShowAnnouncement] = useState<boolean>(false);
 
-    // 使用自定义 hooks，只在visible为true且activeTab为chat时启用
+    // Use custom hooks, only enable when visible is true and activeTab is chat
     useMousePosition(visible && activeTab === 'chat');
     useNodeSelection(visible);
 
-    // 使用自定义 hooks
+    // Use custom hooks
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -190,7 +190,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         fetchInstalledNodes();
     }, [activeTab]);
 
-    // 获取历史消息
+    // Get historical messages
     const fetchMessages = async (sid: string) => {
         try {
             const data = await WorkflowChatAPI.fetchMessages(sid);
@@ -215,34 +215,34 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     }, [activeTab]);
 
-    // 添加保存和恢复activeTab的逻辑
+    // Add logic to save and restore activeTab
     useEffect(() => {
-        // 从localStorage恢复activeTab状态
+        // Restore activeTab state from localStorage
         const savedTab = localStorage.getItem("activeTab") as TabType;
         if (savedTab) {
             dispatch({ type: 'SET_ACTIVE_TAB', payload: savedTab });
         }
         
-        // 从localStorage恢复screenState状态（如果存在）
+        // Restore screenState from localStorage (if it exists)
         const savedScreenState = localStorage.getItem("screenState");
         if (savedScreenState) {
             dispatch({ type: 'SET_SCREEN_STATE', payload: JSON.parse(savedScreenState) });
         }
     }, []);
     
-    // 当activeTab变化时保存到localStorage
+    // Save to localStorage when activeTab changes
     useEffect(() => {
         localStorage.setItem("activeTab", activeTab);
     }, [activeTab]);
     
-    // 当screenState变化时保存到localStorage
+    // Save to localStorage when screenState changes
     useEffect(() => {
         if (state.screenState) {
             localStorage.setItem("screenState", JSON.stringify(state.screenState));
         }
     }, [state.screenState]);
 
-    // 使用防抖处理宽度调整
+    // Use debounce for width adjustment
     const handleMouseMoveForResize = React.useCallback((e: MouseEvent) => {
         if (!isResizing) return;
         
@@ -297,7 +297,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
         try {
             const modelExt = { type: "model_select", data: [selectedModel] };
-            let aiMessageId = generateUUID(); // 生成一个固定的消息ID
+            let aiMessageId = generateUUID(); // Generate a fixed message ID
             let isFirstResponse = true;
 
             for await (const response of WorkflowChatAPI.streamInvokeServer(
@@ -554,23 +554,23 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         }
     }, [triggerUsage, activeTab]);
 
-    // 获取公告内容
+    // Get announcement content
     useEffect(() => {
         if (!visible || activeTab !== 'chat') return;
         
         const fetchAnnouncement = async () => {
             try {
-                // 检查今天是否已经显示过公告
+                // Check if announcement was already shown today
                 const today = new Date().toDateString();
                 const lastShownDate = localStorage.getItem('announcementLastShownDate');
                 
-                // 如果今天没有显示过公告，则显示
+                // If announcement wasn't shown today, show it
                 if (lastShownDate !== today) {
                     const message = await WorkflowChatAPI.fetchAnnouncement();
                     if (message && message.trim() !== '') {
                         setAnnouncement(message);
                         setShowAnnouncement(true);
-                        // 记录今天的日期
+                        // Record today's date
                         localStorage.setItem('announcementLastShownDate', today);
                     }
                 }
@@ -582,7 +582,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         fetchAnnouncement();
     }, [visible, activeTab]);
 
-    // 关闭公告
+    // Close announcement
     const handleCloseAnnouncement = () => {
         setShowAnnouncement(false);
     };
@@ -635,7 +635,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     </TabButton>
                 </div>
                 
-                {/* 将公告移到 ChatHeader 下方和Tab导航下方 */}
+                {/* Move announcement below ChatHeader and Tab navigation */}
                 {showAnnouncement && announcement && activeTab === 'chat' && (
                     <Announcement 
                         message={announcement} 

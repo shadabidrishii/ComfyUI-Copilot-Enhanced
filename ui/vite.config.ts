@@ -4,7 +4,6 @@
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
  * @LastEditTime: 2025-02-25 20:58:44
  * @FilePath: /comfyui_copilot/ui/vite.config.ts
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -49,7 +48,7 @@ export default defineConfig(({ mode }) => ({
     watch: mode === "development" ? {
       include: ["src/**"],
       buildStart() {
-        // 只在开发模式下启动 Tailwind CSS watch 进程
+        // Start Tailwind CSS watch process only in development mode
         console.log("Starting Tailwind CSS watch process...");
         const tailwindProcess = exec(
           'npx tailwindcss -i ./src/scoped-tailwind.css -o ./src/output.css --watch',
@@ -72,7 +71,7 @@ export default defineConfig(({ mode }) => ({
         });
         console.log("Tailwind CSS watch process started.");
       }
-    } : undefined,  // 在生产环境下不启用 watch
+    } : undefined,  // Disable watch in production
     // minify: false, // ___DEBUG__MODE only
     // sourcemap: true, // ___DEBUG___MODE only
     emptyOutDir: true,
@@ -100,10 +99,10 @@ export default defineConfig(({ mode }) => ({
           return `copilot_web/assets/[name]-[hash].[ext]`;
         },
         manualChunks: {
-          // 只包含实际使用的 React 相关依赖
+          // Include only React-related dependencies that are actually used
           'vendor-react': ['react', 'react-dom'],
           
-          // Markdown 相关依赖
+          // Markdown related dependencies
           'vendor-markdown': [
             'react-markdown',
             'remark-gfm',
@@ -112,13 +111,13 @@ export default defineConfig(({ mode }) => ({
             'rehype-external-links'
           ],
           
-          // UI 组件
+          // UI components
           'vendor-ui': [
             '@heroicons/react',
             '@tabler/icons-react'
           ],
           
-          // 消息组件
+          // Message components
           'message-components': [
             './src/components/chat/messages/AIMessage',
             './src/components/chat/messages/UserMessage',
@@ -133,7 +132,7 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
     minify: 'esbuild',
     cssMinify: true,
-    chunkSizeWarningLimit: 600 // 适当调整警告阈值
+    chunkSizeWarningLimit: 600 // Adjust warning threshold as needed
   },
   plugins: [react(), rewriteImportPlugin({ isDev: mode === "development" })],
 }));

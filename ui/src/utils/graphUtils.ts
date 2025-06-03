@@ -7,16 +7,16 @@ import { app } from "./comfyapp";
 export function addNodeOnGraph(type: string, options: any = {}) {
     const node = LiteGraph.createNode(type, "", options);
     
-    // 只在没有指定位置时，才设置节点到中心位置
+    // Only set node to center position if no position is specified
     if (!options.pos) {
-        // 获取画布的可视区域大小
+        // Get the visible area size of the canvas
         const rect = app.canvas.canvas.getBoundingClientRect();
         
-        // 计算画布中心点
+        // Calculate the center point of the canvas
         const centerX = (rect.width / 2) / app.canvas.ds.scale + (-app.canvas.ds.offset[0]) / app.canvas.ds.scale;
         const centerY = (rect.height / 2) / app.canvas.ds.scale + (-app.canvas.ds.offset[1]) / app.canvas.ds.scale;
         
-        // 设置节点位置到画布中心
+        // Set node position to canvas center
         node.pos = [
             centerX - node.size[0] / 2,
             centerY - node.size[1] / 2

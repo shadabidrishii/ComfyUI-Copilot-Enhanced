@@ -6,7 +6,7 @@ import { clearStateFromLocalStorage } from './localStorageUtils';
 import { WorkflowChatAPI } from '../../../apis/workflowChatApi';
 
 /**
- * 重置所有状态变量
+ * Reset all state variables
  */
 export const resetAllStates = (
   setCurrentScreen: React.Dispatch<React.SetStateAction<number>>,
@@ -48,7 +48,7 @@ export const resetAllStates = (
     threshold: false,
     prompt: false
   });
-  // Reset task_id
+  // Generate a new task_id
   setTask_id(generateUUID());
   cleanupPolling();
   setIsProcessing(false);
@@ -74,7 +74,7 @@ export const resetAllStates = (
   setModalVisible(false);
   setModalImageUrl('');
   setModalImageParams(null);
-  // Reset text inputs
+  // Clear all text inputs
   setTextInputs({});
   setAiWritingModalVisible(false);
   setAiWritingModalText('');
@@ -92,7 +92,7 @@ export const resetAllStates = (
 };
 
 /**
- * 处理选择图像
+ * Handle image selection
  */
 export const handleSelectImage = (
   index: number,
@@ -107,7 +107,7 @@ export const handleSelectImage = (
 };
 
 /**
- * 处理应用选中的图像配置
+ * Handle applying selected image configuration
  */
 export const handleApplySelected = async (
   selectedImageIndex: number | null,
@@ -199,7 +199,7 @@ export const handleApplySelected = async (
 };
 
 /**
- * 处理关闭
+ * Handle close action
  */
 export const handleClose = (
   currentScreen: number,
@@ -219,7 +219,6 @@ export const handleClose = (
   if (currentScreen === 1 && nodeIndex !== undefined) {
     // Remove the node at specified index
     const newSelectedNodes = [...selectedNode];
-    const removedNode = newSelectedNodes[nodeIndex];
     newSelectedNodes.splice(nodeIndex, 1);
     
     // If no nodes left, return to original screen

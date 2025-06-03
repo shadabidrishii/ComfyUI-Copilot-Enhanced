@@ -3,15 +3,6 @@
 
 import { config } from '../config';
 
-// 添加 JSEncrypt 的类型定义
-declare module 'jsencrypt' {
-  export default class JSEncrypt {
-    constructor();
-    setPublicKey(key: string): void;
-    encrypt(data: string): string | false;
-  }
-}
-
 import JSEncrypt from 'jsencrypt';
 
 /**
@@ -46,7 +37,7 @@ export async function fetchRsaPublicKey(): Promise<string> {
  */
 export async function encryptWithRsaPublicKey(data: string, publicKey: string): Promise<string> {
   try {
-    // 检查是否可以使用 Web Crypto API
+    // Check if Web Crypto API is available
     if (window.crypto && window.crypto.subtle) {
       // Extract the PEM contents between the header and footer
       const pemHeader = "-----BEGIN PUBLIC KEY-----";
@@ -92,13 +83,13 @@ export async function encryptWithRsaPublicKey(data: string, publicKey: string): 
       // Convert the encrypted data to base64
       return arrayBufferToBase64(encryptedBuffer);
     } else {
-      // 使用 JSEncrypt 作为备选方案（适用于 HTTP 环境）
-      console.warn('Web Crypto API 不可用，使用 JSEncrypt 作为备选方案');
+      // Use JSEncrypt as fallback (for HTTP environments)
+      console.warn('Web Crypto API not available, using JSEncrypt as fallback');
       const encrypt = new JSEncrypt();
       encrypt.setPublicKey(publicKey);
       const encrypted = encrypt.encrypt(data);
       if (!encrypted) {
-        throw new Error('JSEncrypt 加密失败');
+        throw new Error('JSEncrypt encryption failed');
       }
       return encrypted;
     }

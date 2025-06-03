@@ -4,7 +4,7 @@
 import React from 'react';
 
 /**
- * 处理页面跳转到下一步
+ * Handle navigation to next screen
  */
 export const handleNext = (
   currentScreen: number,
@@ -24,7 +24,7 @@ export const handleNext = (
     event.stopPropagation();
   }
   
-  // When moving from screen 0 to screen 1, clean up paramTestValues for unselected parameters
+  // Clean up paramTestValues for unselected parameters when moving from screen 0 to 1
   if (currentScreen === 0) {
     // Make a copy of the current paramTestValues
     const updatedParamTestValues = { ...paramTestValues };
@@ -46,7 +46,7 @@ export const handleNext = (
     setParamTestValues(updatedParamTestValues);
   }
   
-  // When moving to the confirmation screen, ensure all text values are properly synchronized
+  // Ensure all text values are properly synchronized when moving to confirmation screen
   if (currentScreen === 1) {
     // Ensure textInputs are synced to paramTestValues for all selected nodes
     const updatedParamTestValues = { ...paramTestValues };
@@ -83,7 +83,7 @@ export const handleNext = (
 };
 
 /**
- * 处理页面跳转到上一步
+ * Handle navigation to previous screen
  */
 export const handlePrevious = (
   currentScreen: number,
@@ -154,7 +154,7 @@ export const handlePrevious = (
 };
 
 /**
- * 处理页码变化
+ * Handle page number change
  */
 export const handlePageChange = (
   newPage: number,

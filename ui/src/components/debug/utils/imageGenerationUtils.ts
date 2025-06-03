@@ -7,7 +7,7 @@ import { generateDynamicParams } from './parameterUtils';
 import { saveHistoryItem } from './historyUtils';
 
 /**
- * 处理启动图像生成过程
+ * Handle the image generation process
  */
 export const handleStartGeneration = async (
   paramTestValues: {[nodeId: string]: {[paramName: string]: any[]}},
@@ -171,7 +171,7 @@ export const handleStartGeneration = async (
 };
 
 /**
- * 处理图像轮询逻辑
+ * Handle image polling logic
  */
 export const pollForImages = async (
   prompt_ids: string[],
@@ -319,7 +319,7 @@ export const pollForImages = async (
 };
 
 /**
- * 清理轮询超时
+ * Clean up polling timeout
  */
 export const cleanupPolling = (
   pollingTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>,

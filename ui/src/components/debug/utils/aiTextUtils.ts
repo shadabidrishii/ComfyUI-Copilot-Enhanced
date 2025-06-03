@@ -4,7 +4,7 @@
 import { WorkflowChatAPI } from '../../../apis/workflowChatApi';
 
 /**
- * 处理AI文本生成
+ * Handle AI text generation
  */
 export const handleAiWriting = async (
   aiWritingModalText: string,
@@ -53,7 +53,7 @@ export const handleAiWriting = async (
 };
 
 /**
- * 处理文本选择切换
+ * Handle text selection toggle
  */
 export const toggleTextSelection = (
   textKey: string,
@@ -66,7 +66,7 @@ export const toggleTextSelection = (
 };
 
 /**
- * 添加选中的文本到文本输入列表
+ * Add selected texts to text input list
  */
 export const addSelectedTexts = (
   aiWritingNodeId: string,
@@ -121,7 +121,7 @@ export const addSelectedTexts = (
 };
 
 /**
- * 打开AI写作模态框
+ * Open AI writing modal
  */
 export const openAiWritingModal = (
   nodeId: string,

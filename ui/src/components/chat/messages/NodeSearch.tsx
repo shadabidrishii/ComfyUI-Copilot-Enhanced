@@ -29,7 +29,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
     const installedNodesList = nodes.filter(node => isNodeInstalled(node.name));
     const uninstalledNodesList = nodes.filter(node => !isNodeInstalled(node.name));
 
-    // 添加一个格式化数字的辅助函数
+    // Helper function to format numbers
     const formatNumber = (num: number) => {
         if (num >= 10000) {
             return `${(num / 10000).toFixed(1)}w`;
@@ -182,7 +182,7 @@ export function NodeSearch({ content, name = 'Assistant', avatar, installedNodes
                 </div>
             )}
 
-            {/* 全局悬浮描述框 */}
+            {/* Global hover description box */}
             {hoveredNode && hoveredNodeData?.description && (
                 <div className="fixed -translate-y-full z-[9999] w-64 p-2 
                             bg-gray-800 text-white text-xs rounded-md shadow-lg mb-2"

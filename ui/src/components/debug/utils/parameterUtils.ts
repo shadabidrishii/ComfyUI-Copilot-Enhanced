@@ -1,7 +1,7 @@
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
 
-// 生成数值类型的测试参数
+// Generate test values for numeric types
 export const generateNumericTestValues = (
   min: number, 
   max: number, 
@@ -60,14 +60,14 @@ export const generateNumericTestValues = (
   return values;
 };
 
-// WidgetParamConf接口定义
+// WidgetParamConf interface definition
 export interface WidgetParamConf {
   nodeId: number;
   paramName: string;
   paramValue: string;
 }
 
-// 生成所有参数组合
+// Generate all parameter combinations
 export const generateParameterCombinations = (
   paramTestValues: {[nodeId: string]: {[paramName: string]: any[]}}
 ): WidgetParamConf[][] => {

@@ -47,9 +47,9 @@ const LazyDownstreamSubgraphs = lazy(() => import('./messages/DownstreamSubgraph
 const LazyNodeInstallGuide = lazy(() => import('./messages/NodeInstallGuide').then(m => ({ default: m.NodeInstallGuide })));
 
 export function MessageList({ messages, latestInput, onOptionClick, installedNodes, onAddMessage, loading }: MessageListProps) {
-    // 使用useMemo缓存renderMessage函数
+    // Cache renderMessage function with useMemo
     const renderMessage = React.useMemo(() => (message: Message) => {
-        // 移除频繁的日志输出
+        // Remove frequent log output
         // console.log('[MessageList] Rendering message:', message);
         
         if (message.role === 'user') {
@@ -65,16 +65,16 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
             
             try {
                 const response = JSON.parse(message.content);
-                // 移除频繁的日志输出
+                // Remove frequent log output
                 // console.log('[MessageList] Parsed message content:', response);
                 
-                // 获取扩展类型
+                // Get extension types
                 const workflowExt = response.ext?.find((item: ExtItem) => item.type === 'workflow');
                 const nodeExt = response.ext?.find((item: ExtItem) => item.type === 'node');
                 const downstreamSubgraphsExt = response.ext?.find((item: ExtItem) => item.type === 'downstream_subgraph_search');
                 const nodeInstallGuideExt = response.ext?.find((item: ExtItem) => item.type === 'node_install_guide');
                 
-                // 移除频繁的日志输出
+                // Remove frequent log output
                 // console.log('[MessageList] Found extensions:', {
                 //     workflowExt,
                 //     nodeExt,
@@ -83,7 +83,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                 //     nodeInstallGuideExt
                 // });
 
-                // 根据扩展类型添加对应组件
+                // Add corresponding component based on extension type
                 let ExtComponent = null;
                 if (workflowExt) {
                     ExtComponent = (
@@ -149,7 +149,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                                     if (message.metadata?.pendingSubgraph) {
                                         const selectedNode = Object.values(app.canvas.selected_nodes)[0] as any;
                                         if (selectedNode) {
-                                            // 直接调用 DownstreamSubgraphs 中的 loadSubgraphToCanvas
+                                            // Directly call loadSubgraphToCanvas in DownstreamSubgraphs
                                             const node = message.metadata.pendingSubgraph;
                                             const nodes = node.json.nodes;
                                             const links = node.json.links;
@@ -162,7 +162,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                                                 nodeMap[entryNodeId] = selectedNode;
                                             }
                                             
-                                            // 创建其他所有节点
+                                            // Create all other nodes
                                             app.canvas.emitBeforeChange();
                                             try {
                                                 for (const node of nodes as NodeWithPosition[]) {
@@ -180,7 +180,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                                                 app.canvas.emitAfterChange();
                                             }
 
-                                            // 处理所有连接
+                                            // Process all connections
                                             for (const link of links) {
                                                 const origin_node = nodeMap[link['origin_id']];
                                                 const target_node = nodeMap[link['target_id']];
@@ -229,7 +229,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                     );
                 }
 
-                // 如果有response.text，使用AIMessage渲染
+                // If response.text exists, render with AIMessage
                 if (response.text || ExtComponent) {
                     return (
                         <AIMessage 
@@ -245,12 +245,12 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                     );
                 }
 
-                // 如果没有response.text但有扩展组件，直接返回扩展组件
+                // If no response.text but has extension component, return the extension component directly
                 if (ExtComponent) {
                     return ExtComponent;
                 }
 
-                // 默认返回AIMessage
+                // Default to returning AIMessage
                 return (
                     <AIMessage 
                         key={message.id}
@@ -264,8 +264,8 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
                 );
             } catch (error) {
                 console.error('[MessageList] Error parsing message content:', error);
-                // 如果解析JSON失败,使用AIMessage
-                console.error('解析JSON失败', message.content);
+                // If JSON parsing fails, use AIMessage
+                console.error('Failed to parse JSON', message.content);
                 return (
                     <AIMessage 
                         key={message.id}
@@ -283,7 +283,7 @@ export function MessageList({ messages, latestInput, onOptionClick, installedNod
         return null;
     }, [installedNodes, onOptionClick, onAddMessage, latestInput]); // Added dependencies that are used inside the function
 
-    // 使用useMemo缓存消息列表
+    // Cache message list with useMemo
     const messageElements = React.useMemo(() => 
         messages?.map(renderMessage),
         [messages, renderMessage]

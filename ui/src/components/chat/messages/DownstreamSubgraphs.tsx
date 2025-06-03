@@ -26,7 +26,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
 
     const nodes = response.ext?.find(item => item.type === 'downstream_subgraph_search')?.data || [];
 
-    // 将 Subgraph 转换为 vis.js 格式的函数
+    // Function to convert Subgraph to vis.js format
     const convertToVisFormat = (subgraph: Subgraph) => {
         const visNodes = subgraph.json.nodes.map(node => ({
             id: node.id,
@@ -63,7 +63,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
         return { nodes: visNodes, edges: visEdges };
     };
 
-    // 添加清理函数
+    // Add cleanup function
     useEffect(() => {
         return () => {
             if (networkRef.current) {
@@ -155,7 +155,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
             return;
         }
 
-        // 检查所有节点是否已安装
+        // Check if all nodes are installed
         const requiredNodeTypes = nodes.map(node => node.type);
         const installedNodeTypes = installedNodes;
         console.log('[DownstreamSubgraphs] Required node types:', requiredNodeTypes);
@@ -172,7 +172,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
                 const nodeInfos = await WorkflowChatAPI.batchGetNodeInfo(missingNodeTypes);
                 console.log('[DownstreamSubgraphs] Received node infos:', nodeInfos);
                 
-                // 构造消息内容 - 修改为显示按钮列表格式
+                // Construct message content - modified to display button list format
                 const messageContent = {
                     text: ``,
                     ext: [{
@@ -191,7 +191,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
                     content: JSON.stringify(messageContent),
                     format: 'markdown',
                     name: 'Assistant',
-                    // 保存原始的subgraph信息，用于后续加载
+                    // Save the original subgraph information for later loading
                     metadata: {
                         pendingSubgraph: node
                     }
@@ -224,7 +224,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
             nodeMap[entryNodeId] = selectedNode;
         }
         
-        // 创建其他所有节点
+        // Create all other nodes
         app.canvas.emitBeforeChange();
         try {
             for (const node of nodes) {
@@ -238,7 +238,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
                     nodeMap[node.id] = addNodeOnGraph(node.type, {pos: nodePosNew});
                 }
             }
-            // 处理所有连接
+            // Process all connections
             for (const link of links) {
                 const origin_node = nodeMap[link['origin_id']];
                 const target_node = nodeMap[link['target_id']];
@@ -257,7 +257,7 @@ export function DownstreamSubgraphs({ content, name = 'Assistant', avatar, onAdd
     };
 
     useEffect(() => {
-        // 只在组件挂载时添加事件监听
+        // Only add event listener when component is mounted
         const handleNodeSelection = () => {
             const selectedNodes = app.canvas.selected_nodes;
             if (Object.keys(selectedNodes ?? {}).length) {

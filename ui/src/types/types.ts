@@ -123,8 +123,8 @@ export interface OptimizedWorkflowRequest {
 }
 
 export interface OptimizedWorkflowResponse {
-  workflow: any;  // 工作流数据
-  optimized_params: [number, string, number, string, string | number | boolean][];  // 优化后的参数
+  workflow: any;  // Workflow data
+  optimized_params: [number, string, number, string, string | number | boolean][];  // Optimized parameters
 }
 
 export interface TrackEventRequest {

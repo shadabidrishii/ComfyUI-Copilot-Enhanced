@@ -29,7 +29,7 @@ export const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   setCurrentScreen,
   cleanupPolling
 }) => {
-  // 处理取消生成
+  // Handle cancel generation
   const handleCancel = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

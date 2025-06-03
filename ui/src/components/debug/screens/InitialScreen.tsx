@@ -4,7 +4,6 @@
  * @LastEditors: Shadab Idrishi <official.shadabidrishi@gmail.com>
  * @LastEditTime: 2025-05-15 17:29:01
  * @FilePath: /comfyui_copilot/ui/src/components/debug/screens/InitialScreen.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 // Copyright (C) 2025 AIDC-AI
 // Licensed under the MIT License.
@@ -26,12 +25,12 @@ export const InitialScreen: React.FC<InitialScreenProps> = ({
   handleNext,
   handleClose
 }) => {
-  // 获取所有当前节点中实际存在的参数名称
+  // Get all parameter names that actually exist in the current nodes
   const availableParams: string[] = selectedNodes.flatMap(node => 
     (node.widgets || []).map((widget: any) => widget.name)
   );
   
-  // 检查当前显示的节点参数中是否有被选中的
+  // Check if any parameters are selected in the currently displayed node
   const anyParamSelected = availableParams.some(param => selectedParams[param] === true);
   
   return (

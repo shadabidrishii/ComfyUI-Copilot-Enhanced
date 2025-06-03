@@ -101,7 +101,7 @@ export function ChatInput({
 
     return (
         <div className={`relative ${uploadedImages.length > 0 ? 'mt-12' : ''}`}>
-            {/* 已上传图片预览 */}
+            {/* Uploaded images preview */}
             {uploadedImages.length > 0 && (
                 <div className="absolute -top-10 left-0 flex gap-2">
                     {uploadedImages.map(image => (
@@ -195,7 +195,7 @@ export function ChatInput({
                 )}
             </button>
 
-            {/* 上传图片模态框 */}
+            {/* Upload image modal */}
             {showUploadModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-96 relative">
@@ -236,7 +236,7 @@ export function ChatInput({
                             className="hidden"
                         />
 
-                        {/* 预览区域 */}
+                        {/* Preview area */}
                         {uploadedImages.length > 0 && (
                             <div className="mt-4 grid grid-cols-3 gap-2">
                                 {uploadedImages.map(image => (

@@ -4,7 +4,7 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
-// 定义事件常量
+// Define event constants
 const COPILOT_EVENTS = {
     EXPLAIN_NODE: 'copilot:explain-node'
 };
@@ -17,7 +17,7 @@ function addExtraMenuOptions(nodeType, nodeData, app) {
             content: "Explain with Copilot",
             callback: async () => {
                 const nodeTypeUniqueId = nodeType?.comfyClass;
-                // 触发自定义事件
+                // Trigger custom event
                 window.dispatchEvent(new CustomEvent(COPILOT_EVENTS.EXPLAIN_NODE, {
                     detail: { nodeType: nodeTypeUniqueId }
                 }));

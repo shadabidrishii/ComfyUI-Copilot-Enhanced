@@ -36,21 +36,21 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
             return;
         }
 
-        // 将workflow.id转换为字符串，确保可以作为对象的键
+        // Convert workflow.id to string to ensure it can be used as an object key
         const workflowId = String(workflow.id);
 
-        // 防止重复点击
+        // Prevent double-clicking
         if (loadingWorkflows[workflowId]) {
             return;
         }
 
-        // 设置当前工作流为加载状态
+        // Set current workflow to loading state
         setLoadingWorkflows(prev => ({
             ...prev,
             [workflowId]: true
         }));
 
-        // 发送埋点事件
+        // Send tracking event
         WorkflowChatAPI.trackEvent({
             event_type: 'workflow_accept',
             message_type: 'workflow',
@@ -62,15 +62,15 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
         });
 
         try {
-            // 获取优化后的工作流
+            // Get optimized workflow
             const optimizedResult = await WorkflowChatAPI.getOptimizedWorkflow(
                 workflow.id,
                 latestInput
             );
 
-            // 加载优化后的工作流
+            // Load the optimized workflow
             if (optimizedResult.workflow) {
-                // 检查是否需要安装节点
+                // Check if nodes need to be installed
                 const nodeTypes = new Set<string>();
                 if(optimizedResult.workflow.nodes) {
                     for (const node of optimizedResult.workflow.nodes) {
@@ -122,7 +122,7 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                         console.error('[WorkflowOption] Error fetching node info:', error);
                         alert('Error checking required nodes. Please try again.');
                     } finally {
-                        // 无论成功或失败，重置加载状态
+                        // Reset loading state regardless of success or failure
                         setLoadingWorkflows(prev => ({
                             ...prev,
                             [workflowId]: false
@@ -131,14 +131,14 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                     return;
                 }
 
-                // 如果所有节点都已安装，直接加载工作流
+                // If all nodes are already installed, load the workflow directly
                 loadWorkflow(optimizedResult.workflow, optimizedResult.optimized_params);
             }
         } catch (error) {
             console.error('Failed to optimize workflow:', error);
             alert('Failed to optimize workflow. Please try again.');
         } finally {
-            // 无论成功或失败，重置加载状态
+            // Reset loading state regardless of success or failure
             setLoadingWorkflows(prev => ({
                 ...prev,
                 [workflowId]: false
@@ -153,7 +153,7 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
             app.loadApiJson(workflow);
         }
 
-        // 应用优化后的参数 [节点id，节点名称，参数id，参数名称，参数默认值]
+        // Apply optimized parameters [node id, node name, parameter id, parameter name, parameter default value]
         for (const [nodeId, nodeName, paramIndex, paramName, value] of optimizedParams) {
             const widgets = app.graph._nodes_by_id[nodeId].widgets;
             for (const widget of widgets) {
@@ -184,7 +184,7 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                 {workflows.length > 0 && (
                     <div className="flex flex-col space-y-4">
                         {workflows.map((workflow: Workflow, index: number) => {
-                            // 确保workflow.id存在并转换为字符串
+                            // Ensure workflow.id exists and convert to string
                             const workflowId = workflow.id ? String(workflow.id) : '';
                             return (
                                 <div key={index} className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:bg-gray-50">
@@ -195,7 +195,7 @@ export function WorkflowOption({ content, name = 'Assistant', avatar, latestInpu
                                             className="w-14 h-14 object-cover rounded-lg"
                                             onError={(e) => {
                                                 const target = e.target as HTMLImageElement;
-                                                target.onerror = null; // 防止循环触发
+                                                target.onerror = null; // Prevent infinite trigger
                                                 target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56' fill='none'%3E%3Crect width='56' height='56' fill='%23F3F4F6'/%3E%3Cpath d='M28 28C30.2091 28 32 26.2091 32 24C32 21.7909 30.2091 20 28 20C25.7909 20 24 21.7909 24 24C24 26.2091 25.7909 28 28 28Z' fill='%239CA3AF'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M18.7253 37.6307C19.8278 35.1533 22.6897 33.6 26 33.6H30C33.3103 33.6 36.1722 35.1533 37.2747 37.6307C37.6419 38.4561 37.0611 39.2 36.1694 39.2H19.8306C18.9389 39.2 18.3581 38.4561 18.7253 37.6307Z' fill='%239CA3AF'/%3E%3C/svg%3E";
                                             }}
                                         />

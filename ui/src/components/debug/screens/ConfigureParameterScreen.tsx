@@ -106,7 +106,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
           const min = widget.options?.min || 0;
           const max = widget.options?.max || 100;
           let step = (widget.options?.step || 10) / 10;
-          // 添加最小step值检查
+          // Add minimum step value check
           if (step < 0.1) {
             step = 0.1;
           }
@@ -168,7 +168,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
         selectedNodes.map((node, nodeIndex) => {
           const widgets = node.widgets || {};
           const nodeWidgets = Object.values(widgets);
-          const nodeId = node.id; // 获取节点ID
+          const nodeId = node.id; // Get node ID
           
           return (
             <div key={nodeIndex} className="border rounded-md mb-4 overflow-hidden">
@@ -193,7 +193,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                     return null;
                   }
 
-                  // 为每个输入字段创建唯一的键值
+                  // Create a unique key for each input field
                   const inputKey = `${nodeId}_${paramName}`;
                   
                   // Handle text parameter type
@@ -259,7 +259,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                     const precision = widget.options?.precision || 0;
                     const defaultValues = generateNumericTestValues(min, max, step, precision);
                     
-                    // 获取当前输入状态，如果不存在则初始化
+                    // Get current input state, initialize if it doesn't exist
                     const currentInputs = inputValues[inputKey] || {
                       min: min.toString(),
                       max: max.toString(),
@@ -288,7 +288,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                               e.stopPropagation();
                               const value = e.target.value;
                               
-                              // 更新输入状态
+                              // Update input state
                               setInputValues(prev => ({
                                 ...prev,
                                 [inputKey]: {
@@ -297,7 +297,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                 }
                               }));
                               
-                              // 只有当输入为空或有效时才更新参数值
+                              // Only update parameter value if input is empty or valid
                               if (value === '' || !isNaN(parseFloat(value))) {
                                 const newMin = value === '' ? 0 : parseFloat(value);
                                 const newMax = parseFloat(currentInputs.max || max.toString());
@@ -322,7 +322,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                               e.stopPropagation();
                               const value = e.target.value;
                               
-                              // 更新输入状态
+                              // Update input state
                               setInputValues(prev => ({
                                 ...prev,
                                 [inputKey]: {
@@ -331,7 +331,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                 }
                               }));
                               
-                              // 只有当输入为空或有效时才更新参数值
+                              // Only update parameter value if input is empty or valid
                               if (value === '' || !isNaN(parseFloat(value))) {
                                 const newMin = parseFloat(currentInputs.min || min.toString());
                                 const newMax = value === '' ? newMin : parseFloat(value);
@@ -356,7 +356,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                               e.stopPropagation();
                               const value = e.target.value;
                               
-                              // 更新输入状态
+                              // Update input state
                               setInputValues(prev => ({
                                 ...prev,
                                 [inputKey]: {
@@ -365,7 +365,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                                 }
                               }));
                               
-                              // 只有当输入为空或有效时才更新参数值
+                              // Only update parameter value if input is empty or valid
                               if (value === '' || (!isNaN(parseFloat(value)) && parseFloat(value) > 0)) {
                                 const newMin = parseFloat(currentInputs.min || min.toString());
                                 const newMax = parseFloat(currentInputs.max || max.toString());

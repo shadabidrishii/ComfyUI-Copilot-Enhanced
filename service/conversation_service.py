@@ -5,239 +5,180 @@ import json
 import os
 import asyncio
 import time
+import sys
+from pathlib import Path
 from typing import Optional, Dict, Any, TypedDict, List, Union
 
-import server
+# Add parent directory to path to allow imports
+sys.path.append(str(Path(__file__).parent.parent))
+
+# Import server mock
+from service.server import app as server
+
 from aiohttp import web
 import aiohttp
 import base64
 
-# 使用内存字典存储会话消息
+# Use in-memory dictionary to store session messages
 session_messages = {}
 
-# 在文件开头添加
+# Add at the beginning of the file
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
+
+# Import the server instance and routes
+from .server import server, add_route
+
+# Make server available globally
+server = server
 
 # Define types using TypedDict
 class Node(TypedDict):
-    name: str  # 节点名称
-    description: str  # 节点描述
-    image: str  # 节点图片url，可为空
-    github_url: str  # 节点github地址
-    from_index: int  # 节点在列表中的位置
-    to_index: int  # 节点在列表中的位置
+    name: str  # Node name
+    description: str  # Node description
+    image: str  # Node image URL (optional)
+    github_url: str  # Node GitHub URL
+    from_index: int  # Node position in the list
+    to_index: int  # Node position in the list
 
 class NodeInfo(TypedDict):
-    existing_nodes: List[Node]  # 已安装的节点
-    missing_nodes: List[Node]  # 未安装的节点
+    existing_nodes: List[Node]  # Installed nodes
+    missing_nodes: List[Node]  # Missing nodes
 
-class Workflow(TypedDict, total=False):
-    id: Optional[int]  # 工作流id
-    name: Optional[str]  # 工作流名称
-    description: Optional[str]  # 工作流描述
-    image: Optional[str]  # 工作流图片
-    workflow: Optional[str]  # 工作流
+class Workflow(TypedDict):
+    id: Optional[int]
+    name: Optional[str]
+    description: Optional[str]
+    image: Optional[str]
+    workflow: Optional[str]
 
 class ExtItem(TypedDict):
-    type: str  # 扩展类型
-    data: Union[dict, list]  # 扩展数据
+    type: str
+    data: Union[dict, list]
 
 class ChatResponse(TypedDict):
-    session_id: str  # 会话id
-    text: Optional[str]  # 返回文本
-    finished: bool  # 是否结束
-    type: str  # 返回的类型
-    format: str  # 返回的格式
-    ext: Optional[List[ExtItem]]  # 扩展信息
+    session_id: str
+    text: Optional[str]
+    finished: bool
+    type: str
+    format: str
+    ext: Optional[List[ExtItem]]
 
+# Get workflow template
 def get_workflow_templates():
-    templates = []
-    workflows_dir = os.path.join(STATIC_DIR, "workflows")
-    
-    for filename in os.listdir(workflows_dir):
-        if filename.endswith('.json'):
-            with open(os.path.join(workflows_dir, filename), 'r') as f:
-                template = json.load(f)
-                templates.append(template)
+    templates = [
+        {
+            "id": 1,
+            "name": "Image Generation",
+            "description": "Generate images using a text prompt",
+            "image": "https://placehold.co/600x400"
+        },
+        {
+            "id": 2,
+            "name": "Image to Image",
+            "description": "Transform an image based on a text prompt",
+            "image": "https://placehold.co/600x400"
+        },
+        {
+            "id": 3,
+            "name": "Image Upscaling",
+            "description": "Upscale and enhance image quality",
+            "image": "https://placehold.co/600x400"
+        }
+    ]
     
     return templates
 
-@server.PromptServer.instance.routes.get("/workspace/fetch_messages_by_id")
 async def fetch_messages(request):
-    session_id = request.query.get('session_id')
-    data = await asyncio.to_thread(fetch_messages_sync, session_id)
-    return web.json_response(data)
+    session_id = request.query.get("session_id")
+    if not session_id or session_id not in session_messages:
+        return web.json_response([])
+    return web.json_response(session_messages[session_id])
 
 def fetch_messages_sync(session_id):
     print("fetch_messages: ", session_id)
     return session_messages.get(session_id, [])
 
-@server.PromptServer.instance.routes.post("/workspace/workflow_gen")
 async def workflow_gen(request):
+    """Handle POST request to generate a workflow."""
     print("Received workflow_gen request")
-    req_json = await request.json()
-    print("Request JSON:", req_json)
-    
-    response = web.StreamResponse(
-        status=200,
-        reason='OK',
-        headers={
-            'Content-Type': 'application/json',
-            'X-Content-Type-Options': 'nosniff'
-        }
-    )
-    await response.prepare(request)
-    
-    session_id = req_json.get('session_id')
-    user_message = req_json.get('message')
-    
-    # Create user message
-    user_msg = {
-        "id": str(len(session_messages.get(session_id, []))),
-        "content": user_message,
-        "role": "user"
-    }
-    
-    if "workflow" in user_message.lower():
-        workflow = {
-            "name": "basic_image_gen",
-            "description": "Create a basic image generation workflow",
-            "image": "https://placehold.co/600x400",
-            "workflow": """{ ... }"""  # Your workflow JSON here
-        }
-        
-        chat_response = ChatResponse(
-            session_id=session_id,
-            text="",
-            finished=False,
-            type="workflow_option",
-            format="text",
-            ext=[{"type": "workflows", "data": [workflow]}]
-        )
-        
-        await response.write(json.dumps(chat_response).encode() + b"\n")
-        
-        message = "Let me help you choose a workflow. Here are some options available:"
-        accumulated = ""
-        for char in message:
-            accumulated += char
-            chat_response["text"] = accumulated
-            await response.write(json.dumps(chat_response).encode() + b"\n")
-            await asyncio.sleep(0.01)
-        
-        chat_response["finished"] = True
-        chat_response["text"] = message
-        await response.write(json.dumps(chat_response).encode() + b"\n")
-        
-    elif "recommend" in user_message.lower():
-        existing_nodes = [
-            {
-                "name": "LoraLoader",
-                "description": "Load LoRA weights for conditioning.",
-                "image": "",
-                "github_url": "https://github.com/CompVis/taming-transformers",
-                "from_index": 0,
-                "to_index": 0
-            },
-            {
-                "name": "KSampler",
-                "description": "Generate images using K-diffusion sampling.",
-                "image": "",
-                "github_url": "https://github.com/CompVis/taming-transformers",
-                "from_index": 0,
-                "to_index": 0
+    try:
+        data = await request.json()
+        # Mock response for workflow generation
+        return web.json_response({
+            "status": "success",
+            "workflow": {
+                "id": "workflow_" + str(hash(str(data)))[:8],
+                "name": data.get("name", "Generated Workflow"),
+                "description": "A generated workflow based on your request",
+                "nodes": [],
+                "connections": []
             }
-        ]
-        
-        missing_nodes = [
-            {
-                "name": "CLIPTextEncode",
-                "description": "Encode text prompts for conditioning.",
-                "image": "",
-                "github_url": "https://github.com/CompVis/clip-interrogator",
-                "from_index": 0,
-                "to_index": 0
-            }
-        ]
-        
-        node_info = {
-            "existing_nodes": existing_nodes,
-            "missing_nodes": missing_nodes
-        }
-        
-        chat_response = ChatResponse(
-            session_id=session_id,
-            text="",
-            finished=False,
-            type="downstream_node_recommend",
-            format="text",
-            ext=[{"type": "node_info", "data": node_info}]
-        )
-        
-        await response.write(json.dumps(chat_response).encode() + b"\n")
-        
-        message = "Here are some recommended nodes:"
-        accumulated = ""
-        for char in message:
-            accumulated += char
-            chat_response["text"] = accumulated
-            await response.write(json.dumps(chat_response).encode() + b"\n")
-            await asyncio.sleep(0.01)
-        
-        chat_response["finished"] = True
-        chat_response["text"] = message
-        await response.write(json.dumps(chat_response).encode() + b"\n")
-        
-    else:
-        chat_response = ChatResponse(
-            session_id=session_id,
-            text="",
-            finished=False,
-            type="message",
-            format="text",
-            ext=[{"type": "guides", "data": ["Create a workflow", "Search for nodes", "Get node recommendations"]}]
-        )
-        
-        await response.write(json.dumps(chat_response).encode() + b"\n")
-        
-        message = "I can help you with workflows, nodes, and more. Try asking about:"
-        accumulated = ""
-        for char in message:
-            accumulated += char
-            chat_response["text"] = accumulated
-            await response.write(json.dumps(chat_response).encode() + b"\n")
-            await asyncio.sleep(0.01)
-        
-        chat_response["finished"] = True
-        chat_response["text"] = message
-        await response.write(json.dumps(chat_response).encode() + b"\n")
-    
-    if session_id not in session_messages:
-        session_messages[session_id] = []
-    
-    session_messages[session_id].extend([user_msg])
-    
-    await response.write_eof()
-    return response
+        })
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
 
-async def upload_to_oss(file_data: bytes, filename: str) -> str:
-    # Implement your OSS upload logic here
-    # Return the URL of the uploaded file
-    pass
+async def upload_to_oss(file_data, filename):
+    """Handle file upload to OSS (mock implementation)."""
+    try:
+        # In a real implementation, this would upload the file to an object storage service
+        file_url = f"https://example.com/uploads/{filename}"
+        return file_url
+    except Exception as e:
+        print(f"Error uploading file: {e}")
+        raise
 
-@server.PromptServer.instance.routes.post("/api/chat/invoke")
 async def invoke_chat(request):
-    data = await request.json()
-    session_id = data['session_id']
-    prompt = data['prompt']
-    images = data.get('images', [])
+    """Handle chat messages and generate responses."""
+    try:
+        data = await request.json()
+        session_id = data.get("session_id", "default_session")
+        message = data.get("message", "")
+        
+        print(f"Received chat request - Session: {session_id}, Message: {message}")
+        
+        # Initialize session if it doesn't exist
+        if session_id not in session_messages:
+            session_messages[session_id] = []
+        
+        # Add user message to session
+        session_messages[session_id].append({"role": "user", "content": message})
+        
+        # Generate AI response based on message content
+        if "hello" in message.lower():
+            ai_response = "Hello! How can I assist you with ComfyUI today?"
+        elif "workflow" in message.lower():
+            ai_response = "I can help you create a workflow. What kind of workflow are you looking to create?"
+        else:
+            ai_response = f"I received your message: {message}"
+        
+        # Add AI response to session
+        session_messages[session_id].append({"role": "assistant", "content": ai_response})
+        
+        # Create response in the format expected by the client
+        response_data = {
+            "session_id": session_id,
+            "response": ai_response,
+            "timestamp": int(time.time())
+        }
+        print(f"Sending response: {response_data}")
+        
+        # Return a dictionary that FastAPI can convert to JSON
+        return response_data
+        
+    except Exception as e:
+        error_msg = f"Error in invoke_chat: {str(e)}"
+        print(error_msg)
+        # Return a dictionary with error information
+        return {"error": "An error occurred while processing your request", "details": str(e)}
 
-    image_urls = []
-    for image in images:
-        # 从base64解码图片数据
-        image_data = base64.b64decode(image['data'].split(',')[1])
-        # 上传到OSS
-        url = await upload_to_oss(image_data, image['filename'])
-        image_urls.append(url)
+# Define routes using the add_route function
+def setup_routes():
+    """Set up all the routes for the conversation service."""
+    add_route("/workspace/fetch_messages_by_id", fetch_messages, methods=["GET"])
+    add_route("/workspace/fetch_workflow_templates", get_workflow_templates, methods=["GET"])
+    add_route("/workspace/workflow_gen", workflow_gen, methods=["POST"])
+    add_route("/workspace/upload", upload_to_oss, methods=["POST"])
+    add_route("/workspace/chat", invoke_chat, methods=["POST"])
 
-    # 使用image_urls进行后续处理...
+# Call setup_routes to register all routes
+setup_routes()

@@ -47,7 +47,7 @@ export function useDraggable(config: DragConfig = {}) {
       );
       const timeElapsed = Date.now() - startTime;
 
-      // 如果移动距离小于 5px 且时间小于 200ms，则认为是点击
+      // If movement is less than 5px and time is less than 200ms, consider it a click
       if (moveDistance < 5 && timeElapsed < 200) {
         config.onClick?.();
       }
