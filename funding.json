@@ -1,0 +1,98 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "group",
+    "role": "owner",
+    "name": "ComfyUI-Copilot India Team",
+    "email": "official.shadabidrishi@gmail.com",
+    "phone": "+919082873931",
+    "description": "A small, dedicated team based in India working to enhance ComfyUI-Copilot. Our mission is to make AI workflow creation accessible to everyone through intuitive natural language interactions and intelligent assistance. We're focused on improving documentation, fixing bugs, and adding features that matter most to the ComfyUI community.",
+    "webpageUrl": {
+      "url": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced",
+      "wellKnown": "https://raw.githubusercontent.com/shadabidrishii/ComfyUI-Copilot-Enhanced/main/.well-known/funding-manifest-urls"
+    }
+  },
+  "projects": [{
+    "guid": "comfyui-copilot",
+    "name": "ComfyUI-Copilot Enhanced",
+    "description": "An intelligent assistant for Comfy-UI that simplifies AI workflow creation through natural language interactions, node recommendations, and smart workflow building. This enhanced version aims to improve upon the original with better performance, more features, and stronger community support.",
+    "webpageUrl": {
+      "url": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced",
+      "wellKnown": "https://raw.githubusercontent.com/shadabidrishii/ComfyUI-Copilot-Enhanced/main/.well-known/funding-manifest-urls"
+    },
+    "repositoryUrl": {
+      "url": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced",
+      "wellKnown": "https://raw.githubusercontent.com/shadabidrishii/ComfyUI-Copilot-Enhanced/main/.well-known/funding-manifest-urls"
+    },
+    "licenses": ["spdx:MIT"],
+    "tags": ["ai", "machine-learning", "workflow-automation", "developer-tools", "comfyui"]
+  }],
+  "funding": {
+    "channels": [
+      {
+        "guid": "upi",
+        "type": "bank",
+        "address": "shadabidrishi@pthdfc",
+        "description": "Preferred: Instant UPI payment (Works across all UPI apps like Google Pay, PhonePe, Paytm)"
+      },
+      {
+        "guid": "bank-transfer",
+        "type": "bank",
+        "address": "Contact official.shadabidrishi@gmail.com for bank transfer details",
+        "description": "Direct bank transfer (NEFT/IMPS/RTGS)"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "monthly-team",
+        "status": "active",
+        "name": "Monthly Team Support",
+        "description": "Supports our 3-person team and infrastructure for one month. Aligns with FLOSS/fund's sustainable funding model (₹93,000/month for 6 months). Includes:\n- 2 part-time developers (40 hours total per week)\n- Project management and community leadership\n- Cloud infrastructure and operational costs\n- Contingency buffer\n\nBudget breakdown available in the project's README.md",
+        "amount": 93000,
+        "currency": "INR",
+        "frequency": "monthly",
+        "channels": ["upi", "bank-transfer"]
+      },
+      {
+        "guid": "specific-support",
+        "status": "active",
+        "name": "Targeted Support",
+        "description": "Contribute to specific needs. Example allocations:\n- 1 month of developer time: ₹25,000\n- 1 month of infrastructure: ₹14,000\n- 1 month of project leadership: ₹20,000",
+        "amount": 0,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": ["upi", "bank-transfer"]
+      },
+      {
+        "guid": "feature-sponsor",
+        "status": "active",
+        "name": "Feature Sponsorship",
+        "description": "Sponsor specific improvements. Examples:\n- Documentation improvements: ₹10,000\n- New node development: ₹25,000\n- Performance optimization: ₹15,000\n- Major feature: ₹50,000+",
+        "amount": 0,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": ["upi", "bank-transfer"]
+      },
+      {
+        "guid": "donation",
+        "status": "active",
+        "name": "General Donation",
+        "description": "Support the project with any amount. Every contribution helps us continue development and maintenance.",
+        "amount": 0,
+        "currency": "INR",
+        "frequency": "one-time",
+        "channels": ["upi", "bank-transfer"]
+      }
+    ],
+    "history": [
+      {
+        "year": 2025,
+        "income": 0,
+        "expenses": 0,
+        "taxes": 0,
+        "currency": "INR",
+        "description": "Funding initiative launched for ComfyUI-Copilot with a small, dedicated team. Goals include stabilizing features, enhancing documentation, building a sustainable open-source project, and creating opportunities for junior developers in India."
+      }
+    ]
+  }
+}

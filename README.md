@@ -18,13 +18,32 @@
 </h4>
 
 
-👾 _**Alibaba International Digital Commerce**_ 👾
+👨‍💻 **Maintained by Shadab Idrishi**
 
-:octocat: [**Github**](https://github.com/AIDC-AI/ComfyUI-Copilot)
+:octocat: [**GitHub**](https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced) | 💬 [Contact](mailto:official.shadabidrishi@gmail.com)
 
 </div>
 
 https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
+
+## 💰 Support Our Work
+
+Your support helps us maintain and improve ComfyUI-Copilot. Here's how you can contribute:
+
+- **UPI**: `shadabidrishi@pthdfc` (Works with all UPI apps)
+- **Bank Transfer**: Contact [official.shadabidrishi@gmail.com](mailto:official.shadabidrishi@gmail.com) for details
+
+### Monthly Budget Breakdown
+
+| Category | Amount (INR) | Description |
+|----------|-------------:|-------------|
+| Development Team | 50,000 | 2 Junior Python Developers (20 hrs/week each) |
+| Project Leadership | 20,000 | Project management & community engagement |
+| Infrastructure | 14,000 | Cloud hosting, AI APIs, domain & tools |
+| Contingency | 9,000 | Buffer for unexpected costs |
+| **Total** | **93,000** | Monthly operational costs |
+
+For more details, see our [funding.json](funding.json) file.
 
 ## 🌟 Introduction
 
