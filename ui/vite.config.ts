@@ -81,6 +81,7 @@ export default defineConfig(({ mode }) => ({
       external: ["/scripts/app.js", "/scripts/api.js"],
       input: {
         input: "/src/main.tsx",
+        fonts: "/src/fonts.css"
       },
       output: {
         // Provide global variables to use in the UMD build for externalized deps
@@ -92,7 +93,12 @@ export default defineConfig(({ mode }) => ({
         // assetFileNames: "[name]-[hash][extname]",
         entryFileNames: "copilot_web/[name].js",
         chunkFileNames: `copilot_web/[name]-[hash].js`,
-        assetFileNames: `copilot_web/assets/[name]-[hash].[ext]`,
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'fonts.css') {
+            return 'copilot_web/[name].css';
+          }
+          return `copilot_web/assets/[name]-[hash].[ext]`;
+        },
         manualChunks: {
           // 只包含实际使用的 React 相关依赖
           'vendor-react': ['react', 'react-dom'],

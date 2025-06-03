@@ -1,9 +1,9 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React, { useState, useEffect, useRef } from 'react';
-import { getOnlyOneImageNode, getOutputImageByPromptId, queuePrompt } from '../../utils/queuePrompt';
 import { app } from '../../utils/comfyapp';
-import { interruptProcessing, manageQueue } from '../../apis/comfyApiCustom';
 import { useChatContext } from '../../context/ChatContext';
-import { WorkflowChatAPI } from '../../apis/workflowChatApi';
 import { InitialScreen } from './screens/InitialScreen';
 import { ConfigureParameterScreen } from './screens/ConfigureParameterScreen';
 import { ConfirmConfigurationScreen } from './screens/ConfirmConfigurationScreen';
@@ -12,51 +12,89 @@ import { ResultGalleryScreen } from './screens/ResultGalleryScreen';
 import { AIWritingModal } from './modals/AIWritingModal';
 import { ImageModal } from './modals/ImageModal';
 import { generateDynamicParams, generateParameterCombinations } from './utils/parameterUtils';
-import { WidgetParamConf } from './utils/parameterUtils';
 import { generateUUID } from '../../utils/uuid';
+// Import history components
+import { HistoryScreen } from './screens/HistoryScreen';
+import { HistoryItemScreen } from './screens/HistoryItemScreen';
 
-// Add CSS for the highlight pulse effect
-const highlightPulseStyle = `
-  @keyframes highlight-pulse {
-    0% { 
-      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
-    }
-    70% { 
-      box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
-    }
-    100% { 
-      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-    }
-  }
-  
-  .highlight-pulse {
-    animation: highlight-pulse 1.5s infinite;
-    border: 2px solid #3b82f6;
-  }
+// Import types from the extracted types file
+import { 
+  GeneratedImage, 
+  ParameterDebugInterfaceProps
+} from './types/parameterDebugTypes';
 
-  @keyframes fade-in-out {
-    0% { opacity: 0; transform: translateY(-20px); }
-    10% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-20px); }
-  }
-  
-  .animate-fade-in-out {
-    animation: fade-in-out 3s forwards;
-  }
-`;
+// Import styles from the extracted styles file
+import { highlightPulseStyle } from './styles/highlightPulseStyle';
 
-// 添加一个新的接口来定义图像类型
-interface GeneratedImage {
-  url: string;
-  params: { [key: string]: any };
-}
+// Import localStorage utilities from the extracted utils file
+import {
+  PARAM_DEBUG_STORAGE_KEY,
+  saveStateToLocalStorage
+} from './utils/localStorageUtils';
 
-interface ParameterDebugInterfaceProps {
-  selectedNodes: any[];
-  visible: boolean;
-  onClose?: () => void;
-}
+// Import history utilities
+import {
+  HistoryItem,
+  loadHistoryItems
+} from './utils/historyUtils';
+
+// Import text input utilities from the extracted utils file
+import {
+  handleTextInputChange as utilsHandleTextInputChange,
+  handleAddTextInput as utilsHandleAddTextInput,
+  handleRemoveTextInput as utilsHandleRemoveTextInput
+} from './utils/textInputUtils';
+
+// Import interface utilities from the extracted utils file
+import {
+  toggleDropdown as utilsToggleDropdown,
+  updateParamTestValues as utilsUpdateParamTestValues,
+  handleTestValueSelect as utilsHandleTestValueSelect
+} from './utils/interfaceUtils';
+
+// Import search utilities from the extracted utils file
+import {
+  handleSearch as utilsHandleSearch,
+  handleSelectAll as utilsHandleSelectAll,
+  handleParamSelect as utilsHandleParamSelect
+} from './utils/searchUtils';
+
+// Import modal utilities from the extracted utils file
+import {
+  openImageModal as utilsOpenImageModal,
+  closeImageModal as utilsCloseImageModal
+} from './utils/modalUtils';
+
+// Import navigation utilities from the extracted utils file
+import {
+  handleNext as utilsHandleNext,
+  handlePrevious as utilsHandlePrevious,
+  handlePageChange as utilsHandlePageChange
+} from './utils/navigationUtils';
+
+// Import image generation utilities
+import {
+  handleStartGeneration as utilsHandleStartGeneration,
+  cleanupPolling as utilsCleanupPolling
+} from './utils/imageGenerationUtils';
+
+// Import AI text utilities
+import {
+  handleAiWriting as utilsHandleAiWriting,
+  toggleTextSelection as utilsToggleTextSelection,
+  addSelectedTexts as utilsAddSelectedTexts,
+  openAiWritingModal as utilsOpenAiWritingModal
+} from './utils/aiTextUtils';
+
+// Import state management utilities
+import {
+  resetAllStates as utilsResetAllStates,
+  handleSelectImage as utilsHandleSelectImage,
+  handleApplySelected as utilsHandleApplySelected,
+  handleClose as utilsHandleClose
+} from './utils/stateManagementUtils';
+
+// Note: Removed duplicate interface definitions to use imported types instead
 
 export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = ({
   selectedNodes,
@@ -89,7 +127,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     }));
   });
 
-  // 修改参数测试值结构，使用嵌套对象，按节点ID进行分组
+  // Modify parameter test values structure, use nested objects, group by node ID
   const [paramTestValues, setParamTestValues] = useState<{[nodeId: string]: {[paramName: string]: any[]}}>({}); 
   // Add a state to store dropdown open status
   const [openDropdowns, setOpenDropdowns] = useState<{[key: string]: boolean | {isOpen: boolean, x: number, y: number}}>({});
@@ -97,7 +135,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   // Add new state to store search terms
   const [searchTerms, setSearchTerms] = useState<{[key: string]: string}>({});
 
-  // Add state to track input values - 更新为使用nodeId_paramName作为键
+  // Add state to track input values - Update to use nodeId_paramName as key
   const [inputValues, setInputValues] = useState<{[nodeId_paramName: string]: {min?: string, max?: string, step?: string}}>({});
 
   // Add a state to store current page
@@ -111,6 +149,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   // Add new state for modal
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState('');
+  const [modalImageParams, setModalImageParams] = useState<{ [key: string]: any } | null>(null);
 
   // Add state for text inputs and AI writing modal
   const [textInputs, setTextInputs] = useState<{[nodeId_paramName: string]: string[]}>({});
@@ -123,6 +162,11 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   const [aiWritingError, setAiWritingError] = useState<string | null>(null);
   const [aiSelectedTexts, setAiSelectedTexts] = useState<{[key: string]: boolean}>({});
 
+  // Add state for history screen
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
+
   // Get dispatch from context to update screen state
   const { dispatch } = useChatContext();
 
@@ -130,164 +174,119 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Add a ref to track the current polling session ID
   const pollingSessionIdRef = useRef<string | null>(null);
+  
+  // Add loading state after other state declarations
+  const [isLoading, setIsLoading] = useState(() => visible); // Initialize loading based on visibility
+
+  // Load history items when component loads or when isHistoryVisible changes
+  useEffect(() => {
+    if (isHistoryVisible) {
+      const items = loadHistoryItems();
+      setHistoryItems(items);
+    }
+  }, [isHistoryVisible]);
 
   // Add function to handle AI text generation
   const handleAiWriting = async () => {
-    if (!aiWritingModalText.trim()) {
-      setAiWritingError("Please enter some text to generate variations");
-      return;
-    }
-    
-    setAiWritingLoading(true);
-    setAiWritingError(null);
-    setAiGeneratedTexts([]);
-    setAiSelectedTexts({});
-    
-    try {
-      const generatedTexts = await WorkflowChatAPI.generateSDPrompts(aiWritingModalText);
-      setAiGeneratedTexts(generatedTexts);
-      // 发送埋点事件
-      WorkflowChatAPI.trackEvent({
-        event_type: 'prompt_generate',
-        message_type: 'parameter_debug',
-        message_id: task_id,
-        data: {
-          input_text: aiWritingModalText,
-          generated_texts: generatedTexts
-        }
-      });
-      
-      // Pre-select all generated texts
-      const newSelectedTexts: {[key: string]: boolean} = {};
-      generatedTexts.forEach((text, index) => {
-        newSelectedTexts[`text${index+1}`] = false;
-      });
-      setAiSelectedTexts(newSelectedTexts);
-    } catch (error) {
-      console.error("Error generating text:", error);
-      setAiWritingError("Failed to generate text variations. Please try again.");
-    } finally {
-      setAiWritingLoading(false);
-    }
+    utilsHandleAiWriting(
+      aiWritingModalText,
+      task_id,
+      setAiWritingLoading,
+      setAiWritingError,
+      setAiGeneratedTexts,
+      setAiSelectedTexts
+    );
   };
   
-  // Add function to handle text input changes
+  // Add function to handle text input changes - Use imported utility
   const handleTextInputChange = (nodeId: string, paramName: string, index: number, value: string) => {
-    const textKey = `${nodeId}_${paramName}`;
-    
-    setTextInputs(prev => {
-      const currentTexts = [...(prev[textKey] || [])];
-      currentTexts[index] = value;
-      return {
-        ...prev,
-        [textKey]: currentTexts
-      };
-    });
-    
-    // Also update paramTestValues with the new value directly instead of using textInputs state
-    // (which hasn't been updated yet)
-    const currentTexts = [...(textInputs[textKey] || [])];
-    currentTexts[index] = value;
+    const currentTexts = utilsHandleTextInputChange(nodeId, paramName, index, value, textInputs, setTextInputs);
+    // Also update paramTestValues with the new value directly
     updateParamTestValues(nodeId, paramName, currentTexts);
   };
   
-  // Add function to add a new text input
+  // Add function to add a new text input - Use imported utility
   const handleAddTextInput = (nodeId: string, paramName: string) => {
-    const textKey = `${nodeId}_${paramName}`;
-    
-    setTextInputs(prev => {
-      const currentTexts = [...(prev[textKey] || [])];
-      currentTexts.push('');
-      return {
-        ...prev,
-        [textKey]: currentTexts
-      };
-    });
-    
+    const updatedTexts = utilsHandleAddTextInput(nodeId, paramName, textInputs, setTextInputs);
     // Also update paramTestValues
-    const updatedTexts = [...(textInputs[textKey] || []), ''];
     updateParamTestValues(nodeId, paramName, updatedTexts);
   };
   
-  // Add function to remove a text input
+  // Add function to remove a text input - Use imported utility
   const handleRemoveTextInput = (nodeId: string, paramName: string, index: number) => {
-    const textKey = `${nodeId}_${paramName}`;
-    
-    setTextInputs(prev => {
-      const currentTexts = [...(prev[textKey] || [])];
-      currentTexts.splice(index, 1);
-      return {
-        ...prev,
-        [textKey]: currentTexts
-      };
-    });
-    
+    const updatedTexts = utilsHandleRemoveTextInput(nodeId, paramName, index, textInputs, setTextInputs);
     // Also update paramTestValues
-    const updatedTexts = [...(textInputs[textKey] || [])];
-    updatedTexts.splice(index, 1);
     updateParamTestValues(nodeId, paramName, updatedTexts);
   };
   
   // Add function to toggle text selection in AI writing modal
   const toggleTextSelection = (textKey: string) => {
-    setAiSelectedTexts(prev => ({
-      ...prev,
-      [textKey]: !prev[textKey]
-    }));
+    utilsToggleTextSelection(textKey, setAiSelectedTexts);
   };
   
   // Add function to add selected texts from AI modal
   const addSelectedTexts = () => {
-    const textKey = `${aiWritingNodeId}_${aiWritingParamName}`;
-    const selectedTexts = Object.entries(aiSelectedTexts)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([key]) => {
-        const index = parseInt(key.replace('text', '')) - 1;
-        return aiGeneratedTexts[index];
-      });
-    
-    if (selectedTexts.length === 0) {
-      return;
-    }
-    
-    setTextInputs(prev => {
-      const currentTexts = [...(prev[textKey] || [])];
-      return {
-        ...prev,
-        [textKey]: [...currentTexts, ...selectedTexts]
-      };
-    });
-
-    // 发送埋点事件
-    WorkflowChatAPI.trackEvent({
-      event_type: 'prompt_apply',
-      message_type: 'parameter_debug',
-      message_id: task_id,
-      data: {
-        input_text: aiWritingModalText,
-        generated_texts: aiGeneratedTexts,
-        selected_texts: selectedTexts
-      }
-    });
-    
-    // Also update paramTestValues
-    const updatedTexts = [...(textInputs[textKey] || []), ...selectedTexts];
-    updateParamTestValues(aiWritingNodeId, aiWritingParamName, updatedTexts);
-    
-    // Close the modal
-    setAiWritingModalVisible(false);
+    utilsAddSelectedTexts(
+      aiWritingNodeId,
+      aiWritingParamName,
+      aiSelectedTexts,
+      aiGeneratedTexts,
+      aiWritingModalText,
+      task_id,
+      textInputs,
+      setTextInputs,
+      updateParamTestValues,
+      setAiWritingModalVisible
+    );
   };
   
   // Add function to open AI writing modal
   const openAiWritingModal = (nodeId: string, paramName: string) => {
-    setAiWritingModalVisible(true);
-    setAiWritingNodeId(nodeId);
-    setAiWritingParamName(paramName);
-    setAiWritingModalText('');
-    setAiGeneratedTexts([]);
-    setAiSelectedTexts({});
-    setAiWritingLoading(false);
-    setAiWritingError(null);
+    utilsOpenAiWritingModal(
+      nodeId,
+      paramName,
+      setAiWritingModalVisible,
+      setAiWritingNodeId,
+      setAiWritingParamName,
+      setAiWritingModalText,
+      setAiGeneratedTexts,
+      setAiSelectedTexts,
+      setAiWritingLoading,
+      setAiWritingError
+    );
+  };
+
+  // Add function to toggle history screen visibility
+  const toggleHistoryScreen = (event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setIsHistoryVisible(prev => !prev);
+  };
+
+  // Add function to view a history item
+  const handleViewHistoryItem = (historyItem: HistoryItem) => {
+    setSelectedHistoryItem(historyItem);
+    setIsHistoryVisible(false);
+    
+    // Set generated images from history item
+    setGeneratedImages(historyItem.generatedImages || []);
+    
+    // Reset selected image index
+    setSelectedImageIndex(null);
+    
+    // Set current page to 1
+    setCurrentPage(1);
+  };
+
+  // Add function to close history item view
+  const handleCloseHistoryItem = (event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setSelectedHistoryItem(null);
   };
 
   // Add useEffect to initialize parameter test values when selectedNodes change
@@ -374,318 +373,261 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     };
   }, [openDropdowns]);
 
-  // Add useEffect to reset task_id when visible changes from false to true
+  // Modify useEffect that uses localStorage key to use imported constant
   useEffect(() => {
     if (visible) {
-      setTask_id(generateUUID());
+      // Only generate a new task_id if we don't have one in localStorage
+      const savedState = JSON.parse(localStorage.getItem(PARAM_DEBUG_STORAGE_KEY) || '{}');
+      if (!savedState.task_id) {
+        setTask_id(generateUUID());
+      }
     }
   }, [visible]);
 
+  // Modify the useEffect that loads state to handle loading state
+  useEffect(() => {
+    // Load state from localStorage when component becomes visible
+    if (visible) {
+      setIsLoading(true); // Set loading to true while we load state
+      
+      try {
+        const savedState = localStorage.getItem(PARAM_DEBUG_STORAGE_KEY);
+        if (savedState) {
+          const parsedState = JSON.parse(savedState);
+          
+          // Only restore state if we have selected nodes
+          if (!selectedNodes || selectedNodes.length === 0) {
+            console.log("Not restoring parameter debug state: no nodes selected");
+            setIsLoading(false);
+            return;
+          }
+          
+          // Restore all states
+          if (parsedState.currentScreen !== undefined) setCurrentScreen(parsedState.currentScreen);
+          if (parsedState.selectedParams) setSelectedParams(parsedState.selectedParams);
+          if (parsedState.task_id) setTask_id(parsedState.task_id);
+          
+          // Don't restore processing state if it was interrupted (e.g., by page refresh)
+          // Only restore isCompleted if we have generated images
+          const hasImages = parsedState.generatedImages && parsedState.generatedImages.length > 0;
+          if (parsedState.isProcessing !== undefined && !parsedState.isProcessing) {
+            setIsProcessing(false);
+          }
+          if (parsedState.isCompleted !== undefined && hasImages) {
+            setIsCompleted(parsedState.isCompleted);
+          }
+          
+          if (parsedState.completedCount !== undefined) setCompletedCount(parsedState.completedCount);
+          if (parsedState.totalCount !== undefined) setTotalCount(parsedState.totalCount);
+          if (parsedState.selectedImageIndex !== undefined) setSelectedImageIndex(parsedState.selectedImageIndex);
+          if (parsedState.generatedImages) setGeneratedImages(parsedState.generatedImages);
+          if (parsedState.paramTestValues) setParamTestValues(parsedState.paramTestValues);
+          if (parsedState.searchTerms) setSearchTerms(parsedState.searchTerms);
+          if (parsedState.inputValues) setInputValues(parsedState.inputValues);
+          if (parsedState.currentPage !== undefined) setCurrentPage(parsedState.currentPage);
+          if (parsedState.textInputs) setTextInputs(parsedState.textInputs);
+        }
+      } catch (error) {
+        console.error('Error loading parameter debug state:', error);
+      } finally {
+        // Set loading to false after loading (with a small delay to ensure all state is updated)
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 50);
+      }
+    } else {
+      // Reset loading state when component becomes invisible
+      setIsLoading(true);
+    }
+    
+    // Save current state when component becomes invisible but don't clear it
+    return () => {
+      if (!visible) return; // Don't do anything if already invisible
+      
+      const stateToSave = {
+        currentScreen,
+        selectedParams,
+        task_id,
+        isProcessing,
+        isCompleted,
+        completedCount,
+        totalCount,
+        selectedImageIndex,
+        generatedImages,
+        paramTestValues,
+        searchTerms,
+        inputValues,
+        currentPage,
+        textInputs
+      };
+      
+      saveStateToLocalStorage(stateToSave);
+    };
+  }, [visible]);
+
+  // Helper function to reset all state variables - Use imported localStorage utility
+  const resetAllStates = (clearStorage = false) => {
+    utilsResetAllStates(
+      setCurrentScreen,
+      setSelectedParams,
+      setTask_id,
+      cleanupPolling,
+      setIsProcessing,
+      setIsCompleted,
+      setCompletedCount,
+      setTotalCount,
+      setSelectedImageIndex,
+      setGeneratedImages,
+      setParamTestValues,
+      setOpenDropdowns,
+      setSearchTerms,
+      setInputValues,
+      setCurrentPage,
+      setErrorMessage,
+      setNotificationVisible,
+      setModalVisible,
+      setModalImageUrl,
+      setModalImageParams,
+      setTextInputs,
+      setAiWritingModalVisible,
+      setAiWritingModalText,
+      setAiGeneratedTexts,
+      setAiWritingLoading,
+      setAiWritingNodeId,
+      setAiWritingParamName,
+      setAiWritingError,
+      setAiSelectedTexts,
+      clearStorage
+    );
+    
+    // Reset history states
+    setIsHistoryVisible(false);
+    setSelectedHistoryItem(null);
+  };
+  
+  // Add useEffect to save state when relevant states change - Use imported localStorage utility
+  useEffect(() => {
+    if (!visible) return;
+    
+    // Use a timeout to debounce saves (only save after 500ms of no changes)
+    const saveTimeout = setTimeout(() => {
+      const stateToSave = {
+        currentScreen,
+        selectedParams,
+        task_id,
+        isProcessing,
+        isCompleted,
+        completedCount,
+        totalCount,
+        selectedImageIndex,
+        generatedImages,
+        paramTestValues,
+        searchTerms,
+        inputValues,
+        currentPage,
+        textInputs
+      };
+      
+      saveStateToLocalStorage(stateToSave);
+    }, 500);
+    
+    // Clear timeout if state changes again before it fires
+    return () => clearTimeout(saveTimeout);
+  }, [
+    visible,
+    currentScreen,
+    selectedParams,
+    task_id,
+    isProcessing,
+    isCompleted,
+    completedCount,
+    totalCount,
+    selectedImageIndex,
+    generatedImages,
+    paramTestValues,
+    searchTerms,
+    inputValues,
+    currentPage,
+    textInputs
+  ]);
+
   // Navigate to next screen
   const handleNext = (event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    // When moving from screen 0 to screen 1, clean up paramTestValues for unselected parameters
-    if (currentScreen === 0) {
-      // Make a copy of the current paramTestValues
-      const updatedParamTestValues = { ...paramTestValues };
-      
-      // For each node
-      Object.keys(updatedParamTestValues).forEach(nodeId => {
-        const nodeParams = updatedParamTestValues[nodeId];
-        
-        // For each parameter in this node
-        Object.keys(nodeParams).forEach(paramName => {
-          // If this parameter is no longer selected, remove it
-          if (!selectedParams[paramName]) {
-            delete nodeParams[paramName];
-          }
-        });
-      });
-      
-      // Update the state with cleaned up values
-      setParamTestValues(updatedParamTestValues);
-    }
-    
-    // When moving to the confirmation screen, ensure all text values are properly synchronized
-    if (currentScreen === 1) {
-      // Ensure textInputs are synced to paramTestValues for all selected nodes
-      const updatedParamTestValues = { ...paramTestValues };
-      selectedNodes.forEach(node => {
-        const nodeId = node.id.toString();
-        const widgets = node.widgets || {};
-        
-        Object.values(widgets).forEach((widget: any) => {
-          const paramName = widget.name;
-          
-          // Only process selected text parameters
-          if (selectedParams[paramName] && (widget.type === "customtext" || widget.type.toLowerCase().includes("text"))) {
-            const inputKey = `${nodeId}_${paramName}`;
-            const currentTexts = textInputs[inputKey] || [''];
-            
-            // Update paramTestValues with the current text values
-            updatedParamTestValues[nodeId] = updatedParamTestValues[nodeId] || {};
-            updatedParamTestValues[nodeId][paramName] = currentTexts;
-          }
-        });
-      });
-      
-      // Update the state with synchronized values
-      setParamTestValues(updatedParamTestValues);
-      
-      // Update totalCount with parameter combinations
-      const combinations = generateParameterCombinations(updatedParamTestValues);
-      setTotalCount(combinations.length);
-    }
-    
-    // 清除错误消息
-    setErrorMessage(null);
-    setCurrentScreen(prev => Math.min(prev + 1, 2));
+    utilsHandleNext(
+      currentScreen,
+      setCurrentScreen,
+      selectedParams,
+      paramTestValues,
+      setParamTestValues,
+      textInputs,
+      selectedNodes,
+      setTotalCount,
+      setErrorMessage,
+      generateParameterCombinations,
+      event
+    );
   };
 
   // Navigate to previous screen
   const handlePrevious = (event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    // 清除错误消息
-    setErrorMessage(null);
-    // Reset completed state when going back
-    if (isCompleted) {
-      setIsCompleted(false);
-    }
-    
-    // If going back from screen 1 to 0, clean up any paramTestValues for nodes that are no longer selected
-    if (currentScreen === 1) {
-      const selectedNodeIds = selectedNodes.map(node => node.id.toString());
-      const currentNodeIds = Object.keys(paramTestValues);
-      
-      // Remove test values for any nodes that are no longer selected
-      const updatedParamTestValues = { ...paramTestValues };
-      currentNodeIds.forEach(nodeId => {
-        if (!selectedNodeIds.includes(nodeId)) {
-          delete updatedParamTestValues[nodeId];
-        }
-      });
-      
-      setParamTestValues(updatedParamTestValues);
-    }
-    
-    // If returning from the result gallery or confirmation screen, ensure text values are maintained
-    if (currentScreen === 2 || isCompleted) {
-      // Ensure paramTestValues are correctly synchronized with textInputs
-      const updatedParamTestValues = { ...paramTestValues };
-      
-      // For each text input value, ensure it's properly synced to paramTestValues
-      Object.entries(textInputs).forEach(([key, texts]) => {
-        if (!texts || texts.length === 0) return;
-        
-        const [nodeId, paramName] = key.split('_');
-        
-        // Skip if node doesn't exist in selected nodes
-        if (!selectedNodes.some(node => node.id.toString() === nodeId)) return;
-        
-        // Ensure the node and parameter exist in paramTestValues
-        updatedParamTestValues[nodeId] = updatedParamTestValues[nodeId] || {};
-        
-        // Only update if the values are different to avoid unnecessary state updates
-        if (JSON.stringify(updatedParamTestValues[nodeId][paramName]) !== JSON.stringify(texts)) {
-          updatedParamTestValues[nodeId][paramName] = texts;
-        }
-      });
-      
-      setParamTestValues(updatedParamTestValues);
-    }
-    
-    setCurrentScreen(prev => Math.max(prev - 1, 0));
+    utilsHandlePrevious(
+      currentScreen,
+      setCurrentScreen,
+      selectedNodes,
+      paramTestValues,
+      setParamTestValues,
+      textInputs,
+      isCompleted,
+      setIsCompleted,
+      setErrorMessage,
+      event
+    );
   };
 
   // Handle parameter selection
   const handleParamSelect = (param: string, event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    const isCurrentlySelected = selectedParams[param];
-    
-    // Update the selected params state
-    setSelectedParams(prev => ({
-      ...prev,
-      [param]: !isCurrentlySelected
-    }));
-    
-    // If we're deselecting a parameter, remove its values from paramTestValues
-    if (isCurrentlySelected) {
-      // Make a copy of the current paramTestValues
-      const updatedParamTestValues = { ...paramTestValues };
-      
-      // For each node
-      Object.keys(updatedParamTestValues).forEach(nodeId => {
-        // If this parameter exists in this node, remove it
-        if (updatedParamTestValues[nodeId][param]) {
-          delete updatedParamTestValues[nodeId][param];
-        }
-      });
-      
-      // Update the state with cleaned up values
-      setParamTestValues(updatedParamTestValues);
-    }
+    utilsHandleParamSelect(param, selectedParams, setSelectedParams, paramTestValues, setParamTestValues, event);
   };
   
-  // Toggle dropdown open status - 使用nodeId_paramName作为键
+  // Toggle dropdown open status - Use nodeId_paramName as key
   const toggleDropdown = (nodeId: string, paramName: string, event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const dropdownKey = `${nodeId}_${paramName}`;
-    
-    setOpenDropdowns(prev => {
-      const isCurrentlyOpen = prev[dropdownKey] && 
-        typeof prev[dropdownKey] === 'object' ? 
-        (prev[dropdownKey] as {isOpen: boolean}).isOpen : 
-        Boolean(prev[dropdownKey]);
-      
-      if (isCurrentlyOpen) {
-        return {
-          ...prev,
-          [dropdownKey]: false
-        };
-      } else {
-        // 确定下拉框的位置
-        let x = 0;
-        let y = 0;
-        
-        // 尝试从事件目标获取位置
-        if (event.currentTarget) {
-          const rect = event.currentTarget.getBoundingClientRect();
-          x = rect.left;
-          y = rect.bottom;
-        } else {
-          // 如果无法获取元素位置，使用鼠标点击位置
-          x = event.clientX;
-          y = event.clientY + 20; // 在鼠标位置下方20px显示
-        }
-        
-        // 确保下拉框不会超出窗口边界
-        const windowWidth = window.innerWidth;
-        const dropdownWidth = 250; // 估计的下拉框宽度
-        
-        if (x + dropdownWidth > windowWidth) {
-          x = windowWidth - dropdownWidth - 10; // 确保距离右边界至少10px
-        }
-        
-        if (x < 0) x = 10; // 确保距离左边界至少10px
-        
-        return {
-          ...prev,
-          [dropdownKey]: {
-            isOpen: true,
-            x: x,
-            y: y
-          }
-        };
-      }
-    });
+    utilsToggleDropdown(nodeId, paramName, event, openDropdowns, setOpenDropdowns);
   };
   
-  // Update parameter test values - 修改为支持新的参数结构
+  // Update parameter test values - Modify to support new parameter structure
   const updateParamTestValues = (nodeId: string, paramName: string, values: any[]) => {
-    setParamTestValues(prev => {
-      const updatedValues = { ...prev };
-      
-      // 确保节点ID存在
-      if (!updatedValues[nodeId]) {
-        updatedValues[nodeId] = {};
-      }
-      
-      // 更新特定节点和参数的值
-      updatedValues[nodeId][paramName] = values;
-      
-      return updatedValues;
-    });
+    utilsUpdateParamTestValues(nodeId, paramName, values, paramTestValues, setParamTestValues);
   };
   
-  // Handle selecting specific test values - 修改为支持新的参数结构
+  // Handle selecting specific test values - Modify to support new parameter structure
   const handleTestValueSelect = (nodeId: string, paramName: string, value: any, event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    setParamTestValues(prev => {
-      const updatedValues = { ...prev };
-      
-      // 确保节点ID存在
-      if (!updatedValues[nodeId]) {
-        updatedValues[nodeId] = {};
-      }
-      
-      // 确保参数名存在
-      if (!updatedValues[nodeId][paramName]) {
-        updatedValues[nodeId][paramName] = [];
-      }
-      
-      const currentValues = updatedValues[nodeId][paramName];
-      
-      if (currentValues.includes(value)) {
-        updatedValues[nodeId][paramName] = currentValues.filter(v => v !== value);
-      } else {
-        updatedValues[nodeId][paramName] = [...currentValues, value];
-      }
-      
-      return updatedValues;
-    });
+    utilsHandleTestValueSelect(nodeId, paramName, value, paramTestValues, setParamTestValues, event);
   };
 
-  // Add processing search - 使用nodeId_paramName作为键
+  // Add processing search - Use nodeId_paramName as key
   const handleSearch = (nodeId: string, paramName: string, term: string) => {
-    const searchKey = `${nodeId}_${paramName}`;
-    setSearchTerms(prev => ({
-      ...prev,
-      [searchKey]: term
-    }));
+    utilsHandleSearch(nodeId, paramName, term, searchTerms, setSearchTerms);
   };
 
-  // Add select all - 修改为支持新的参数结构
+  // Add select all - Modify to support new parameter structure
   const handleSelectAll = (nodeId: string, paramName: string, values: any[]) => {
-    // 确保节点ID存在
-    if (!paramTestValues[nodeId]) {
-      updateParamTestValues(nodeId, paramName, values);
-      return;
-    }
-    
-    // 获取当前值
-    const currentValues = paramTestValues[nodeId][paramName] || [];
-    
-    // 如果所有值都已选择，则取消选择所有，否则选择所有
-    if (values.length === currentValues.length) {
-      updateParamTestValues(nodeId, paramName, []);
-    } else {
-      updateParamTestValues(nodeId, paramName, [...values]);
-    }
+    utilsHandleSelectAll(nodeId, paramName, values, paramTestValues, updateParamTestValues);
   };
 
   // Handle page change
   const handlePageChange = (newPage: number, event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    setCurrentPage(Math.max(1, Math.min(newPage, Math.ceil(generatedImages.length / imagesPerPage))));
+    utilsHandlePageChange(
+      newPage,
+      imagesPerPage,
+      generatedImages,
+      setCurrentPage,
+      event
+    );
   };
 
   // Handle polling cleanup function
   const cleanupPolling = () => {
-    if (pollingTimeoutRef.current) {
-      clearTimeout(pollingTimeoutRef.current);
-      pollingTimeoutRef.current = null;
-    }
-    pollingSessionIdRef.current = null;
+    utilsCleanupPolling(pollingTimeoutRef, pollingSessionIdRef);
   };
 
   // Add useEffect cleanup on unmount
@@ -695,383 +637,154 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
     };
   }, []);
 
-  // Handle start generation - modified to clean up before starting
+  // Handle start generation - Modified to clean up before starting
   const handleStartGeneration = async (event?: React.MouseEvent, selectedNodeId?: number) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    // Clean up any existing polling
-    cleanupPolling();
-    
-    // Get parameter combinations
-    const paramCombinations = generateParameterCombinations(paramTestValues);
-    const totalCombinations = paramCombinations.length;
-    
-    // Check if total runs exceed 100
-    if (totalCombinations > 100) {
-      setErrorMessage(`Cannot generate more than 100 images at once (currently: ${totalCombinations} images)`);
-      return;
-    }
-    
-    setErrorMessage(null);
-    setIsProcessing(true);
-    setCompletedCount(0);
-    
-    console.log("Generated parameter combinations:", paramCombinations);
-
-    // 发送埋点事件
-    WorkflowChatAPI.trackEvent({
-      event_type: 'start_generation',
-      message_type: 'parameter_debug',
-      message_id: task_id,
-      data: {
-        workflow: (await app.graphToPrompt()).output,
-        all_params: paramTestValues,
-        count: totalCombinations
-      }
-    });
-    
-    // If we have no combinations, show error and return
-    if (paramCombinations.length === 0) {
-      setErrorMessage("No valid parameter combinations found. Please check your parameter selections.");
-      setIsProcessing(false);
-      return;
-    }
-    
-    // Get node ID to use for showing images - use provided selectedNodeId if available
-    let showNodeId: number | null = selectedNodeId || null;
-    
-    // If no selectedNodeId provided, try to get one automatically
-    if (showNodeId === null) {
-      const nodeId = getOnlyOneImageNode();
-      if (nodeId !== null) {
-        showNodeId = nodeId;
-      }
-    }
-    
-    // If showNodeId is null, we need user selection (handled in ConfirmConfigurationScreen)
-    if (showNodeId === null) {
-      setErrorMessage("Please select a SaveImage or PreviewImage node first.");
-      setIsProcessing(false);
-      return;
-    }
-    
-    const prompt_ids: string[] = [];
-    try {
-      // Generate a unique session ID
-      const sessionId = Date.now().toString();
-      pollingSessionIdRef.current = sessionId;
-      
-      // Each combination represents all parameters for a single image generation
-      for (const combination of paramCombinations) {
-        const response = await queuePrompt(combination);
-        if(response.prompt_id) {
-            prompt_ids.push(response.prompt_id);
-        } else {
-            console.error("Failed to get prompt_id from response:", response);
-            prompt_ids.push("");
-        }
-      }
-
-      // Create an array to track images and their parameters
-      const newImages: GeneratedImage[] = Array(paramCombinations.length).fill(null).map((_, i) => ({
-        url: `https://source.unsplash.com/random/300x300?sig=${Math.random()}`, // Default placeholder
-        params: generateDynamicParams(paramTestValues, i)
-      }));
-      
-      // Set initial images
-      setGeneratedImages(newImages);
-      
-      // Track timeout
-      const startTime = Date.now();
-      const timeoutDuration = 5 * 60 * 1000; // 5 minutes
-      
-      // Function to poll for images
-      const pollForImages = async () => {
-        // Check if this polling session is still active
-        if (pollingSessionIdRef.current !== sessionId) {
-          console.log("Another polling session has started, stopping this one");
-          return;
-        }
-        
-        // Check if timeout has been reached
-        if (Date.now() - startTime > timeoutDuration) {
-          console.log("Timeout reached while waiting for images");
-          if (pollingSessionIdRef.current === sessionId) {
-            setIsProcessing(false);
-            setIsCompleted(true);
-            setCurrentPage(1);
-          }
-          return;
-        }
-        
-        let completedImagesCount = 0;
-        
-        // Check each prompt id to see if images are ready
-        for (let i = 0; i < prompt_ids.length; i++) {
-          const promptId = prompt_ids[i];
-          if (!promptId) continue;
-          
-          try {
-            // We've already verified showNodeId is not null at this point
-            const imageUrl = await getOutputImageByPromptId(promptId, Number(showNodeId));
-            
-            if (imageUrl) {
-              // If we have an image URL, update in our array
-              newImages[i] = {
-                ...newImages[i],
-                url: imageUrl
-              };
-              completedImagesCount++;
-            }
-          } catch (error) {
-            console.error(`Error fetching image for prompt ID ${promptId}:`, error);
-          }
-        }
-        
-        // Only update state if this polling session is still active
-        if (pollingSessionIdRef.current === sessionId) {
-          // Update the images in state
-          setGeneratedImages([...newImages]);
-          
-          // Update the completed count
-          setCompletedCount(completedImagesCount);
-          
-          // If all images are ready or timeout occurred, we're done
-          if (completedImagesCount === prompt_ids.length) {
-            console.log("All images ready, completing session");
-            setIsProcessing(false);
-            setIsCompleted(true);
-            setCurrentPage(1);
-          } else {
-            // Otherwise, poll again in 3 seconds
-            pollingTimeoutRef.current = setTimeout(pollForImages, 3000);
-          }
-        }
-      };
-      
-      // Start polling
-      pollForImages();
-    } catch (error) {
-      console.error("Error generating images:", error);
-      setIsProcessing(false);
-    }
+    utilsHandleStartGeneration(
+      paramTestValues,
+      task_id,
+      setIsProcessing,
+      setCompletedCount,
+      setErrorMessage,
+      setGeneratedImages,
+      setIsCompleted,
+      setCurrentPage,
+      pollingSessionIdRef,
+      pollingTimeoutRef,
+      generateParameterCombinations,
+      app,
+      event,
+      selectedNodeId
+    );
   };
 
   // Handle selecting an image
   const handleSelectImage = (index: number, event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    setSelectedImageIndex(index);
+    utilsHandleSelectImage(index, setSelectedImageIndex, event);
   };
 
   // Add new function to open image modal
-  const openImageModal = (imageUrl: string, event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setModalImageUrl(imageUrl);
-    setModalVisible(true);
+  const openImageModal = (imageUrl: string, params: { [key: string]: any }, event: React.MouseEvent) => {
+    utilsOpenImageModal(
+      imageUrl,
+      params,
+      selectedNodes,
+      setModalImageUrl,
+      setModalImageParams,
+      setModalVisible,
+      event
+    );
   };
 
   // Add new function to close image modal
   const closeImageModal = (event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    setModalVisible(false);
+    utilsCloseImageModal(
+      setModalVisible,
+      event
+    );
   };
 
   // Handle applying selected image
   const handleApplySelected = async (event?: React.MouseEvent) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    if (selectedImageIndex !== null) {
-      console.log(`Applied image ${selectedImageIndex + 1} with parameters:`, generatedImages[selectedImageIndex].params);
-
-      // 发送埋点事件
-      let count_temp = 1;
-      // Calculate total parameter combinations
-      if (paramTestValues) {
-        for (const nodeId in paramTestValues) {
-          if (paramTestValues[nodeId]) {
-            for (const paramName in paramTestValues[nodeId]) {
-              const paramOptions = paramTestValues[nodeId][paramName];
-              if (paramOptions) {
-                let optionsCount = 1;
-                if (Array.isArray(paramOptions)) {
-                  optionsCount = paramOptions.length > 0 ? paramOptions.length : 1;
-                } else if (typeof paramOptions === 'object' && paramOptions !== null) {
-                  // Handle both numeric and string keys in objects
-                  optionsCount = Object.keys(paramOptions).length > 0 ? Object.keys(paramOptions).length : 1;
-                }
-                count_temp = count_temp * optionsCount;
-              }
-            }
-          }
-        }
-      }
-
-      WorkflowChatAPI.trackEvent({
-          event_type: 'parameter_debug_apply',
-          message_type: 'parameter_debug',
-          message_id: task_id,
-          data: {
-              workflow: (await app.graphToPrompt()).output,
-              selected_params: generatedImages[selectedImageIndex].params,
-              all_params: paramTestValues,
-              count: count_temp
-          }
-      });
-
-      // 把选中图片的参数应用到画布上
-      const selectedParams = generatedImages[selectedImageIndex].params;
-      
-      // 使用结构化的参数格式
-      if (selectedParams.nodeParams) {
-        // 遍历所有节点参数
-        Object.entries(selectedParams.nodeParams).forEach(([nodeId, nodeParams]) => {
-          // 获取节点
-          const node = app.graph._nodes_by_id[nodeId];
-          if (!node || !node.widgets) return;
-          
-          // 遍历节点的参数
-          Object.entries(nodeParams as Record<string, any>).forEach(([paramName, value]) => {
-            // 在节点的widgets中查找对应名称的widget
-            for (const widget of node.widgets) {
-              if (widget.name === paramName) {
-                // 设置widget的值
-                widget.value = value;
-                break;
-              }
-            }
-          });
-        });
-        
-        // 标记画布为脏，触发重新渲染
-        app.graph.setDirtyCanvas(false, true);
-        
-        // 显示通知消息
-        setNotificationVisible(true);
-        
-        // 3秒后隐藏通知
-        setTimeout(() => {
-          setNotificationVisible(false);
-        }, 3000);
-      }
-    }
+    utilsHandleApplySelected(
+      selectedImageIndex,
+      generatedImages,
+      app,
+      task_id,
+      paramTestValues,
+      setNotificationVisible,
+      event
+    );
   };
 
   // Modified handle close to implement different behaviors based on current screen
   const handleClose = (event?: React.MouseEvent, nodeIndex?: number) => {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    // Screen 2: Close individual node card
-    if (currentScreen === 1 && nodeIndex !== undefined) {
-      // Remove the node at specified index
-      const newSelectedNodes = [...selectedNodes];
-      const removedNode = newSelectedNodes[nodeIndex];
-      newSelectedNodes.splice(nodeIndex, 1);
-      
-      // Also remove the parameter test values for the removed node
-      if (removedNode) {
-        const removedNodeId = removedNode.id.toString();
-        setParamTestValues(prev => {
-          const updated = { ...prev };
-          delete updated[removedNodeId];
-          return updated;
-        });
-      }
-      
-      // If no nodes left, return to original screen
-      if (newSelectedNodes.length === 0) {
-        if (onClose) {
-          // Clear screen state from context when closing
-          dispatch({ type: 'SET_SCREEN_STATE', payload: null });
-          // Clear all state variables
-          resetAllStates();
-          // Call provided onClose to reset the interface
-          onClose();
-        }
-      } else {
-        // Update the context with the new selected nodes
-        dispatch({ type: 'SET_SELECTED_NODE', payload: newSelectedNodes });
-      }
-      return;
-    }
-    
-    // Screen 3, 4, 5 or original: Close the entire interface
-    if (onClose) {
-      // Clear screen state from context when closing
-      dispatch({ type: 'SET_SCREEN_STATE', payload: null });
-      // Clear all state variables
-      resetAllStates();
-      // Use the provided onClose callback
-      onClose();
-    } else {
-      // For users of this component without a callback
-      // Reset all states
-      resetAllStates();
-    }
+    utilsHandleClose(
+      currentScreen,
+      selectedNodes,
+      nodeIndex,
+      dispatch,
+      onClose,
+      resetAllStates,
+      event
+    );
   };
 
-  // Helper function to reset all state variables
-  const resetAllStates = () => {
-    setCurrentScreen(0);
-    setSelectedParams({
-      Steps: true,
-      CFG: true,
-      sampler_name: true,
-      threshold: false,
-      prompt: false
-    });
-    // Reset task_id
-    setTask_id(generateUUID());
-    cleanupPolling(); // Add cleanup call
-    setIsProcessing(false);
-    setIsCompleted(false);
-    setCompletedCount(0);
-    setTotalCount(12);
-    setSelectedImageIndex(null);
-    setGeneratedImages(Array(12).fill(null).map((_, i) => ({
-      url: `https://source.unsplash.com/random/300x300?sig=${Math.random()}`,
-      params: {
-        step: i % 3 === 0 ? 5 : i % 3 === 1 ? 10 : 15,
-        sampler_name: 'euler',
-        cfg: 1
-      }
-    })));
-    setParamTestValues({});
-    setOpenDropdowns({});
-    setSearchTerms({});
-    setInputValues({});
-    setCurrentPage(1);
-    setErrorMessage(null);
-    setNotificationVisible(false);
-    setModalVisible(false);
-    setModalImageUrl('');
-    // Completely reset text inputs to ensure clean state on next run
-    setTextInputs({});
-    setAiWritingModalVisible(false);
-    setAiWritingModalText('');
-    setAiGeneratedTexts([]);
-    setAiWritingLoading(false);
-    setAiWritingNodeId('');
-    setAiWritingParamName('');
-    setAiWritingError(null);
-    setAiSelectedTexts({});
-  };
+  // Add a wrapper component for common modal display
+  const CommonModals = () => (
+    <>
+      <ImageModal
+        visible={modalVisible}
+        imageUrl={modalImageUrl}
+        params={modalImageParams || {}}
+        onClose={closeImageModal}
+      />
+    </>
+  );
+
+  // If showing a history item
+  if (selectedHistoryItem) {
+    return (
+      <div 
+        className="flex-1 overflow-y-auto bg-gray-50 p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <HistoryItemScreen 
+          historyItem={selectedHistoryItem}
+          selectedImageIndex={selectedImageIndex}
+          handleSelectImage={handleSelectImage}
+          handleClose={handleCloseHistoryItem}
+          currentPage={currentPage}
+          handlePageChange={handlePageChange}
+          imagesPerPage={imagesPerPage}
+          modalVisible={modalVisible}
+          modalImageUrl={modalImageUrl}
+          modalImageParams={modalImageParams}
+          openImageModal={openImageModal}
+          closeImageModal={closeImageModal}
+        />
+      </div>
+    );
+  }
+
+  // If showing history screen
+  if (isHistoryVisible) {
+    return (
+      <div 
+        className="flex-1 overflow-y-auto bg-gray-50 p-4 flex flex-col h-full max-h-[80vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <HistoryScreen 
+          historyItems={historyItems}
+          onViewHistoryItem={handleViewHistoryItem}
+          onClose={toggleHistoryScreen}
+        />
+      </div>
+    );
+  }
 
   // Conditionally render based on whether nodes are selected
+  // First check if loading
+  if (isLoading && visible && selectedNodes.length > 0) {
+    return (
+      <div 
+        className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-8 rounded-lg shadow-sm relative flex flex-col items-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="mt-4 text-gray-600 text-sm">Loading interface...</div>
+        </div>
+        
+        <ImageModal
+          visible={modalVisible}
+          imageUrl={modalImageUrl}
+          params={modalImageParams || {}}
+          onClose={closeImageModal}
+        />
+      </div>
+    );
+  }
+
   // Screen original - Only stop propagation, don't prevent default
   if (!visible || selectedNodes.length === 0) {
     return (
@@ -1079,42 +792,63 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="max-w-lg p-8 bg-white rounded-lg shadow-sm border border-blue-100 relative">
+        <div className="max-w-lg p-8 rounded-lg shadow-sm border border-blue-100 relative">
+          <div className="absolute top-3 right-3 flex">
+            {/* Show History Icon */}
+            <button 
+              className="text-blue-500 hover:text-blue-700 mr-2"
+              onClick={toggleHistoryScreen}
+              title="Show History"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <button 
+              className="text-gray-400 hover:text-gray-600"
+              onClick={handleClose}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           <div className="mb-6 text-center">
-            <h3 className="text-base font-bold text-blue-800 mb-2">GenLab</h3>
+            <h3 className="text-base font-bold text-blue-600 mb-2">GenLab</h3>
             <div className="h-1 w-16 bg-blue-500 mx-auto rounded-full mb-4"></div>
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <div className="bg-blue-100 p-2 rounded-full text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-800">Batch Test Parameter Pairs</h4>
-                <p className="text-xs text-gray-600">Select a node to batch test parameter pairs</p>
-              </div>
+            <div className="text-left mb-4">
+              <h3 className="text-sm font-medium text-gray-800 mb-3">Batch-test parameters & find the best combo in one click.</h3>
+              <div className="h-px w-full bg-gray-200 my-4"></div>
             </div>
 
-            <div className="flex items-start space-x-3">
-              <div className="bg-indigo-100 p-2 rounded-full text-indigo-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
+            <div className="text-left">
+              <h4 className="text-base font-medium text-gray-800 mb-4">How to use</h4>
+              
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">1 - </span>Click any node(hold Shift to select multiple nodes)
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">2 - </span>Set parameter ranges and start batch generation.
+                </p>
               </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-800">How To Use</h4>
-                <p className="text-xs text-gray-600">Click on any node in your workflow to start the parameter testing process</p>
-              </div>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-600 mb-3">No node is currently selected</p>
+              
+              <div className="h-px w-full bg-gray-200 my-4"></div>
+              
+              <p className="text-sm text-blue-600 mt-6">Let's select a node to begin!</p>
             </div>
           </div>
         </div>
+        
+        <ImageModal
+          visible={modalVisible}
+          imageUrl={modalImageUrl}
+          params={modalImageParams || {}}
+          onClose={closeImageModal}
+        />
       </div>
     );
   }
@@ -1139,6 +873,7 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           notificationVisible={notificationVisible}
           modalVisible={modalVisible}
           modalImageUrl={modalImageUrl}
+          modalImageParams={modalImageParams}
           openImageModal={openImageModal}
           closeImageModal={closeImageModal}
         />
@@ -1165,6 +900,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           setCurrentScreen={setCurrentScreen}
           cleanupPolling={cleanupPolling}
         />
+        
+        <CommonModals />
       </div>
     );
   }
@@ -1183,6 +920,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           handleNext={handleNext}
           handleClose={handleClose}
         />
+        
+        <CommonModals />
       </div>
     );
   }
@@ -1231,6 +970,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
           addSelectedTexts={addSelectedTexts}
           onClose={() => setAiWritingModalVisible(false)}
         />
+        
+        <CommonModals />
       </div>
     );
   }
@@ -1251,6 +992,8 @@ export const ParameterDebugInterface: React.FC<ParameterDebugInterfaceProps> = (
         handleStartGeneration={handleStartGeneration}
         handleClose={handleClose}
       />
+      
+      <CommonModals />
     </div>
   );
 }; 

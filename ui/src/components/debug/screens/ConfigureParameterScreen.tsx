@@ -1,3 +1,6 @@
+// Copyright (C) 2025 AIDC-AI
+// Licensed under the MIT License.
+
 import React, { useEffect } from 'react';
 
 interface ConfigureParameterScreenProps {
@@ -102,7 +105,11 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
         if (!hasValues && widget.type === "number") {
           const min = widget.options?.min || 0;
           const max = widget.options?.max || 100;
-          const step = (widget.options?.step || 10) / 10;
+          let step = (widget.options?.step || 10) / 10;
+          // 添加最小step值检查
+          if (step < 0.1) {
+            step = 0.1;
+          }
           const precision = widget.options?.precision || 0;
           
           // Generate default values
@@ -144,7 +151,7 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <div className="mb-4 border-b pb-2 flex justify-between items-center">
         <div>
-          <h3 className="text-base font-medium text-gray-800">Parameter Options</h3>
+          <h3 className="text-base font-medium text-gray-800">Set test values</h3>
           <p className="text-xs text-gray-500">Configure the test values for each parameter</p>
         </div>
         <button 
@@ -362,7 +369,10 @@ export const ConfigureParameterScreen: React.FC<ConfigureParameterScreenProps> =
                               if (value === '' || (!isNaN(parseFloat(value)) && parseFloat(value) > 0)) {
                                 const newMin = parseFloat(currentInputs.min || min.toString());
                                 const newMax = parseFloat(currentInputs.max || max.toString());
-                                const newStep = value === '' ? 1 : parseFloat(value);
+                                let newStep = value === '' ? 1 : parseFloat(value);
+                                if (newStep < 0.1) {
+                                  newStep = 0.1;
+                                }
                                 const newValues = generateNumericTestValues(newMin, newMax, newStep, precision);
                                 updateParamTestValues(nodeId, paramName, newValues);
                               }

@@ -1,8 +1,8 @@
 /*
  * @Author: ai-business-hql ai.bussiness.hql@gmail.com
  * @Date: 2025-03-20 15:15:20
- * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
- * @LastEditTime: 2025-03-26 15:48:39
+ * @LastEditors: ai-business-hql qingli.hql@alibaba-inc.com
+ * @LastEditTime: 2025-05-14 20:48:24
  * @FilePath: /comfyui_copilot/ui/src/workflowChat/workflowChat.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,7 +12,6 @@
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Message } from "../types/types";
 import { WorkflowChatAPI } from "../apis/workflowChatApi";
-import { app } from "../utils/comfyapp";
 import { ChatHeader } from "../components/chat/ChatHeader";
 import { ChatInput } from "../components/chat/ChatInput";
 import { SelectedNodeInfo } from "../components/chat/SelectedNodeInfo";
@@ -24,7 +23,6 @@ import React from "react";
 import { debounce } from "lodash";
 import { useChatContext } from '../context/ChatContext';
 import { useMousePosition } from '../hooks/useMousePosition';
-import { useResizable } from '../hooks/useResizable';
 import { useNodeSelection } from '../hooks/useNodeSelection';
 import { MemoizedReactMarkdown } from "../components/markdown";
 import remarkGfm from 'remark-gfm';
@@ -105,7 +103,7 @@ const ParameterDebugTab = () => {
     const selectedNodes = selectedNode ? selectedNode : [];
     
     const ParameterDebugInterface = React.lazy(() => 
-      import("../components/debug/ParameterDebugInterfaceNew").then(module => ({
+      import("../components/debug/ParameterDebugInterfaceV2").then(module => ({
           default: module.ParameterDebugInterface
       }))
     );
@@ -114,6 +112,8 @@ const ParameterDebugTab = () => {
         // Clear selected nodes and screen state
         dispatch({ type: 'SET_SELECTED_NODE', payload: null });
         dispatch({ type: 'SET_SCREEN_STATE', payload: null });
+        // 同时清除localStorage中保存的状态
+        localStorage.removeItem("screenState");
     };
     
     return (
@@ -141,7 +141,7 @@ const TabButton = ({
 }) => (
     <button
         onClick={onClick}
-        className={`px-4 py-2 font-medium text-sm transition-colors duration-200 ${
+        className={`px-4 py-2 font-medium text-xs transition-colors duration-200 ${
             active 
                 ? "text-blue-600 border-b-2 border-blue-600" 
                 : "text-gray-600 hover:text-blue-500 hover:border-b-2 hover:border-blue-300"
@@ -172,17 +172,6 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
     useNodeSelection(visible);
 
     // 使用自定义 hooks
-    const { 
-        isResizing: resizableIsResizing, 
-        setIsResizing: resizableSetIsResizing, 
-        dimensions, 
-        handleHeightResize 
-    } = useResizable({
-        minWidth: 300,
-        maxWidth: window.innerWidth * 0.8,
-        minHeight: 300,
-        maxHeight: window.innerHeight
-    }, visible);
 
     useEffect(() => {
         if (messageDivRef.current) {
@@ -225,6 +214,33 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
             localStorage.setItem("sessionId", sid);
         }
     }, [activeTab]);
+
+    // 添加保存和恢复activeTab的逻辑
+    useEffect(() => {
+        // 从localStorage恢复activeTab状态
+        const savedTab = localStorage.getItem("activeTab") as TabType;
+        if (savedTab) {
+            dispatch({ type: 'SET_ACTIVE_TAB', payload: savedTab });
+        }
+        
+        // 从localStorage恢复screenState状态（如果存在）
+        const savedScreenState = localStorage.getItem("screenState");
+        if (savedScreenState) {
+            dispatch({ type: 'SET_SCREEN_STATE', payload: JSON.parse(savedScreenState) });
+        }
+    }, []);
+    
+    // 当activeTab变化时保存到localStorage
+    useEffect(() => {
+        localStorage.setItem("activeTab", activeTab);
+    }, [activeTab]);
+    
+    // 当screenState变化时保存到localStorage
+    useEffect(() => {
+        if (state.screenState) {
+            localStorage.setItem("screenState", JSON.stringify(state.screenState));
+        }
+    }, [state.screenState]);
 
     // 使用防抖处理宽度调整
     const handleMouseMoveForResize = React.useCallback((e: MouseEvent) => {
@@ -424,11 +440,13 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         if (!sessionId || !selectedNode) return;
         dispatch({ type: 'SET_LOADING', payload: true });
 
+        const nodeName = selectedNode[0].comfyClass || selectedNode[0].type;
+
         const traceId = generateUUID();
         const userMessage: Message = {
             id: generateUUID(),
             role: "user",
-            content: selectedNode.comfyClass || selectedNode.type,
+            content: nodeName,
             trace_id: traceId,
         };
 
@@ -440,7 +458,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
             for await (const response of WorkflowChatAPI.streamInvokeServer(
                 sessionId, 
-                selectedNode.comfyClass || selectedNode.type,
+                nodeName,
                 [], 
                 intent, 
                 ext,
@@ -579,22 +597,18 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
         <ParameterDebugTab />
     ), []);
 
+    if (!visible) return null;
+
     return (
         <div 
-            className="fixed right-0 shadow-lg bg-white duration-200 ease-out"
+            className="flex flex-col h-full w-full bg-white"
             style={{ 
-                display: visible ? 'block' : 'none',
-                width: `${dimensions.width}px`,
-                height: `${dimensions.height}px`,
-                top: `${dimensions.top}px`
+                display: visible ? 'flex' : 'none',
+                height: '100%'
             }}
         >
             <div
                 className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-gray-300"
-                onMouseDown={(e) => {
-                    resizableSetIsResizing(true);
-                    e.preventDefault();
-                }}
             />
             
             <div className="flex h-full flex-col">
@@ -602,7 +616,6 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                     onClose={onClose}
                     onClear={handleClearMessages}
                     hasMessages={messages.length > 0}
-                    onHeightResize={handleHeightResize}
                     title={`ComfyUI-Copilot`}
                 />
                 
@@ -632,7 +645,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
                 
                 {/* Tab content - Both tabs are mounted but only the active one is displayed */}
                 <div 
-                    className="flex-1 overflow-y-auto p-4 scroll-smooth"
+                    className="flex-1 overflow-y-auto p-4 scroll-smooth h-0"
                     style={{ display: activeTab === 'chat' ? 'block' : 'none' }}
                     ref={messageDivRef}
                 >
@@ -675,7 +688,7 @@ export default function WorkflowChat({ onClose, visible = true, triggerUsage = f
 
                 {/* ParameterDebugTab - Always mounted but conditionally displayed */}
                 <div 
-                    className="flex-1 flex flex-col"
+                    className="flex-1 flex flex-col h-0"
                     style={{ display: activeTab === 'parameter-debug' ? 'flex' : 'none' }}
                 >
                     {parameterDebugTabComponent}
