@@ -9,7 +9,7 @@
     "description": "A small, dedicated team based in India working to enhance ComfyUI-Copilot. Our mission is to make AI workflow creation accessible to everyone through intuitive natural language interactions and intelligent assistance. We're focused on improving documentation, fixing bugs, and adding features that matter most to the ComfyUI community.",
     "webpageUrl": {
       "url": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced",
-      "wellKnown": "https://raw.githubusercontent.com/shadabidrishii/ComfyUI-Copilot-Enhanced/main/.well-known/funding-manifest-urls"
+      "wellKnown": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced/blob/main/.well-known/funding-manifest-urls"
     }
   },
   "projects": [{
@@ -18,11 +18,11 @@
     "description": "An intelligent assistant for Comfy-UI that simplifies AI workflow creation through natural language interactions, node recommendations, and smart workflow building. This enhanced version aims to improve upon the original with better performance, more features, and stronger community support.",
     "webpageUrl": {
       "url": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced",
-      "wellKnown": "https://raw.githubusercontent.com/shadabidrishii/ComfyUI-Copilot-Enhanced/main/.well-known/funding-manifest-urls"
+      "wellKnown": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced/blob/main/.well-known/funding-manifest-urls"
     },
     "repositoryUrl": {
       "url": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced",
-      "wellKnown": "https://raw.githubusercontent.com/shadabidrishii/ComfyUI-Copilot-Enhanced/main/.well-known/funding-manifest-urls"
+      "wellKnown": "https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced/blob/main/.well-known/funding-manifest-urls"
     },
     "licenses": ["spdx:MIT"],
     "tags": ["ai", "machine-learning", "workflow-automation", "developer-tools", "comfyui"]
