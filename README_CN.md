@@ -154,7 +154,7 @@ https://github.com/user-attachments/assets/0372faf4-eb64-4aad-82e6-5fd69f349c2c
 
 ## 📞 联系我们
 
-如有任何疑问或建议，请随时联系：ComfyUI-Copilot@service.alibaba.com。
+如有任何疑问或建议，请在[GitHub仓库](https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced/issues)上提交问题。
 
 微信服务群：
 <div align="center">

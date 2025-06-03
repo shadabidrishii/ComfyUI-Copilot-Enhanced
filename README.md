@@ -183,7 +183,7 @@ We welcome any form of contribution! Feel free to make issues, pull requests, or
 
 ## 📞 Contact Us
 
-For any queries or suggestions, please feel free to contact: ComfyUI-Copilot@service.alibaba.com.
+For any queries or suggestions, please open an issue on our [GitHub repository](https://github.com/shadabidrishii/ComfyUI-Copilot-Enhanced/issues).
 <div align="center">
   <img src="assets/qrcode.jpg" width="20%"/> 
   

@@ -1,5 +1,5 @@
 /*
- * @Author: 晴知 qingli.hql@alibaba-inc.com
+ * @Author: Shadab Idrishi <official.shadabidrishi@gmail.com>
  * @Date: 2024-12-12 21:28:03
  * @LastEditors: ai-business-hql ai.bussiness.hql@gmail.com
  * @LastEditTime: 2025-02-28 11:34:23
